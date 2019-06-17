@@ -1,0 +1,51 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<import src="template_introduction.wxml"></import>
+<import src="../detail_team/template_member.wxml"></import>
+<import src="../detail_team/template_data.wxml"></import>
+<import src="../detail_team/template_schedule.wxml"></import>
+<view class="container">
+    <view class="item-container">
+        <image class="item-image" style="padding:0;" mode="aspectFit" src="{{(allItems.t_logo!='')?(allItems.serverUploadRoot + allItems.t_logo):'../../../images/team_logo02@2x.png'}}"></image>
+        <image class="image-edit" mode="aspectFit" src="../../../images/edit01@2x.png" bindtap="oninput_value" data-type="t_logo"></image>
+        <view class="image-description">请上传球队logo</view>
+        <view class="item-content">
+            <view class="item-title">
+                <input placeholder="请输入球队名字(最多14个字)" maxlength="14" value="{{allItems.t_full_name}}" bindinput="oninput_value" data-type="t_full_name"></input>
+            </view>
+            <view class="item-title">
+                <input placeholder="请输入球队简称(最多7个字)" maxlength="7" value="{{allItems.t_short_name}}" bindinput="oninput_value" data-type="t_short_name"></input>
+            </view>
+            <view class="item-title selector">
+                成立时间:
+                <picker mode="multiSelector" class='date-input' value="{{dateTime}}" bindchange="changeDateTime" bindcolumnchange="changeDateTimeColumn" range="{{dateTimeArray}}">
+                    {{dateTimeArray[0][dateTime[0]]}}-{{dateTimeArray[1][dateTime[1]]}}-{{dateTimeArray[2][dateTime[2]]}}
+                    <image mode="aspectFit" src="../../../images/select01@2x.png"></image>
+                </picker>
+            </view>
+        </view>
+    </view>
+    <view class='top-menu'>
+        <view class="menu-item {{menuSelected=='introduction'?'selected':''}}" bindtap="onclick_menuitem" data-type="introduction">
+            资料
+        </view>
+        <view class="menu-item {{menuSelected=='member'?'selected':''}}" bindtap="onclick_menuitem" data-type="member">
+            成员
+        </view>
+        <view class="menu-item {{menuSelected=='data'?'selected':''}}" bindtap="onclick_menuitem" data-type="data">
+            数据
+        </view>
+        <view class="menu-item {{menuSelected=='schedule'?'selected':''}}" bindtap="onclick_menuitem" data-type="schedule">
+            赛程
+        </view>
+    </view>
+    <view class="table-view">
+        <template is="template-introduction" wx:if="{{menuSelected=='introduction'}}" data="{{allItems}}"></template>
+        <template is="template-member" wx:if="{{menuSelected=='member'}}" data="{{allItems}}"></template>
+        <template is="template-data" wx:if="{{menuSelected=='data'}}" data="{{allItems,submenuSelected}}"></template>
+        <template is="template-schedule" wx:if="{{menuSelected=='schedule'}}" data="{{allItems}}"></template>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

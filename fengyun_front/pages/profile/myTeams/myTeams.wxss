@@ -1,0 +1,185 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+
+/************* fixed authorize button **************/
+
+.fixed_button {
+    position: fixed;
+    bottom: 40rpx;
+    left: 622rpx;
+    width: 88rpx;
+    height: 88rpx;
+    line-height: 38rpx;
+    padding-top: 4rpx;
+    background: #EF641C;
+    color: white;
+    border-radius: 12rpx;
+    -webkit-border-radius: 12rpx;
+    -moz-border-radius: 12rpx;
+    -ms-border-radius: 12rpx;
+    -o-border-radius: 12rpx;
+    z-index: 10;
+    text-align: center;
+    font-size: 28rpx;
+}
+
+
+/*********** top menu part *************/
+
+.index_top_view {
+    position: relative;
+    background: white;
+    width: 100%;
+    height: 88rpx;
+    padding: 20rpx 0;
+    z-index: 7;
+    display: flex;
+    margin-bottom: 20rpx;
+}
+
+.menu-item {
+    flex: 30%;
+    font-size: 28rpx;
+    font-weight: bold;
+    text-align: center;
+    border-right: 1px solid #d8d8d8;
+    color: #333333;
+}
+
+.menu-item:last-child {
+    border: none;
+}
+
+.menu-item.selected {
+    color: #6cab3b;
+}
+
+
+/*********** team item part ************/
+
+.table-view {
+    position: relative;
+    top: 0rpx;
+    width: 100%;
+    background: #f4f4f4;
+}
+
+.item-container {
+    position: relative;
+    background: white;
+    width: 100%;
+    height: 240rpx;
+    margin-bottom: 20rpx;
+}
+
+.item-status-icon {
+    position: absolute;
+    left: 0;
+    top: 20rpx;
+    width: 140rpx;
+    height: 38rpx;
+    line-height: 38rpx;
+    background: #489CE5;
+    color: white;
+    font-size: 24rpx;
+    padding-left: 0;
+    text-align: center;
+    border-top-right-radius: 12rpx;
+    border-bottom-right-radius: 12rpx;
+}
+
+.item-status-icon.mine {
+    background: #6cab3b;
+}
+
+image.item-image {
+    position: absolute;
+    left: 30rpx;
+    top: 30rpx;
+    width: 180rpx;
+    height: 180rpx;
+    border-radius: 50%;
+}
+
+.item-content {
+    position: relative;
+    padding: 30rpx 0 0;
+    padding-left: 230rpx;
+    width: 750rpx;
+}
+
+.item-title {
+    width: 490rpx;
+    font-size: 30rpx;
+    line-height: 46rpx;
+    font-weight: bold;
+}
+
+.item-info {
+    padding: 2rpx 0;
+    font-size: 24rpx;
+    display: flex;
+    justify-content: center;
+    align-content: flex-end;
+    align-items: flex-end;
+}
+
+.item-info-cell {
+    align-self: center;
+    flex: auto;
+    padding-right: 20rpx;
+    line-height: 1;
+}
+
+.item-info-cell.right {
+    width: 160rpx;
+    align-self: flex-end;
+    text-align: right;
+}
+
+.item-info-cell.right button {
+    position: relative;
+    width: 160rpx;
+    height: 56rpx;
+    line-height: 56rpx;
+    color: #6cab3b;
+    background: white;
+    font-size: 26rpx;
+    border: 1px solid #6cab3b;
+}
+
+.info-type {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.item-info-cell.text {
+    width: 160rpx;
+    padding: 0;
+    line-height: 1;
+    vertical-align: top;
+    font-size: 20rpx;
+    color: #888888;
+    text-align: center;
+    border: none;
+}
+
+.item-info-cell.text.status1 {
+    background: #e6b53c;
+}
+
+.item-info-cell.text.status2 {
+    background: white;
+    border: 1px solid #6cab3b;
+    border-right: none;
+    color: #6cab3b;
+}
+
+.item-info-cell.text.status3 {
+    background: #6cab3b;
+}
+
+.item-info-cell.text.status4 {
+    background: #ccc;
+}

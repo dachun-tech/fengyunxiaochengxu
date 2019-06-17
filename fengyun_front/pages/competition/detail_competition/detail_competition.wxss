@@ -1,0 +1,127 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+@import "../../templates/fixedButtons/fixedButtons.wxss";
+@import "../../templates/shareImage/shareImage.wxss";
+@import "../../../wxParse/wxParse.wxss";
+
+/*********** top title part **************/
+
+.item-container {
+    position: relative;
+    background: white;
+    width: 100%;
+    height: 240rpx;
+    padding: 0;
+}
+
+image.item-image {
+    position: absolute;
+    left: 30rpx;
+    top: 30rpx;
+    width: 180rpx;
+    height: 180rpx;
+}
+
+.item-content {
+    position: relative;
+    padding: 30rpx 0 0;
+    padding-left: 230rpx;
+    width: 750rpx;
+}
+
+.item-title {
+    width: 490rpx;
+    font-size: 30rpx;
+    line-height: 46rpx;
+    font-weight: bold;
+    color: #333333;
+}
+
+.item-info {
+    font-size: 24rpx;
+    text-align: right;
+    position: absolute;
+    top: 166rpx;
+    right: 0;
+}
+
+.item-info-cell {
+    display: inline-block;
+    margin: 0 30rpx;
+}
+
+.item-info-cell.favorite {
+    width: 140rpx;
+    height: 44rpx;
+    line-height: 44rpx;
+    background: #6cab3b;
+    border-radius: 12rpx;
+    color: white;
+    text-align: center;
+    border: none;
+}
+
+.item-info-cell.favorite.status1 {
+    background: white;
+    border: 1px solid #6cab3b;
+    color: #6cab3b;
+}
+
+
+/**************  top menu part ***********************/
+
+.top-menu {
+    background: #ececec;
+    width: 100%;
+    height: 100rpx;
+    line-height: 100rpx;
+    text-align: center;
+}
+
+.menu-item {
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+    width: 180rpx;
+    height: 60rpx;
+    line-height: 60rpx;
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #6cab3b;
+    border-top: 1px solid #6cab3b;
+    border-bottom: 1px solid #6cab3b;
+    background: white;
+}
+
+.menu-item:first-child {
+    border-top-left-radius: 12rpx;
+    border-bottom-left-radius: 12rpx;
+    border-left: 1px solid #6cab3b;
+}
+
+.menu-item:last-child {
+    border-top-right-radius: 12rpx;
+    border-bottom-right-radius: 12rpx;
+    border-right: 1px solid #6cab3b;
+}
+
+.menu-item.selected {
+    background: #6cab3b;
+    color: white;
+}
+
+
+/************** bottom view part *****************/
+
+.table-view {
+    position: absolute;
+    top: 340rpx;
+    width: 100%;
+    background: #f4f4f4;
+}
+
+@import "template_introduction.wxss";
+@import "template_data.wxss";
+@import "template_advertise.wxss";
+@import "template_apply.wxss";

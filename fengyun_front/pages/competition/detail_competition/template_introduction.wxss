@@ -1,0 +1,96 @@
+/** template introduction **/
+
+.intro-section {
+    width: 100%;
+    margin-bottom: 20rpx;
+    background: white;
+    padding: 15rpx 0;
+}
+
+.section-title {
+    width: 690rpx;
+    height: 42rpx;
+    padding: 0 12rpx;
+    margin: 15rpx 0 30rpx 30rpx;
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333333;
+    border-left: 8rpx solid #6cab3b;
+}
+
+.intro-item {
+    width: 100%;
+    padding: 0;
+    margin: 15rpx 0;
+    font-size: 26rpx;
+}
+
+.intro-item view {
+    display: inline-block;
+    padding: 0;
+    margin: 0 10rpx;
+    line-height: 42rpx;
+    vertical-align: top;
+    color: #333333;
+}
+
+.item-key {
+    width: 140rpx;
+    text-align: right;
+    font-weight: bold;
+}
+
+.item-value {
+    max-width: 560rpx;
+    text-align: left;
+}
+
+.intro-item button {
+    display: inline-block;
+    margin: 0 10rpx;
+    width: 140rpx;
+    height: 44rpx;
+    line-height: 44rpx;
+    background: #6cab3b;
+    border-radius: 12rpx;
+    color: white;
+    text-align: center;
+    border: none;
+    font-size: inherit;
+}
+
+.intro-description {
+    position: relative;
+    padding: 0 30rpx;
+    line-height: 44rpx;
+    font-size: 26rpx;
+    width: 100%;
+    padding: 0 30rpx 20rpx;
+    margin: 0;
+}
+
+.intro-button {
+    width: 100%;
+    padding: 0 12rpx;
+    margin: 30rpx 0;
+    text-align: center;
+}
+
+.intro-button button {
+    width: 300rpx;
+    height: 44rpx;
+    line-height: 44rpx;
+    font-size: 26rpx;
+    background: #ececec;
+    border-radius: 12rpx;
+    color: #333333;
+}
+
+.gradient-layer {
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: 100rpx;
+    background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+}

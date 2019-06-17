@@ -1,0 +1,14 @@
+<view class="container">
+    <view class="transaction-container">
+        <view class="cls_bind_bank_card_info" wx:for="{{allItems}}" wx:key="index">
+            <view class="cls_cost_m">
+                <text class="cls_user_active_state_txt" style="font-weight: bold;">{{titleStr[item.type]}}</text>
+                <text class="cls_user_active_pay_amount_txt" style="color: {{(item.type==1)?'#6CAB3B':'#E66E3C'}};">{{item.price}}</text>
+            </view>
+            <view class='cls_cost_detail'>
+                <text class="cls_user_active_date_txt">{{(item.competition.length>0)?(item.competition[0].c_name):''}}</text>
+                <text class="cls_user_active_pay_state_txt">{{item.submit_time}}</text>
+            </view>
+        </view>
+    </view>
+</view>

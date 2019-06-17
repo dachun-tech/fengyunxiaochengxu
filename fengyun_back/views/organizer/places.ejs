@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="container">
+            <div style="padding: 5% 0 0 1%">
+                <button class="btn btn-primary" style="margin-right: 30px; width: 150px;" onclick="$('#add_place_modal').modal()">新增</button>
+                <button class="btn btn-danger" style="width: 150px;" onclick="delete_places()">删除</button>
+                <a href="/" style="float: right; padding-right: 1%"><button class="btn btn-warning" style="width: 150px;">返回赛事信息页面</button></a>
+            </div>
+
+            <div class="box-body">
+                <table class="table table-bordered organizer-tables" id="place_table">
+                    <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>场地名称</th>
+                        <th>发布状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <!-- competitions -->
+                    <tbody>
+                    <% for (let i = 0; i < places.length; i++) { %>
+                        <tr>
+                            <td class="place-select-box">
+                                <div class="round">
+                                    <input class="place-checkbox" data-id="<%= places[i].id %>" type="checkbox" id="checkbox<%= i %>" />
+                                    <label for="checkbox<%= i %>"></label>
+                                </div>
+                            </td>
+                            <td><%= places[i].place %></td>
+                            <td>
+                                <label class="switch">
+                                    <input type="checkbox" data-id="<%= places[i].id %>" <%= (places[i].state == 1)?'':'checked'; %>>
+                                    <span class="slider round"></span>
+                                </label></td>
+                            <td><a href="javascript:" onclick="delete_place('<%= places[i].id %>')">删除</a></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+
+<!-- delete confirm modal -->
+<div class="modal fade" id="delete_confirm_modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">场地删除</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="delete_modal_ids">
+                <h3 style="text-align: center">确定删除吗？</h3>
+                <div class="delete-modal-row" style="padding: 3%">
+                    <div class="delete-modal-btn" style="text-align: center">
+                        <button type="button" class="btn btn-info" id="delete_success" onclick="delete_success()">确定</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- add place modal -->
+<div class="modal fade" id="add_place_modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">新增场地名称</h4>
+            </div>
+            <div class="modal-body">
+                <div style="padding: 5%;">
+                    <input class="form-control" id="add_place_name" placeholder="请输入场地名称（最多30个字）">
+                </div>
+                <div class="add-modal-row" style="padding: 3%">
+                    <div class="add-modal-btn" style="text-align: center">
+                        <button type="button" class="btn btn-info" onclick="add_success()">确定</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<% include ../partials/foot.ejs %>
+<script>
+    $('.switch input').on('change', function () {
+        let place_state = $(this).prop('checked') === true ? 2 : 1;
+        let place_id = $(this).attr('data-id');
+        $.ajax({
+            url: '/organizer/change-place-state',
+            method: 'post',
+            data: {
+                place_id: place_id,
+                place_state: place_state
+            },
+            success: function (res) {
+                if (res.status === 'success') showAlert(res.message, true);
+                else showAlert(res.message);
+            }
+        })
+    })
+    function delete_place(id) {
+        let ids = []
+        ids.push(id);
+        $('#delete_modal_ids').val(JSON.stringify(ids));
+        $('#delete_confirm_modal').modal();
+    }
+    function delete_success() {
+        let ids = JSON.parse($('#delete_modal_ids').val());
+        console.log(ids);
+        $.ajax({
+            url: '/organizer/place-add-delete',
+            method: 'post',
+            data: {
+                method_type: 'delete',
+                ids: ids
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000);
+                }
+                else showAlert(res.message);
+            }
+        })
+    }
+    function delete_places() {
+        let ids = [];
+        let checkboxes = $('.place-checkbox').filter(':checked');
+        checkboxes.each(function () {
+            ids.push($(this).attr('data-id'));
+        })
+        if (ids.length === 0) {
+            showAlert('请输入场地名称');
+            return;
+        }
+        $('#delete_modal_ids').val(JSON.stringify(ids));
+        $('#delete_confirm_modal').modal();
+    }
+    function add_success() {
+        let place_name = $('#add_place_name').val();
+        if (place_name === '' || place_name.length > 30) {
+            showAlert('请输入赛事名称（最多30个字）');
+            return;
+        }
+        $('#add_place_modal').modal('toggle');
+        $.ajax({
+            url: '/organizer/place-add-delete',
+            method: 'post',
+            data: {
+                method_type: 'add',
+                place_name: place_name
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload()
+                    }, 2000);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

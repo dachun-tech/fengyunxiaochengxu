@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="container">
+            <div style="padding: 3% 0 0 1%">
+                <h3 style="text-align: center"><%= vote.v_title %></h3>
+                <div style="text-align: right; padding-right: 15px; margin-top: -30px">
+                    <a href="javascript:history.back()"><button class="btn btn-primary" style="width: 150px;">返回投票页面</button></a>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <table class="table table-bordered organizer-tables" id="voting_table">
+                    <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>投票对象</th>
+                        <th>得票数</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for (let i = 0; i < votings.length; i++) { %>
+                        <tr>
+                            <td class="voting-order"></td>
+                            <td class="voting-team"><%= votings[i].team %></td>
+                            <td class="voting-number" data-order="<%= votings[i].numbers %>"><%= votings[i].numbers %></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+<% include ../partials/foot.ejs %>
+<script>
+    $(function () {
+        sort_voting_table();
+    })
+    function sort_voting_table() {
+        let sA = [2];
+        let table_rows = $('#voting_table tbody')[0];
+        let table, rows, switching, x, y, i, shouldSwitch;
+        table = table_rows;
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 0; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName('TD');
+                y = rows[i+1].getElementsByTagName('TD');
+                if (parseInt(x[sA[0]].getAttribute('data-order').toLowerCase()) < parseInt(y[sA[0]].getAttribute('data-order').toLowerCase())) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+        for (let j = 0; j < rows.length; j++) {
+            rows[j].getElementsByTagName('TD')[0].innerHTML = j + 1;
+        }
+    }
+</script>
+</body>
+</html>

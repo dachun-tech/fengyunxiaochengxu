@@ -1,0 +1,22 @@
+<view class="container">
+    <view class="withdraw_history-container" wx:if="{{true}}">
+        <view class="cls_cost_item" wx:for="{{allItems}}" wx:key="index">
+            <view class="cls_cost_label">
+                <view class="cls_cost_title">提现时间:</view>
+                <view class="cls_cost_content">{{item.submit_time}}</view>
+            </view>
+            <view class="cls_cost_label">
+                <view class="cls_cost_title">提现金额:</view>
+                <view class="cls_cost_content">{{item.price}}元</view>
+            </view>
+            <view class="cls_cost_label">
+                <view class="cls_cost_title">到账金额:</view>
+                <view class="cls_cost_content">{{item.realPrice}}元</view>
+            </view>
+            <view class="cls_cost_label ">
+                <view class="cls_cost_title">提现状态:</view>
+                <view class="cls_cost_content {{(item.type==1)?'status_0':'status_1'}}">{{typeStr[item.type]}}</view>
+            </view>
+        </view>
+    </view>
+</view>

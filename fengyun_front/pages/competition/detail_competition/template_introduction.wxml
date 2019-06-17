@@ -1,0 +1,128 @@
+<!-- template-introduction -->
+<import src="../../../wxParse/wxParse.wxml" />
+<template name="template-introduction">
+    <view class="intro-section">
+        <view class="intro-item">
+            <view class="item-key">赛事名称:</view>
+            <view class="item-value">{{allItems.c_name}}</view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">赛季:</view>
+            <view class="item-value">{{allItems.c_season}}</view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">活动类型:</view>
+            <view class="item-value">{{allItems.activeTypeArr[allItems.c_active_type - 1]}}</view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">举办城市:</view>
+            <view class="item-value">{{allItems.c_province.province}} {{allItems.c_city.city}}</view>
+        </view>
+        <view class="intro-item" wx:if="{{allItems.c_place!=''}}">
+            <view class="item-key">场地:</view>
+            <view class="item-value">{{allItems.c_place}}</view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">比赛时间:</view>
+            <view class="item-value">{{allItems.c_start_time}}至{{allItems.c_end_time}}</view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">赛制:</view>
+            <view class="item-value">{{allItems.c_system}}人制</view>
+        </view>
+        <view class="intro-item" wx:if="{{allItems.c_organizer.length>0}}">
+            <view class="item-key">主办方:</view>
+            <view class="item-value">
+                <block wx:for="{{allItems.c_organizer}}" wx:key="index">
+                    <text>{{item}}\n</text>
+                </block>
+            </view>
+        </view>
+        <view class="intro-item" wx:if="{{allItems.c_manager.length>0}}">
+            <view class="item-key">承办方:</view>
+            <view class="item-value">
+                <block wx:for="{{allItems.c_manager}}" wx:key="index">
+                    <text>{{item}}\n</text>
+                </block>
+            </view>
+        </view>
+        <view class="intro-item" wx:if="{{allItems.c_cooperator.length>0}}">
+            <view class="item-key">协办方:</view>
+            <view class="item-value">
+                <block wx:for="{{allItems.c_cooperator}}" wx:key="index">
+                    <text>{{item}}\n</text>
+                </block>
+            </view>
+        </view>
+        <view class="intro-item" wx:if="{{allItems.c_helper.length>0}}">
+            <view class="item-key">赞助支持:</view>
+            <view class="item-value">
+                <block wx:for="{{allItems.c_helper}}" wx:key="index">
+                    <text>{{item}}\n</text>
+                </block>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">联系电话:</view>
+            <view class="item-value">{{allItems.c_organizer_phone}}</view>
+            <button class="item-button" bindtap="onclick_button" data-type="copyContent" data-value="{{allItems.c_organizer_phone}}">点击复制</button>
+        </view>
+    </view>
+    <view class="intro-section">
+        <view class="section-title">赛事简介</view>
+        <view class="intro-description" style="{{(allItems.isFullCompetitionTxtShowed==0)?'max-height: 300rpx;overflow: hidden;':''}}">
+            <block wx:if="{{true || allItems.isFullCompetitionTxtShowed!=0}}">
+                <template is="wxParse" data="{{wxParseData:c_intro_competition.nodes}}" />
+            </block>
+            <block wx:if="{{allItems.isFullCompetitionTxtShowed==0}}">
+                <view class="gradient-layer"></view>
+            </block>
+        </view>
+        <view class="intro-button" wx:if="{{allItems.isFullCompetitionTxtShowed>=0}}">
+            <button wx:if="{{allItems.isFullCompetitionTxtShowed==0}}" bindtap="onclick_button" data-type="isFullCompetitionTxtShowed">查看全部</button>
+            <button wx:if="{{allItems.isFullCompetitionTxtShowed!=0}}" bindtap="onclick_button" data-type="isFullCompetitionTxtShowed">收起</button>
+        </view>
+    </view>
+    <view class="intro-section">
+        <view class="section-title">规程介绍</view>
+        <view class="intro-description" style="{{(allItems.isFullProgressTxtShowed==0)?'max-height: 300rpx;overflow: hidden;':''}}">
+            <block wx:if="{{true || allItems.isFullProgressTxtShowed!=0}}">
+                <template is="wxParse" data="{{wxParseData:c_intro_progress.nodes}}" />
+            </block>
+            <block wx:if="{{allItems.isFullProgressTxtShowed==0}}">
+                <view class="gradient-layer"></view>
+            </block>
+        </view>
+        <view class="intro-button" wx:if="{{allItems.isFullProgressTxtShowed>=0}}">
+            <button wx:if="{{allItems.isFullProgressTxtShowed==0}}" bindtap="onclick_button" data-type="isFullProgressTxtShowed">查看全部</button>
+            <button wx:if="{{allItems.isFullProgressTxtShowed!=0}}" bindtap="onclick_button" data-type="isFullProgressTxtShowed">收起</button>
+        </view>
+    </view>
+    <view class="intro-section">
+        <view class="section-title">赞助商介绍</view>
+        <view class="intro-description" style="{{(allItems.isFullHelperTxtShowed==0)?'max-height: 300rpx;overflow: hidden;':''}}">
+            <block wx:if="{{true || allItems.isFullHelperTxtShowed!=0}}">
+                <template is="wxParse" data="{{wxParseData:c_intro_helper.nodes}}" />
+            </block>
+            <block wx:if="{{allItems.isFullHelperTxtShowed==0}}">
+                <view class="gradient-layer"></view>
+            </block>
+        </view>
+        <view class="intro-button" wx:if="{{allItems.isFullHelperTxtShowed>=0}}">
+            <button wx:if="{{allItems.isFullHelperTxtShowed==0}}" bindtap="onclick_button" data-type="isFullHelperTxtShowed">查看全部</button>
+            <button wx:if="{{allItems.isFullHelperTxtShowed!=0}}" bindtap="onclick_button" data-type="isFullHelperTxtShowed">收起</button>
+        </view>
+    </view>
+    <view class="intro-section">
+        <view class="section-title">赞助商照片</view>
+        <view class="intro-description" style="height: 320rpx;">
+            <swiper indicator-dots="{{true}}" autoplay="{{true}}" interval="{{5000}}" duration="{{500}}">
+                <block wx:for="{{allItems.c_helper_images}}" wx:key="index">
+                    <swiper-item>
+                        <image class="swiper-image" mode="aspectFill" wx:if="{{item!=''}}" src="{{allItems.serverUploadRoot + item}}" bindtap="previewImg" data-value="{{allItems.serverUploadRoot + item}}" />
+                    </swiper-item>
+                </block>
+            </swiper>
+        </view>
+    </view>
+</template>

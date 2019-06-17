@@ -1,0 +1,11 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<import src="template_introduction.wxml"></import>
+<view class="container">    
+    <view class="table-view">
+        <template is="template-introduction" wx:if="{{menuSelected=='introduction'}}" data="{{allItems}}"></template>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

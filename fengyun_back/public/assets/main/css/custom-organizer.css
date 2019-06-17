@@ -1,0 +1,17 @@
+.organizer-tables th {
+    text-align: center;
+    background: rgba(198, 187, 187, 0.69);
+    border-color: rgb(187, 187, 187) !important;
+}
+.organizer-tables td {
+    text-align: center;
+    vertical-align: middle !important;
+    border-color: rgb(187, 187, 187) !important;
+}
+.td-logo img {
+    width: 35px;
+    height: 35px;
+}
+.organizer-operation a {
+    padding: 3px 5px;
+}

@@ -1,0 +1,104 @@
+<!-- template-introduction -->
+<template name="template-introduction">
+    <view class="member-image">
+        <image mode="aspectFit" src="{{(allItems.m_logo!='')?(allItems.serverUploadRoot + allItems.m_logo):'../../../images/man01@2x.png'}}"></image>
+        <image mode="aspectFit" src="../../../images/edit01@2x.png" bindtap="oninput_value" data-type="m_logo"></image>
+        <view>请上传您的头像</view>
+    </view>
+    <view class="intro-section member" style="padding-top:0;">
+        <view class="intro-item">
+            <view class="item-key">*姓名:</view>
+            <view class="item-value">
+                <view>
+                    <input placeholder="请输入姓名(2-10个字)" maxlength="10" value="{{allItems.m_name}}" bindinput="oninput_value" data-type="m_name"></input>
+                </view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">*电话:</view>
+            <view class="item-value">
+                <view>
+                    <input type="digit" maxlength="11" placeholder="请输入您的电话号" value="{{allItems.m_phone}}" bindinput="oninput_value" data-type="m_phone"></input>
+                </view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">*性别:</view>
+            <view class="item-value" bindtap="oninput_value" data-type="mGender">
+                <view style="background: #f4f4f4;">
+                    {{allItems.mGenderArr[allItems.m_gender-1]}}
+                    <image mode="aspectFit" src="../../../images/select01@2x.png"></image>
+                </view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">身份证号:</view>
+            <view class="item-value">
+                <view>
+                    <input wx:if="{{!allItems.isMGenderShowed}}" placeholder="请输入您的身份证号" value="{{allItems.m_id_number}}" bindinput="oninput_value" data-type="m_id_number"></input>
+                </view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">身高:</view>
+            <view class="item-value">
+                <view>
+                    <input type="digit" maxlength="3" placeholder="请输入您的身高 (cm)" value="{{allItems.m_tall}}" bindinput="oninput_value" data-type="m_tall"></input>
+                </view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">年龄:</view>
+            <view class="item-value">
+                <view>
+                    <input type="digit" maxlength="2" placeholder="请输入您的年龄" value="{{allItems.m_age}}" bindinput="oninput_value" data-type="m_age"></input>
+                </view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">*位置:</view>
+            <view class="item-value" bindtap="oninput_value" data-type="mPos">
+                <view style="background: #f4f4f4;">
+                    {{allItems.m_pos}}
+                    <image mode="aspectFit" src="../../../images/select01@2x.png"></image>
+                </view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">*号码:</view>
+            <view class="item-value">
+                <view>
+                    <input type="digit" maxlength="4" wx:if="{{!allItems.isMPosShowed}}" placeholder="请输入您的号码" value="{{allItems.m_number}}" bindinput="oninput_value" data-type="m_number"></input>
+                </view>
+            </view>
+        </view>
+        <view class="intro-item" style="border:none;">
+            <view class="item-key">邮箱:</view>
+            <view class="item-value">
+                <view>
+                    <input wx:if="{{!allItems.isMPosShowed}}" placeholder="请输入您的邮箱" value="{{allItems.m_mail}}" bindinput="oninput_value" data-type="m_mail"></input>
+                </view>
+            </view>
+        </view>
+        <cover-view class="mGender-selector" wx:if="{{allItems.isMGenderShowed}}">
+            <block wx:for="{{allItems.mGenderArr}}" wx:key="index">
+                <cover-view class="selector-item {{(index==allItems.m_gender - 1)?'selected':''}}" bindtap="oninput_value" data-value="{{index+1}}" data-type="m_gender">
+                    {{item}}
+                </cover-view>
+            </block>
+        </cover-view>
+        <cover-view class="mPos-selector" wx:if="{{allItems.isMPosShowed}}">
+            <block wx:for="{{allItems.mPosArr}}" wx:key="index" wx:if="{{index>0}}">
+                <cover-view class="selector-item {{item==allItems.m_pos?'selected':''}}" bindtap="oninput_value" data-value="{{item}}" data-type="m_pos">
+                    {{item}}
+                </cover-view>
+            </block>
+        </cover-view>
+    </view>
+    <view class="intro-bottom">
+        <view>
+            <text>请确认证件与本人一致，号码正确，否则，赛事主办方有权取消您的参赛资格。\n个人信息只有赛事主办方和本人才能查看，请您放心使用。</text>
+        </view>
+    </view>
+    <view class="intro-button" bindtap="onclick_button" data-type="submit">完成</view>
+</template>

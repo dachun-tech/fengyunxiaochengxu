@@ -1,0 +1,18 @@
+<view class="contact-container">
+    <view class="content">
+        <view class="contact-header">如对本软件有更多的建议或者反馈请联系客服人员</view>
+        <view class="contact-item">
+            <view class="contact-phone-title">电话：</view>
+            <view class="contact-phone">157 7660 1530</view>
+            <view class="contact-copy" bindtap="onclick_button" data-value="15776601530">点击复制</view>
+        </view>
+        <view class="contact-item">
+            <view class="contact-name-title">微信：</view>
+            <view class="contact-name">Joey8208</view>
+            <view class="contact-copy" bindtap="onclick_button" data-value="Joey8208">点击复制</view>
+        </view>
+    </view>
+    <navigator open-type="navigateBack" url="../index/index">
+        <view class="contact-back">返回</view>
+    </navigator>
+</view>

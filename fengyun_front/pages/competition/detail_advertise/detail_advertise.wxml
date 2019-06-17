@@ -1,0 +1,18 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<import src="../../../wxParse/wxParse.wxml" />
+<view class="container">
+    <view class="table-view">
+        <view class="intro-section">
+            <view class="section-title">{{allItems.ad_title}}</view>
+            <view class="intro-author">{{allItems.ad_post_time}} 作者 {{allItems.ad_poster_name}}</view>
+            <view class="intro-description">
+                <template is="wxParse" data="{{wxParseData:ad_intro.nodes}}" />
+            </view>
+            <view class="intro-author" style="text-align: right;">浏览量 {{allItems.ad_read_count}}</view>
+        </view>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

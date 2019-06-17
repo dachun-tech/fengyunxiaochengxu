@@ -1,0 +1,35 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<import src="../../templates/shareImage/shareImage.wxml"></import>
+<import src="template_introduction.wxml"></import>
+<import src="template_data.wxml"></import>
+<import src="template_advertise.wxml"></import>
+<import src="template_apply.wxml"></import>
+<view class="container">
+    <view class="item-container">
+        <image class="item-image" mode="aspectFill" src="{{(allItems.c_logo!='')?(allItems.serverUploadRoot + allItems.c_logo):(allItems.serverImageRoot + 'Competition_s@2x.png')}}"></image>
+        <view class="item-content">
+            <view class="item-title">{{allItems.c_name}}</view>
+            <view class="item-info">
+                <view class="item-info-cell favorite {{allItems.isFavorite==1?'status1':''}}" bindtap="onclick_button" data-type="favorite" data-value="{{allItems.isFavorite}}">{{favoriteStr[allItems.isFavorite]}}</view>
+            </view>
+        </view>
+    </view>
+
+    <view class='top-menu'>
+        <view class="menu-item {{menuSelected=='introduction'?'selected':''}}" bindtap="onclick_menuitem" data-type="introduction">赛事简介</view>
+        <view class="menu-item {{menuSelected=='data'?'selected':''}}" bindtap="onclick_menuitem" data-type="data">赛事数据</view>
+        <view class="menu-item {{menuSelected=='advertise'?'selected':''}}" bindtap="onclick_menuitem" data-type="advertise">赛事公告</view>
+        <view class="menu-item {{menuSelected=='apply'?'selected':''}}" bindtap="onclick_menuitem" data-type="apply">赛事报名</view>
+    </view>
+    <view class="table-view">
+       <template is="template-introduction" wx:if="{{menuSelected=='introduction'}}" data="{{allItems, c_intro_competition, c_intro_progress, c_intro_helper}}"></template>
+       <template is="template-data" wx:if="{{menuSelected=='data'}}" data="{{allItems,submenuSelected}}"></template>
+       <template is="template-advertise" wx:if="{{menuSelected=='advertise'}}" data="{{allItems}}"></template>
+       <template is="template-apply" wx:if="{{menuSelected=='apply'}}" data="{{allItems}}"></template>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<template is="template-shareImage" data="{{allItems}}"></template>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

@@ -1,0 +1,81 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<view class="container">
+    <view class='index_top_view'>
+        <cover-image bindtap="onclick_topmenu" data-type="news" class="news-image" src="../../../images/inf@2x.png"></cover-image>
+        <cover-view class="news-new-count" wx:if="{{newsCount!=0}}">{{newsCount}}</cover-view>
+        <cover-view bindtap="onclick_topmenu" data-type="city" class="topmenu-box city">
+            <cover-view class="inner-box">{{curCity}}</cover-view>
+            <cover-image class="box-icon" src="../../../images/pull_down01@2x.png"></cover-image>
+        </cover-view>
+        <cover-view bindtap="onclick_topmenu" data-type="status" class="topmenu-box status">
+            <cover-view class="inner-box">{{statusArr[curStatusId]}}</cover-view>
+            <cover-image class="box-icon" src="../../../images/pull_down01@2x.png"></cover-image>
+        </cover-view>
+        <cover-view bindtap="onclick_topmenu" data-type="type" class="topmenu-box type">
+            <cover-view class="inner-box">{{typeArr[curTypeId]}}</cover-view>
+            <cover-image class="box-icon" src="../../../images/pull_down01@2x.png"></cover-image>
+        </cover-view>
+    </view>
+    <view class="table-view">
+        <block wx:for="{{allItems}}" wx:for-item="item" wx:key="index">
+            <view class="item-container" bindtap="onclick_button" data-type="go2Detail" data-id="{{item.id}}">
+                <image class="item-image" mode="aspectFill" src="{{(item.c_logo!='')?(serverUploadRoot + item.c_logo):(serverImageRoot+'man01@2x.png')}}"></image>
+                <view class="item-status-icon" wx:if="{{item.c_order==1}}">推荐</view>
+                <view class="item-content">
+                    <view class="item-title">{{item.c_name}}</view>
+                    <view class="item-info">
+                        <view class="item-info-cell">
+                            <image class="info-icon" mode="aspectFill" src="../../../images/type@2x.png"></image>
+                            <view class="info-type" style="font-size: 24rpx;">{{typeArr[item.c_active_type]}}</view>
+                        </view>
+                        <view class="item-info-cell right">
+                            <image class="info-icon location" mode="aspectFill" src="../../../images/site@2x.png"></image>
+                            <view class="info-type" style="font-size: 22rpx;">{{item.c_city.city}}</view>
+                        </view>
+                    </view>
+                    <view class="item-info">
+                        <view class="item-info-cell">
+                            <image class="info-icon" mode="aspectFill" src="../../../images/clock@2x.png"></image>
+                            <view class="info-type" style="font-size: 26rpx;">
+                                {{item.c_start_time}} - {{item.c_end_time}}
+                            </view>
+                        </view>
+                        <view class="item-info-cell text status{{item.c_state}}">
+                            {{statusArr[item.c_state]}}
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </block>
+    </view>
+    <view bindtap="onclick_button" data-type="go2Authorize" class="fixed_button" wx-if="{{!isAuthorized}}">
+        <text>赛事\n入驻</text>
+    </view>
+    <cover-view class="modal-mask" bindtap="onclick_button" data-type="confirm" wx:if="{{isMenuShowed}}"></cover-view>
+    <cover-view class="modal-menu" wx:if="{{isMenuShowed && isMenu1Showed}}" style="left: 120rpx; width: 150rpx;">
+        <cover-view class="menu-item" wx:for="{{cityArr}}" wx:key="index">
+            <cover-view class='display_show {{(item.city==curCity)?"selected":""}}' bindtap="onclick_menuitem" data-type="city" data-value="{{item.city}}" style="{{(index==0?'border:none;':'')}}">
+                {{item.city}}
+            </cover-view>
+            <cover-image src="../../../images/checked01@2x.png" class="img_check" wx:if="{{item.city==curCity}}" />
+        </cover-view>
+    </cover-view>
+    <cover-view class="modal-menu" wx:if="{{isMenuShowed && isMenu2Showed}}" style="left: 290rpx;">
+        <cover-view class="menu-item" wx:for="{{statusArr}}" wx:key="index">
+            <cover-view class='display_show {{(index==curStatusId)?"selected":""}}' bindtap="onclick_menuitem" data-type="status" data-value="{{index}}" style="{{(index==0?'border:none;':'')}}">
+                {{item}}
+            </cover-view>
+            <cover-image src="../../../images/checked01@2x.png" class="img_check" wx:if="{{index==curStatusId}}" />
+        </cover-view>
+    </cover-view>
+    <cover-view class="modal-menu" wx:if="{{isMenuShowed && isMenu3Showed}}" style="left: 510rpx;width:210rpx;">
+        <cover-view class="menu-item" wx:for="{{typeArr}}" wx:key="index">
+            <cover-view class='display_show {{(index==curTypeId)?"selected":""}}' bindtap="onclick_menuitem" data-type="type" data-value="{{index}}" style="{{(index==0?'border:none;':'')}}">
+                {{item}}
+            </cover-view>
+            <cover-image src="../../../images/checked01@2x.png" class="img_check" wx:if="{{index==curTypeId}}" />
+        </cover-view>
+    </cover-view>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

@@ -1,0 +1,41 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<import src="template_progress.wxml"></import>
+<import src="template_analyse.wxml"></import>
+<import src="template_players.wxml"></import>
+<view class="container">
+    <view class="schedule-section">
+        <view class="schedule-item" bindtap="onclick_menuitem" data-type="teamItem" data-value="{{allItems.game.team1.id}}">
+            <image class="schedule-icon" src="{{(allItems.serverUploadRoot + allItems.game.team1.t_logo)}}"></image>
+            <view class="schedule-title" style="font-weight: bold;">{{allItems.game.team1.t_short_name}}</view>
+        </view>
+        <view class="schedule-item score">
+            <view class="schedule-title score status1">{{allItems.game.scoreStr}}</view>
+            <view class="schedule-title desc">{{allItems.game.g_date}} {{allItems.game.g_time}}</view>
+            <view class="schedule-title desc">{{allItems.game.g_place}}</view>
+        </view>
+        <view class="schedule-item" bindtap="onclick_menuitem" data-type="teamItem" data-value="{{allItems.game.team2.id}}">
+            <image class="schedule-icon" src="{{allItems.serverUploadRoot + allItems.game.team2.t_logo}}"></image>
+            <view class="schedule-title" style="font-weight: bold;">{{allItems.game.team2.t_short_name}}</view>
+        </view>
+    </view>
+    <view class='top-menu'>
+        <view class="menu-item {{menuSelected=='progress'?'selected':''}}" bindtap="onclick_menuitem" data-type="progress">
+            赛况
+        </view>
+        <view class="menu-item {{menuSelected=='analyse'?'selected':''}}" bindtap="onclick_menuitem" data-type="analyse">
+            分析
+        </view>
+        <view class="menu-item {{menuSelected=='players'?'selected':''}}" bindtap="onclick_menuitem" data-type="players">
+            阵容
+        </view>
+    </view>
+    <view class="table-view">
+        <template is="template-progress" wx:if="{{menuSelected=='progress'}}" data="{{allItems, progStatusImg}}"></template>
+        <template is="template-analyse" wx:if="{{menuSelected=='analyse'}}" data="{{allItems,submenuSelected}}"></template>
+        <template is="template-players" wx:if="{{menuSelected=='players'}}" data="{{allItems}}"></template>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

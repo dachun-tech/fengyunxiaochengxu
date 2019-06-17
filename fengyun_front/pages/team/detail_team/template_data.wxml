@@ -1,0 +1,42 @@
+<!-- template-introduction -->
+<template name="template-data">
+    <view class="voting-section">
+        <view class="voting-info">
+            <view>
+                <view>{{allItems.t1win.length}}</view>
+                <view>胜场</view>
+            </view>
+            <view>
+                <view>{{allItems.t1equal.length}}</view>
+                <view>平场</view>
+            </view>
+            <view>
+                <view>{{allItems.t1fail.length}}</view>
+                <view>负场</view>
+            </view>
+            <view>
+                <view>{{allItems.total_score}}</view>
+                <view>进球数</view>
+            </view>
+        </view>
+    </view>
+    <block wx:for="{{allItems.analyse}}" wx:key="index">
+        <view class="schedule-section" wx:if="{{item.scoreStr!=''}}">
+            <view class="schedule-item" bindtap="onclick_menuitem" data-type="teamItem" data-value="{{item.team1.id}}">
+                <image class="schedule-icon" src="{{allItems.serverUploadRoot + item.team1.t_logo}}"></image>
+                <view class="schedule-title" style="font-weight: bold;">{{item.team1.t_short_name}}</view>
+            </view>
+            <view class="schedule-item score" bindtap="onclick_menuitem" data-type="gameItem" data-value="{{item.id}}">
+                <view class="schedule-title score {{(item.g_state!=1 && item.scoreStr!='')?'':'status1'}}">
+                    {{(item.scoreStr!='')?item.scoreStr:'待更新'}}
+                </view>
+                <view class="schedule-title desc">{{item.g_date}} {{item.g_time}}</view>
+                <view class="schedule-title desc">{{item.g_place}}</view>
+            </view>
+            <view class="schedule-item" bindtap="onclick_menuitem" data-type="teamItem" data-value="{{item.team2.id}}">
+                <image class="schedule-icon" src="{{allItems.serverUploadRoot + item.team2.t_logo}}"></image>
+                <view class="schedule-title" style="font-weight: bold;">{{item.team2.t_short_name}}</view>
+            </view>
+        </view>
+    </block>
+</template>

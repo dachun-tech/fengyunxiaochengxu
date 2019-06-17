@@ -1,0 +1,52 @@
+<!-- template-introduction -->
+<template name="template-analyse">
+    <view class="analyse-section">
+        <view class="section-header">双方交战记录</view>
+        <view class="section-row analyse">
+            <view>比赛时间</view>
+            <view>主队</view>
+            <view>比分</view>
+            <view>客队</view>
+        </view>
+        <view class="section-row analyse content" wx:for="{{allItems.analyse.an_team}}" wx:key="index" wx:if="{{item.scoreStr!=''}}">
+            <view>{{item.g_date}}</view>
+            <view>{{item.team1.t_short_name}}</view>
+            <view>{{item.scoreStr}}</view>
+            <view>{{item.team2.t_short_name}}</view>
+        </view>
+    </view>
+    <view class="analyse-section">
+        <view class="section-header">
+            {{allItems.game.team1.t_short_name}}最近战绩 {{allItems.analyse.an_team1t1Str}}
+        </view>
+        <view class="section-row analyse">
+            <view>比赛时间</view>
+            <view>主队</view>
+            <view>比分</view>
+            <view>客队</view>
+        </view>
+        <view class="section-row analyse content" wx:for="{{allItems.analyse.an_team1}}" wx:key="index" wx:if="{{item.scoreStr!=''}}">
+            <view>{{item.g_date}}</view>
+            <view>{{item.team1.t_short_name}}</view>
+            <view>{{item.scoreStr}}</view>
+            <view>{{item.team2.t_short_name}}</view>
+        </view>
+    </view>
+    <view class="analyse-section">
+        <view class="section-header">
+            {{allItems.game.team2.t_short_name}}最近战绩 {{allItems.analyse.an_team2t2Str}}
+        </view>
+        <view class="section-row analyse">
+            <view>比赛时间</view>
+            <view>主队</view>
+            <view>比分</view>
+            <view>客队</view>
+        </view>
+        <view class="section-row analyse content" wx:for="{{allItems.analyse.an_team2}}" wx:key="index" wx:if="{{item.scoreStr!=''}}">
+            <view>{{item.g_date}}</view>
+            <view>{{item.team1.t_short_name}}</view>
+            <view>{{item.scoreStr}}</view>
+            <view>{{item.team2.t_short_name}}</view>
+        </view>
+    </view>
+</template>

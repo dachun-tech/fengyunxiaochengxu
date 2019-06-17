@@ -1,0 +1,80 @@
+.competition-row {
+    padding: 1% 0;
+}
+.competition-row select {
+    padding-left: 7px;
+    border-radius: 5px;
+    width: 300px;
+    height: 30px;
+    outline: none;
+}
+.competition-row input[type=text] {
+    padding-left: 7px;
+    width: 300px;
+    height: 30px;
+}
+.competition-row input[type=number] {
+    padding-left: 7px;
+}
+.competition-row .half-input {
+    width: 150px !important;
+    border-radius: 0 !important;
+}
+.competition-item-title {
+    text-align: right;
+}
+.competition-logo-image {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    display: inline-block;
+    margin-right: 30px;
+}
+.competition-logo-image img {
+    width: 100%;
+    height: 100%;
+}
+.competition-item-image {
+    width: 150px;
+    height: 100px;
+    margin-right: 2%;
+    position: relative;
+    display: inline-block;
+}
+.competition-item-image img {
+    width: 100%;
+    height: 100%;
+}
+.competition-item-image i {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    top: -3px;
+    right: -3px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+}
+.competition-item-content button {
+    min-width: 100px;
+    margin-top: -4px;
+}
+.competition-row textarea {
+    min-height: 500px;
+}
+.competition-actions {
+    text-align: center;
+}
+.competition-actions button {
+    width: 150px;
+}
+.fr-view {
+    min-height: 350px !important;
+}
+#wechat_pay {
+    margin-left: 30px;
+}
+.competition-item-content {
+    padding: 3px 0;
+}

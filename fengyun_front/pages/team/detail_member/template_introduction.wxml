@@ -1,0 +1,119 @@
+<!-- template-introduction -->
+<template name="template-introduction">
+    <view class="member-image" wx:if="{{!allItems.isSimpleInfoShowed}}">
+        <image mode="aspectFit" src="{{(allItems.m_logo)?(allItems.serverUploadRoot + allItems.m_logo):'../../../images/man01@2x.png'}}"></image>
+    </view>
+    <view class="member-header" wx:if="{{allItems.isSimpleInfoShowed}}">
+        <image class="item-image" mode="aspectFit" src="{{(allItems.m_logo)?(allItems.serverUploadRoot + allItems.m_logo):'../../../images/man01@2x.png'}}"></image>
+        <view class="item-content">
+            <view class="item-title" style="font-size: 30rpx;font-weight:bold;">{{allItems.m_name}}</view>
+            <view class="item-info" style="font-size: 24rpx;">{{allItems.m_number + '号'}}</view>
+            <view class="item-info">{{allItems.t_full_name}}</view>
+        </view>
+    </view>
+    <view class="intro-section member" style="padding-top:0;" wx:if="{{!allItems.isSimpleInfoShowed}}">
+        <view class="intro-item">
+            <view class="item-key">姓名:</view>
+            <view class="item-value">
+                <view>{{allItems.m_name}}</view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">电话:</view>
+            <view class="item-value">
+                <view>{{allItems.m_phone}}</view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">性别:</view>
+            <view class="item-value">
+                <view>{{allItems.mGenderArr[allItems.m_gender -1]}}</view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">身份证号:</view>
+            <view class="item-value">
+                <view>{{allItems.m_id_number}}</view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">身高:</view>
+            <view class="item-value">
+                <view>{{(allItems.m_tall)?allItems.m_tall:''}}</view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">年龄:</view>
+            <view class="item-value">
+                <view>{{(allItems.m_age)?allItems.m_age:''}}</view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">位置:</view>
+            <view class="item-value">
+                <view>{{allItems.m_pos}}</view>
+            </view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">号码:</view>
+            <view class="item-value">
+                <view>{{allItems.m_number}}</view>
+            </view>
+        </view>
+        <view class="intro-item" style="border:none;">
+            <view class="item-key">邮箱:</view>
+            <view class="item-value">
+                <view>{{allItems.m_mail}}</view>
+            </view>
+        </view>
+    </view>
+    <view class="voting-section">
+        <view class="voting-info">
+            <view>
+                <view style="font-weight: bold;">数据</view>
+            </view>
+            <view>
+                <view>{{allItems.member_info[allItems.progStatusStr[4]]}}</view>
+                <view>进球</view>
+            </view>
+            <view>
+                <view>{{allItems.member_info[allItems.progStatusStr[9]]}}</view>
+                <view>助攻</view>
+            </view>
+            <view>
+                <view>{{allItems.member_appear_count}}</view>
+                <view>出场</view>
+            </view>
+            <view>
+                <view>{{allItems.member_info[allItems.progStatusStr[0]]}}</view>
+                <view>红牌</view>
+            </view>
+            <view>
+                <view>{{allItems.member_info[allItems.progStatusStr[1]]}}</view>
+                <view>黄牌</view>
+            </view>
+        </view>
+    </view>
+    <view class="member-row" wx:if="{{!allItems.isSimpleInfoShowed}}">
+        <block wx:if="{{allItems.is_me && allItems.m_state!=allItems.ST.inApplying}}">
+            <view class="member-button">
+                <button class="member-submit-button" bindtap="onclick_button" data-type="editMember" data-value="{{allItems.member_id}}">
+                    编辑
+                </button>
+                <button class="member-submit-button" bindtap="onclick_button" data-type="navBack">
+                    返回
+                </button>
+            </view>
+        </block>
+        <block wx:elif="{{allItems.is_my_team && allItems.m_state == allItems.ST.inApplying}}">
+            <view class="member-button">
+                <button class="member-submit-button applied" bindtap="onclick_button" data-type="rejectMember" data-value="{{allItems.member_id}}">
+                    拒绝
+                </button>
+                <button class="member-submit-button" bindtap="onclick_button" data-type="allowMember">
+                    通过
+                </button>
+            </view>
+        </block>
+    </view>
+</template>

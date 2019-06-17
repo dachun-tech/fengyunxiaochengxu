@@ -1,0 +1,348 @@
+/** template introduction **/
+
+
+/************** submenu part *************/
+
+.data-submenu {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: white;
+    display: flex;
+    justify-content: center;
+}
+
+.submenu-item {
+    flex: 30%;
+    height: 88rpx;
+    line-height: 88rpx;
+    align-self: center;
+    text-align: center;
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 2rpx solid white;
+}
+
+.submenu-item.selected {
+    color: #6cab3b;
+    border-bottom: 2rpx solid #6cab3b;
+}
+
+
+/*********** schedule header part *************/
+
+.schedule-header {
+    width: 100%;
+    height: 98rpx;
+    padding: 22rpx 0;
+    margin: 0;
+    text-align: center;
+    background: white;
+    overflow: unset;
+}
+
+.header-selector,
+.header-select {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    width: 450rpx;
+    height: 54rpx;
+    line-height: 54rpx;
+    font-size: 26rpx;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+    border-radius: 12rpx;
+    color: #333333;
+}
+
+.header-select image {
+    position: absolute;
+    width: 16rpx;
+    height: 24rpx;
+    top: 15rpx;
+    right: 15rpx;
+}
+
+.header-selector-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+
+.header-selector {
+    position: absolute;
+    top: 110rpx;
+    left: 150rpx;
+    height: auto;
+    max-height: 270rpx;
+    border: 1px solid #d8d8d8;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.header-selector .selector-item {
+    height: 54rpx;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.header-selector .selector-item:last-child {
+    border: none;
+}
+
+.header-selector .selector-item.selected {
+    color: #6cab3b;
+}
+
+
+/************* data-schedule-section part **************/
+
+.schedule-section {
+    position: relative;
+    width: 100%;
+    height: 210rpx;
+    display: flex;
+    margin-bottom: 2rpx;
+    background: white;
+}
+
+.schedule-status {
+    position: absolute;
+    right: 0;
+    top: 10rpx;
+    width: 80rpx;
+    height: 24rpx;
+    line-height: 24rpx;
+    font-size: 20rpx;
+    background: #888888;
+    border-top-left-radius: 8rpx;
+    border-bottom-left-radius: 8rpx;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.schedule-status.status1 {
+    background: #6cab3b;
+}
+
+.schedule-item {
+    position: relative;
+    text-align: center;
+    flex: 35%;
+}
+
+.schedule-item.score {
+    flex: 30%;
+}
+
+.schedule-icon {
+    width: 100rpx;
+    height: 100rpx;
+    margin: 30rpx 0 12rpx;
+    border-radius: 50%;
+}
+
+.schedule-title {
+    width: 100%;
+    font-size: 28rpx;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    color: #333333;
+}
+
+.schedule-title.score {
+    font-size: 42rpx;
+    color: #df4848;
+    margin: 45rpx 0 20rpx;
+    font-weight: bold;
+}
+
+.schedule-title.score.status1 {
+    color: #888888;
+}
+
+.schedule-title.score.status2 {
+    color: #888888;
+}
+
+.schedule-title.desc {
+    font-size: 24rpx;
+    color: #888888;
+    margin: 10rpx 0;
+}
+
+
+/****** ranking header part *******/
+
+.ranking-header {
+    width: 100%;
+    height: 60rpx;
+    line-height: 60rpx;
+    background: #f4f4f4;
+    color: #333333;
+    text-align: center;
+    font-size: 26rpx;
+    font-weight: bold;
+}
+
+
+/********* ranking content part ***********/
+
+.ranking-section {
+    width: 100%;
+    padding: 20rpx 30rpx;
+    background: white;
+    margin-bottom: 1px;
+    font-size: 22rpx;
+    color: #888888;
+    text-align: center;
+}
+
+.section-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10rpx 0;
+}
+
+.section-row view {
+    flex: 10%;
+    text-align: center;
+    align-self: center;
+    font-size: 24rpx;
+    color: #888888;
+}
+
+.section-row view:first-child {
+    flex: 50%;
+}
+
+.section-row view:nth-child(6) {
+    flex: 20%;
+}
+
+.section-row.content>view {
+    color: #333333;
+}
+
+.section-row.content>view:first-child {
+    text-align: left;
+}
+
+.section-row .row-number {
+    display: inline-block;
+    margin: 0;
+    margin-right: 26rpx;
+    min-width: 28rpx;
+    width: auto;
+    height: 28rpx;
+    border-radius: 50%;
+    color: white;
+    background: #333333;
+    font-size: 24rpx;
+    line-height: 28rpx;
+    white-space: nowrap;
+}
+
+.section-row.content:nth-child(2) .row-number,
+.section-row.content:nth-child(3) .row-number {
+    background: #df4848;
+}
+
+.ranking-section.type1 {
+    width: 100%;
+    padding: 0;
+}
+
+.section-row.type1 {
+    padding: 16rpx 0;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.section-row.type1:last-child {
+    /*padding-bottom: 40rpx;*/
+    border: none;
+}
+
+.section-row.type1 view {
+    color: #333333;
+    flex: 30%;
+}
+
+.section-row.type1 view:first-child,
+.section-row.type1 view:last-child {
+    flex: 35%;
+}
+
+
+/**********  players part ************/
+
+.players-header {
+    width: 100%;
+    height: 60rpx;
+    line-height: 60rpx;
+    background: #f4f4f4;
+    color: #333333;
+    text-align: center;
+    font-size: 26rpx;
+    font-weight: bold;
+}
+
+.players-section {
+    width: 100%;
+    padding: 20rpx 30rpx;
+    background: white;
+    font-size: 22rpx;
+    color: #888888;
+    text-align: center;
+}
+
+.section-header {
+    font-size: 26rpx;
+    padding: 10rpx 0;
+    width: 100%;
+    text-align: left;
+    color: #333333;
+    font-weight: bold;
+}
+
+.section-footer {
+    width: 100%;
+}
+
+.section-footer button {
+    display: inline-block;
+    width: 300rpx;
+    margin: 20rpx 0 0;
+    font-size: 26rpx;
+    height: 44rpx;
+    line-height: 44rpx;
+    color: #333333;
+    background: #ececec;
+}
+
+.section-row.players:nth-child(3) .row-number,
+.section-row.players:nth-child(4) .row-number {
+    background: #df4848;
+}
+
+.section-row.players view:first-child {
+    flex: 45%;
+}
+
+.section-row.players view:nth-child(2) {
+    flex: 35%;
+}
+
+.section-row.players view:last-child {
+    flex: 20%;
+}

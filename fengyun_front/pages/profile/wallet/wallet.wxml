@@ -1,0 +1,22 @@
+<view class="container">
+    <view class="my_wallet_title">
+        <text class="my_wallet_title_txt">账户余额</text>
+        <text class="my_account_balance">¥{{amount_total}}</text>
+    </view>
+
+    <view class="my_wallet_list">
+        <navigator url="/pages/profile/wallet/withdraw/withdraw" hover-class="navigator-hover">
+            <view class="my_wallet_list_item">
+                <text class="cls_my_withdrawal_text">提现</text>
+                <image class="cls_my_withdrawal_next_img" src="../../../images/next@2x.png" mode="aspectFill"></image>
+            </view>
+        </navigator>
+        <navigator url="/pages/profile/wallet/transactions/transactions" hover-class="navigator-hover">
+            <view class="my_wallet_list_item">
+                <text class="my_transaction_details_text">交易明细</text>
+                <image class="my_withdrawal_next_img" src="../../../images/next@2x.png" mode="aspectFill"></image>
+            </view>
+        </navigator>
+    </view>
+
+</view>

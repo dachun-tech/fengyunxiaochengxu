@@ -1,0 +1,54 @@
+<!-- profile / index / index.wxml -->
+<view class="container">
+    <view class="user_info">
+        <view class="user_info_basic">
+            <image class="img_profile" src="{{userInfo.avatar}}"></image>
+            <view class="user_name">{{userInfo.nickname}}</view>
+        </view>
+    </view>
+
+    <view class="user_info_list">
+        <navigator url="/pages/profile/myCompetitions/myCompetitions" hover-class="navigator-hover">
+            <view class="auth-text">
+                <image style="height: 40rpx" src="../../../images/my_ss@2x.png"></image>
+                <view>我的赛事</view>
+            </view>
+        </navigator>
+
+        <navigator url="/pages/profile/myTeams/myTeams" hover-class="navigator-hover">
+            <view class="auth-text">
+                <image style="height: 35rpx" src="../../../images/my_team@2x.png"></image>
+                <view>我的球队</view>
+            </view>
+        </navigator>
+
+        <navigator url="/pages/profile/favorites/favorites" hover-class="navigator-hover">
+            <view class="auth-text">
+                <image style="height: 33rpx" src="../../../images/my_attention@2x.png"></image>
+                <view>我的关注</view>
+            </view>
+        </navigator>
+
+        <navigator url="/pages/profile/wallet/wallet" hover-class="navigator-hover" wx:if="{{isAuthorized}}">
+            <view class="auth-text">
+                <image style="height: 40rpx" src="../../../images/my_wallet@2x.png"></image>
+                <view>我的钱包</view>
+            </view>
+        </navigator>
+
+        <navigator url="/pages/profile/identify/{{(!userInfo.organizer || userInfo.identify == 2)?'identify':'identify_result'}}" hover-class="navigator-hover" wx:if="{{isAuthorized}}">
+            <view class="auth-text" bindtap="profile_identify">
+                <image style="height: 33rpx" src="../../../images/my_Document@2x.png"></image>
+                <view>身份认证</view>
+            </view>
+        </navigator>
+
+        <navigator url="/pages/profile/contact/contact" hover-class="navigator-hover">
+            <view class="auth-text">
+                <image style="height: 40rpx" src="../../../images/my_Service@2x.png"></image>
+                <view>客服</view>
+            </view>
+        </navigator>
+
+    </view>
+</view>

@@ -1,0 +1,40 @@
+<view>
+    <view class="identify_result-container">
+        <view class="identify_result-header">
+            <view class="identify_result-header-false" wx:if="{{!userInfo.identify}}">认证中</view>
+            <view class="identify_result-header-true" wx:if="{{userInfo.identify}}">认证通过</view>
+        </view>
+        <view class="identify_result-item">
+            <view class="identify_result-title">赛事认证:</view>
+            <view class="identify_result-content">{{ userInfo.nickname }}</view>
+        </view>
+        <view class="identify_result-item">
+            <view class="identify_result-title">联系人:</view>
+            <view class="identify_result-content">{{ userInfo.name }}</view>
+        </view>
+        <view class="identify_result-item">
+            <view class="identify_result-title">联系电话:</view>
+            <view class="identify_result-content">{{ userInfo.phone }}</view>
+        </view>
+        <view class="identify_result-res">
+            <view wx:if="{{ !userInfo.identify }}">
+                <view class="description">为了更快的通过审核，您可以直接拨打电话</view>
+                <view class="contact-info">
+                    <view class="contact-phone">15776601530</view>
+                    <view class="contact-copy" bindtap="onclick_button" data-value="15776601530">点击复制</view>
+                </view>
+            </view>
+            <view wx:if="{{ userInfo.identify }}">
+                <view class="description">您的认证已通过，为了方便操作，请在电脑端登录后台进行操作：</view>
+                <view class="contact-info">
+                    <view class="contact-url">https://fengquba.cn</view>
+                    <view class="contact-copy" bindtap="onclick_button" data-value="https://fengquba.cn">点击复制</view>
+                </view>
+                <view class="contact-info">
+                    <view class="contact-title">登录账号：</view>
+                    <view class="contact-pwd">{{userInfo.account_name}}</view>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>

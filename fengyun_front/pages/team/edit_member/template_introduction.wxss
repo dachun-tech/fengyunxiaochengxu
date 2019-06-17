@@ -1,0 +1,419 @@
+/** template introduction **/
+
+.intro-section {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0rpx;
+    background: white;
+    padding: 20rpx 0;
+}
+
+.section-title {
+    position: relative;
+    width: 690rpx;
+    height: 42rpx;
+    padding: 0 12rpx;
+    margin: 15rpx 0 30rpx 30rpx;
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333333;
+    border-left: 8rpx solid #6cab3b;
+}
+
+.intro-item {
+    width: 100%;
+    height: 88rpx;
+    line-height: 88rpx;
+    padding: 0;
+    margin: 0;
+    font-size: 26rpx;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.intro-item>view {
+    display: inline-block;
+    padding: 0;
+    margin: 0 10rpx;
+    line-height: 88rpx;
+    vertical-align: top;
+    color: #333333;
+}
+
+.item-key {
+    width: 140rpx;
+    text-align: right;
+    font-weight: bold;
+}
+
+.item-value {
+    max-width: 560rpx;
+    text-align: left;
+}
+
+.item-value input {
+    position: relative;
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+    padding: 0;
+    margin: 0;
+    font-size: 26rpx;
+    min-height: 42rpx;
+    height: 42rpx;
+    width: 560rpx;
+}
+
+.intro-item button {
+    display: inline-block;
+    margin: 0 10rpx;
+    width: 140rpx;
+    height: 44rpx;
+    line-height: 44rpx;
+    background: #6cab3b;
+    border-radius: 12rpx;
+    color: white;
+    text-align: center;
+    border: none;
+    font-size: inherit;
+}
+
+.item-value .color-remove {
+    position: absolute;
+    right: -5rpx;
+    top: -5rpx;
+    width: 30rpx;
+    height: 30rpx;
+}
+
+
+/*********** description input area ************/
+
+.intro-description {
+    padding: 0 30rpx;
+    line-height: 44rpx;
+    font-size: 26rpx;
+    width: 100%;
+    padding: 0 30rpx;
+    margin: 0;
+    color: #333333;
+}
+
+.intro-description textarea {
+    position: relative;
+    width: 100%;
+    min-height: 130rpx;
+    height: auto;
+    border-radius: 8rpx;
+    background: #f4f4f4;
+    padding: 20rpx;
+}
+
+
+/***********bottom button area ***********/
+
+.intro-section.member {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+view.intro-bottom {
+    background: #f4f4f4;
+    width: 100%;
+    height: 230rpx;
+    line-height: 44rpx;
+    padding: 30rpx;
+    margin: 0;
+    font-size: 22rpx;
+}
+
+.intro-bottom>view {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.intro-bottom>view>text {
+    color: #df4848;
+}
+
+.intro-button {
+    width: 100%;
+    height: 98rpx;
+    line-height: 98rpx;
+    background: #6cab3b;
+    color: white;
+    text-align: center;
+    font-size: 32rpx;
+    font-weight: bold;
+}
+
+
+/********** selector part ************/
+
+.item-value>view {
+    display: inline-block;
+    position: relative;
+    background: #f4f4f4;
+    color: #333333;
+    width: 550rpx;
+    height: 54rpx;
+    line-height: 54rpx;
+    border-radius: 10rpx;
+    padding: 0 20rpx;
+}
+
+.intro-section.member .item-value>view {
+    background: transparent;
+}
+
+.item-value>view input {
+    width: 100%;
+    height: 100%;
+}
+
+.item-value>view image {
+    position: absolute;
+    right: 16rpx;
+    width: 16rpx;
+    height: 100%;
+}
+
+.item-value>view view {
+    position: relative;
+    display: inline-block;
+    width: 140rpx;
+    background: #f4f4f4;
+    border-radius: 8rpx;
+    text-align: center;
+    height: 100%;
+    margin: 0 36rpx 0 0;
+}
+
+.teamType-selector,
+.actionType-selector {
+    position: absolute;
+    top: 14rpx;
+    left: 170rpx;
+    color: #333333;
+    width: 550rpx;
+    border-radius: 12rpx;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #d8d8d8;
+    max-height: 324rpx;
+}
+
+.actionType-selector {
+    top: 104rpx;
+}
+
+.selector-item {
+    position: relative;
+    background: #f4f4f4;
+    color: #333333;
+    width: 100%;
+    line-height: 54rpx;
+    padding: 0 20rpx;
+    border-top: 1px solid #d8d8d8;
+    font-size: 26rpx;
+}
+
+.selector-item:first-child {
+    border: none;
+}
+
+.selector-item.selected {
+    color: #6cab3b;
+}
+
+.color-selector {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.3);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+}
+
+.color-selector .color-box {
+    position: absolute;
+    width: 600rpx;
+    height: 560rpx;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12rpx;
+    text-align: center;
+    white-space: normal;
+    overflow: hidden;
+    z-index: 1010;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+cover-view.color-title {
+    position: relative;
+    width: 100%;
+    height: 90rpx;
+    line-height: 90rpx;
+    font-size: 32rpx;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+cover-view.color-item {
+    position: relative;
+    display: inline-block;
+    width: 200rpx;
+    height: 74rpx;
+    line-height: 74rpx;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    font-size: 26rpx;
+    color: #333333;
+}
+
+cover-view.color-item.selected {
+    color: #6cab3b;
+}
+
+cover-view.color-button {
+    position: absolute;
+    left: 30rpx;
+    bottom: 30rpx;
+    width: 540rpx;
+    height: 80rpx;
+    line-height: 80rpx;
+    background: #6cab3b;
+    border-radius: 12rpx;
+    color: white;
+    font-size: 32rpx;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+
+/********* intro image area ************/
+
+view.image-container {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+}
+
+.image-container>view {
+    position: relative;
+    display: inline-block;
+    width: 326rpx;
+    height: 164rpx;
+    margin: 0rpx 20rpx;
+    padding: 0;
+}
+
+.image-item {
+    position: absolute;
+    top: 10rpx;
+    width: 310rpx;
+    height: 148rpx;
+    border: 1px dashed #d8d8d8;
+}
+
+.image-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 30rpx;
+    height: 30rpx;
+}
+
+
+/******** member edit part **********/
+
+.member-header {
+    width: 100%;
+    height: 160rpx;
+    padding: 40rpx 0 0;
+    margin-bottom: 20rpx;
+    text-align: center;
+    background: white;
+}
+
+.member-header view {
+    display: inline-block;
+    width: 600rpx;
+    height: 80rpx;
+    line-height: 80rpx;
+    border-radius: 12rpx;
+    font-size: 32rpx;
+    font-weight: bold;
+    color: white;
+    background: #6cab3b;
+}
+
+.member-image {
+    position: relative;
+    width: 100%;
+    height: 296rpx;
+    padding: 30rpx 0;
+    /* margin-bottom: 20rpx; */
+    text-align: center;
+    background: white;
+}
+
+.member-image image:first-child {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    width: 180rpx;
+    height: 180rpx;
+    border-radius: 50%;
+    background: #f4f4f4;
+}
+
+.member-image image:nth-child(2) {
+    position: absolute;
+    left: 425rpx;
+    top: 170rpx;
+    width: 40rpx;
+    height: 40rpx;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.member-image view {
+    position: relative;
+    padding: 0;
+    margin-top: 10rpx;
+    color: #b0b0b0;
+    font-size: 26rpx;
+}
+
+
+/*********** member selector part ************/
+
+.mGender-selector,
+.mPos-selector {
+    position: absolute;
+    top: 192rpx;
+    left: 170rpx;
+    color: #333333;
+    width: 550rpx;
+    border-radius: 12rpx;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #d8d8d8;
+    max-height: 324rpx;
+}
+
+.mPos-selector {
+    top: 544rpx;
+}

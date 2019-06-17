@@ -1,0 +1,66 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<import src="../../templates/shareImage/shareImage.wxml"></import>
+<import src="../../../wxParse/wxParse.wxml" />
+<view class="container">
+    <view class="table-view">
+        <view class="voting-section">
+            <view class="section-title">{{allItems.vote.v_title}}</view>
+            <view class="section-bg">
+                <image mode="aspectFit" src="{{allItems.serverImageRoot + mainImgs[0]}}"></image>
+            </view>
+            <view class="section-time">投票结束倒计时：{{allItems.remainedTime}}</view>
+            <view class="section-info">
+                <view>
+                    <view>参与者</view>
+                    <view>{{allItems.vote.teams.length}}</view>
+                </view>
+                <view>
+                    <view>累积投票</view>
+                    <view>{{allItems.total_votes}}</view>
+                </view>
+            </view>
+        </view>
+        <view class="info-section" style="padding-bottom: 0;">
+            <view class="section-title" style="margin-bottom: 20rpx;">参与者</view>
+            <block wx:for="{{allItems.vote.teams}}" wx:key="index">
+                <view class="apply-info">
+                    <view class="apply-info-cell" bindtap="onclick_button" data-type="teamItem" data-value="{{item.id}}">
+                        <image class="info-icon" mode="aspectFill" src="{{allItems.serverUploadRoot + item.t_logo}}"></image>
+                        <view class="info-type" style="font-size: 26rpx;">
+                            <view>{{item.t_full_name}}</view>
+                        </view>
+                    </view>
+                    <view class="apply-info-button">
+                        <view>
+                            <view class="{{allItems.isDisabled>0?'disabled':''}}" bindtap="onclick_button" data-type="{{allItems.isDisabled==0?'go2Voting':''}}" data-value="{{item.id}}">{{allItems.applyBtnStr[allItems.isDisabled]}}</view>
+                        </view>
+                        <view>{{item.vote_num}}票</view>
+                    </view>
+                </view>
+            </block>
+        </view>
+        <view class="info-section">
+            <view class="section-title">投票说明</view>
+            <view class="intro-description">
+                <template is="wxParse" data="{{wxParseData:v_intro.nodes}}" />
+            </view>
+        </view>
+        <view class="info-section">
+            <view class="section-title">赛事风采</view>
+            <view class="intro-description" style="height: 320rpx;">
+                <swiper indicator-dots="{{true}}" autoplay="{{true}}" interval="{{5000}}" duration="{{500}}">
+                    <block wx:for="{{allItems.vote.v_images}}" wx:key="index">
+                        <swiper-item>
+                            <image class="swiper-image" mode="aspectFill" src="{{allItems.serverUploadRoot + item}}" bindtap="previewImg" data-value="{{allItems.serverUploadRoot + item}}" />
+                        </swiper-item>
+                    </block>
+                </swiper>
+            </view>
+        </view>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<template is="template-shareImage" data="{{allItems}}"></template>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

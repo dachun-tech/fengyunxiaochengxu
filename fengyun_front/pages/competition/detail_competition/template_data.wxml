@@ -1,0 +1,175 @@
+<!-- template-introduction -->
+<template name="template-data">
+    <view class="data-submenu">
+        <view class="submenu-item {{submenuSelected=='schedule'?'selected':''}}" bindtap="onclick_menuitem" data-type="schedule">
+            赛程
+        </view>
+        <view class="submenu-item {{submenuSelected=='ranking'?'selected':''}}" bindtap="onclick_menuitem" data-type="ranking">
+            积分榜
+        </view>
+        <view class="submenu-item {{submenuSelected=='players'?'selected':''}}" bindtap="onclick_menuitem" data-type="players">
+            球员榜
+        </view>
+    </view>
+    <block wx:if="{{submenuSelected=='schedule'}}">
+        <view class="schedule-header">
+            <view class="header-select" bindtap="onclick_selector" data-type="schedule" data-value="1">
+                {{allItems.curRoundStr}}
+                <image src="../../../images/select01@2x.png"></image>
+            </view>
+        </view>
+        <view class="header-selector-container" wx:if="{{allItems.isRoundSelectorShowed}}" bindtap="onclick_selector" data-type="scheduleContainer">
+            <view class="header-selector">
+                <block wx:for="{{allItems.roundArr}}" wx:key="index">
+                    <view class="selector-item {{allItems.curRoundStr==item?'selected':''}}" bindtap="onclick_selector" data-type="scheduleItem" data-value="{{item}}">
+                        {{item}}
+                    </view>
+                </block>
+            </view>
+        </view>
+        <block wx:for="{{allItems.games}}" wx:key="index">
+            <view class="schedule-section">
+                <view class="schedule-status {{(item.g_stream == '')?'':'status1'}}">
+                    {{(item.g_stream != '')?'直放':'回放'}}
+                </view>
+                <view class="schedule-item" bindtap="onclick_menuitem" data-type="teamItem" data-value="{{item.team1.id}}">
+                    <image class="schedule-icon" src="{{allItems.serverUploadRoot + item.team1.t_logo}}"></image>
+                    <view class="schedule-title" style="font-weight: bold;">{{item.team1.t_short_name}}</view>
+                </view>
+                <view class="schedule-item score" bindtap="onclick_menuitem" data-type="gameItem" data-value="{{item.id}}">
+                    <view class="schedule-title score {{(item.g_state!=1 && item.scoreStr!='')?'':'status1'}}">
+                        {{(item.scoreStr!='')?item.scoreStr:'待更新'}}
+                    </view>
+                    <view class="schedule-title desc">{{item.g_date}} {{item.g_time}}</view>
+                    <view class="schedule-title desc">{{item.g_place}}</view>
+                </view>
+                <view class="schedule-item" bindtap="onclick_menuitem" data-type="teamItem" data-value="{{item.team2.id}}">
+                    <image class="schedule-icon" src="{{allItems.serverUploadRoot + item.team2.t_logo}}"></image>
+                    <view class="schedule-title" style="font-weight: bold;">{{item.team2.t_short_name}}</view>
+                </view>
+            </view>
+        </block>
+    </block>
+    <block wx:if="{{submenuSelected=='ranking'}}">
+        <block wx:for="{{allItems.all_g_stage}}" wx:key="idx" wx:for-item="stageItem">
+            <view class="ranking-header">{{stageItem}}</view>
+            <view class="ranking-section type1">
+                <block wx:for="{{allItems.gameData}}" wx:key="index" wx:if="{{item.g_stage == stageItem}}">
+                    <view class="section-row type1" bindtap="onclick_menuitem" data-type="gameItem" data-value="{{item.id}}">
+                        <view>{{item.team1.t_short_name}}</view>
+                        <view>{{item.scoreStr}}</view>
+                        <view>{{item.team2.t_short_name}}</view>
+                    </view>
+                </block>
+            </view>
+        </block>
+        <block wx:for="{{allItems.rankingData}}" wx:key="idx" wx:for-item="groupItem">
+            <view class="ranking-header">{{(groupItem.group_name=='none')?('联赛'):(groupItem.group_name+'组')}}</view>
+            <view class="ranking-section">
+                <view class="section-row">
+                    <view>球队</view>
+                    <view>赛</view>
+                    <view>胜</view>
+                    <view>平</view>
+                    <view>负</view>
+                    <view>进/失</view>
+                    <view>积分</view>
+                </view>
+                <block wx:for="{{groupItem.group_data}}" wx:key="index" wx:if="{{item.group_name == groupItem.group_name}}">
+                    <view class="section-row content" bindtap="onclick_menuitem" data-type="teamItem" data-value="{{item.team_id}}">
+                        <view>
+                            <view class="row-number">{{index+1}}</view>
+                            {{item.t_short_name}}
+                        </view>
+                        <view>{{item.total_count}}</view>
+                        <view>{{item.win_count}}</view>
+                        <view>{{item.draw_count}}</view>
+                        <view>{{item.lose_count}}</view>
+                        <view>{{item.win_score}}/{{item.lose_score}}</view>
+                        <view>{{item.rankingScore}}</view>
+                    </view>
+                </block>
+            </view>
+        </block>
+        <view class="ranking-section" style="margin-bottom:50rpx;">
+            <view class="section-row">积分榜说明：积分排名将按照赛程实时进行统计。</view>
+        </view>
+    </block>
+    <block wx:if="{{submenuSelected=='players'}}">
+        <!-- <view class="players-header">联赛</view> -->
+        <view class="players-section">
+            <view class="section-header">射手榜</view>
+            <view class="section-row players" wx:if="{{allItems.playerData.length>0}}">
+                <view>球员</view>
+                <view>球队</view>
+                <view>进球(点球)</view>
+            </view>
+            <block wx:for="{{allItems.playerData}}" wx:key="index" wx:if="{{index < (allItems.isAllPlayerShowed>0?100000:10)}}">
+                <view class="section-row content players" bindtap="onclick_menuitem" data-type="memberItem" data-value="{{item.m_id}}" data-team="{{item.t_id}}">
+                    <view style="font-weight: bold;">
+                        <view class="row-number" style="font-weight: 500;">{{index+1}}</view>
+                        {{item.m_name}}
+                    </view>
+                    <view style="font-weight: bold;">{{item.t_short_name}}</view>
+                    <view>{{item.total_score}}({{item.sub_score}})</view>
+                </view>
+            </block>
+            <view class="section-footer" wx:if="{{allItems.playerData.length>10}}">
+                <button bindtap="onclick_button" data-type="isAllPlayerShowed" data-value="{{allItems.isAllPlayerShowed}}" data-len="{{allItems.playerData.length}}">
+                    {{(allItems.isAllPlayerShowed>0)?'收起':'查看全部'}}
+                </button>
+            </view>
+        </view>
+        <view class="players-section">
+            <view class="section-header">助攻榜</view>
+            <view class="section-row players" wx:if="{{allItems.isAllAssistShowed>0}}">
+                <view>球员</view>
+                <view>球队</view>
+                <view>助攻</view>
+            </view>
+            <block wx:for="{{allItems.assistData}}" wx:key="index" wx:if="{{index < (allItems.isAllAssistShowed>0?100000:0)}}">
+                <view class="section-row content players" bindtap="onclick_menuitem" data-type="memberItem" data-value="{{item.m_id}}" data-team="{{item.t_id}}">
+                    <view style="font-weight: bold;">
+                        <view class="row-number" style="font-weight: 500;">{{index+1}}</view>
+                        {{item.m_name}}
+                    </view>
+                    <view style="font-weight: bold;">{{item.t_short_name}}</view>
+                    <view>{{item.assists}}</view>
+                </view>
+            </block>
+            <view class="section-footer" wx:if="{{allItems.assistData.length>0}}">
+                <button bindtap="onclick_button" data-type="isAllAssistShowed" data-value="{{allItems.isAllAssistShowed}}" data-len="{{allItems.assistData.length}}">
+                    {{(allItems.isAllAssistShowed>0)?'收起':'查看全部'}}
+                </button>
+            </view>
+        </view>
+        <view class="players-section">
+            <view class="section-header">红黄牌统计</view>
+            <view class="section-row players" wx:if="{{allItems.isAllRYCardShowed>0}}">
+                <view style="flex:60%;">球队</view>
+                <view style="flex:15%">黄牌</view>
+                <view style="flex:20%;">红牌</view>
+                <view style="flex:5%;"></view>
+            </view>
+            <block wx:for="{{allItems.redCardData}}" wx:key="index" wx:if="{{index < (allItems.isAllRYCardShowed>0?100000:0)}}">
+                <view class="section-row content players" bindtap="onclick_menuitem" data-type="teamItem" data-value="{{item.team_id}}">
+                    <view style="flex:60%;font-weight: bold;">
+                        <view class="row-number" style="font-weight: 500;">{{index+1}}</view>
+                        {{item.t_short_name}}
+                    </view>
+                    <view style="flex:15%;">{{item.yellow_cards}}</view>
+                    <view style="flex:20%;">{{item.red_cards}}</view>
+                    <view style="flex:5%;"></view>
+                </view>
+            </block>
+            <view class="section-footer" wx:if="{{allItems.redCardData.length>0}}">
+                <button bindtap="onclick_button" data-type="isAllRYCardShowed" data-value="{{allItems.isAllRYCardShowed}}" data-len="{{allItems.redCardData.length}}">
+                    {{(allItems.isAllRYCardShowed>0)?'收起':'查看全部'}}
+                </button>
+            </view>
+        </view>
+        <view class="players-section" style="margin-top:1px;">
+            <view class="section-row">球员榜说明：排名将按照赛程实时进行统计。</view>
+        </view>
+    </block>
+</template>

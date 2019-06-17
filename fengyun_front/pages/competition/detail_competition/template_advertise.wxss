@@ -1,0 +1,63 @@
+/** template introduction **/
+
+
+/************* advertise-section part **************/
+
+.advertise-section {
+    position: relative;
+    background: white;
+    width: 100%;
+    height: 200rpx;
+    margin-bottom: 1px;
+}
+
+.advertise-image {
+    position: absolute;
+    left: 30rpx;
+    top: 32rpx;
+    width: 40rpx;
+    height: 40rpx;
+}
+
+.advertise-content {
+    position: relative;
+    padding: 30rpx 0 0;
+    padding-left: 90rpx;
+    width: 750rpx;
+}
+
+.advertise-title {
+    width: 630rpx;
+    font-size: 30rpx;
+    line-height: 46rpx;
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 10rpx;
+}
+
+.advertise-info {
+    padding: 6rpx 0;
+    font-size: 24rpx;
+    display: flex;
+    justify-content: flex-start;
+    color: #333333;
+}
+
+.advertise-info-cell {
+    align-self: flex-start;
+    flex: auto;
+    padding-right: 20rpx;
+}
+
+image.info-icon {
+    width: 32rpx;
+    height: 32rpx;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10rpx;
+}
+
+.info-type {
+    display: inline-block;
+    vertical-align: middle;
+}

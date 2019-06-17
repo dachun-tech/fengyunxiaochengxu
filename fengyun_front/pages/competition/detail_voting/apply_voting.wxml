@@ -1,0 +1,54 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<import src="../../templates/shareImage/shareImage.wxml"></import>
+<view class="container">
+    <view class="table-view">
+        <view class="voting-section">
+            <view class="section-bg">
+                <swiper indicator-dots="{{true}}" autoplay="{{true}}" interval="{{5000}}" duration="{{500}}">
+                    <block wx:for="{{allItems.t_images}}" wx:key="index">
+                        <swiper-item>
+                            <image class="swiper-image" mode="aspectFill" src="{{allItems.serverUploadRoot + item}}" bindtap="previewImg" data-value="{{allItems.serverUploadRoot + item}}" />
+                        </swiper-item>
+                    </block>
+                </swiper>
+            </view>
+            <view class="section-description">
+                <view>{{allItems.t_full_name}}</view>
+                <view>票数：{{allItems.vote_num}}</view>
+            </view>
+            <view class="section-info">
+                <image src="{{allItems.serverUploadRoot + allItems.t_logo}}"></image>
+            </view>
+        </view>
+        <view class="voting-section">
+            <view class="voting-info">
+                <view>
+                    <view>{{allItems.t1win.length}}</view>
+                    <view>胜场</view>
+                </view>
+                <view>
+                    <view>{{allItems.t1equal.length}}</view>
+                    <view>平场</view>
+                </view>
+                <view>
+                    <view>{{allItems.t1fail.length}}</view>
+                    <view>负场</view>
+                </view>
+                <view>
+                    <view>{{allItems.total_score}}</view>
+                    <view>进球数</view>
+                </view>
+            </view>
+            <view class="voting-buttons">
+                <button open-type="share">分享拉票</button>
+                <button class="{{allItems.isDisabled==1?'disabled':''}}" bindtap="onclick_button" data-type="applyVoting">{{allItems.applyBtnStr[allItems.isDisabled]}}</button>
+            </view>
+        </view>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<cover-view class="voting-notify" wx:if="{{allItems.isNotifyShowed}}">投票成功!</cover-view>
+<template is="template-shareImage" data="{{allItems}}"></template>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

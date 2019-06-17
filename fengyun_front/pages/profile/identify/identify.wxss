@@ -1,0 +1,38 @@
+.identify-container {
+    padding: 30rpx;
+    font-family: PingFangSC-Regular;
+    background: white;
+}
+
+.identify-title {
+    font-family: PingFangSC-Semibold;
+    padding: 10rpx 0;
+    font-size: 28rpx;
+    font-weight: bold;
+}
+
+.identify-text {
+    font-size: 26rpx;
+    padding: 15rpx 0;
+    line-height: 45rpx;
+    text-align: justify;
+}
+
+.identify-btn {
+    position: absolute;
+    bottom: 0;
+    height: 98rpx;
+    background: #6CAB3B;
+    width: 100%;
+    margin-left: -30rpx;
+    text-align: center;
+    line-height: 98rpx;
+    font-size: 32rpx;
+    font-weight: bold;
+    color: white;
+    font-family: PingFangSC-Semibold;
+}
+
+.identify-btn text {
+    color: white;
+}

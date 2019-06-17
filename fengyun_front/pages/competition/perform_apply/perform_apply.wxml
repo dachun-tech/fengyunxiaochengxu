@@ -1,0 +1,76 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<view class="container">
+    <view class="table-view">
+        <view class="intro-section">
+            <view class="section-title">赛事信息</view>
+            <view class="intro-item">
+                <view class="item-key">赛事名称:</view>
+                <view class="item-value">{{allItems.c_name}}</view>
+            </view>
+            <view class="intro-item">
+                <view class="item-key">赛事时间:</view>
+                <view class="item-value">{{allItems.c_start_time}} 至 {{allItems.c_end_time}}</view>
+            </view>
+            <view class="intro-item">
+                <view class="item-key">报名费用:</view>
+                <view class="item-value">{{allItems.c_fee==0?'免费':(allItems.c_fee+'元')}}</view>
+            </view>
+        </view>
+        <view class="intro-section input">
+            <view class="section-title">报名信息</view>
+            <view class="intro-item">
+                <view class="item-key">队长:</view>
+                <view class="item-value">
+                    <input type="text" bindinput="oninput_value" data-type="name" value="{{payUser.name}}"></input>
+                    <!-- <text>{{payUser.name}}</text> -->
+                </view>
+            </view>
+            <view class="intro-item">
+                <view class="item-key">电话:</view>
+                <view class="item-value">
+                    <input type="digit" style="width: 300rpx;" bindinput="oninput_value" data-type="phone" value="{{payUser.phone}}"></input>
+                    <!-- <text>{{payUser.phone}}</text> -->
+                </view>
+            </view>
+            <view class="intro-item">
+                <view class="item-key">球队:</view>
+                <view class="item-value" bindtap="oninput_value" data-type="team" value="0">
+                    <view>
+                        {{allItems.teamArr[curTeamId].t_full_name}}
+                        <image src="../../../images/select01@2x.png"></image>
+                    </view>
+                </view>
+            </view>
+            <view class="intro-item" wx:if="{{allItems.c_fee>0}}">
+                <view class="item-key">金额:</view>
+                <view class="item-value" wx:if="{{true}}">
+                    <!-- <input type="digit" style="width: {{payUser.width}}rpx;text-align: right;" disabled="{{true}}" bindinput="oninput_value" data-type="price" value="{{payUser.price}}"></input> -->
+                    <text>{{payUser.price}}元</text>
+                </view>
+            </view>
+        </view>
+        <view class="intro-section" wx:if="{{allItems.c_fee>0}}" style="margin-bottom: 150rpx;">
+            <view class="section-title" style="margin-bottom: 15rpx;">
+                支付方式
+                <view>{{allItems.payTypeArr[allItems.c_payment_type-1]}}</view>
+            </view>
+        </view>
+        <cover-view class="team-selector" wx:if="{{isSelectorShowed}}">
+            <block wx:for="{{allItems.teamArr}}" wx:key="index">
+                <cover-view class="selector-item {{index==curTeamId?'selected':''}}" bindtap="onclick_selector" data-id="{{index}}" data-type="teamSelector">
+                    {{item.t_full_name}}
+                </cover-view>
+            </block>
+        </cover-view>
+    </view>
+    <view class="submit-area">
+        <view wx:if="{{allItems.c_fee>0}}">金额: {{'￥'+payUser.totalPrice}}</view>
+        <button bindtap="onclick_button" data-type="perform_apply">
+            立即{{allItems.c_fee>0?'支付':'报名'}}
+        </button>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

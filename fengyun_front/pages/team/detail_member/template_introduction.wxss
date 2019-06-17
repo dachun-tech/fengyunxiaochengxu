@@ -1,0 +1,222 @@
+/** template introduction **/
+
+
+/******** header section ********/
+
+.member-header {
+    width: 100%;
+    height: 240rpx;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    background: white;
+    color: #333333;
+}
+
+.member-header view {
+    position: relative;
+    padding-left: 240rpx;
+    width: 100%;
+    height: 100%;
+}
+
+.member-header>image.item-image {
+    position: absolute;
+    left: 30rpx;
+    top: 30rpx;
+    width: 180rpx;
+    height: 180rpx;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+}
+
+.member-header .item-content {
+    position: relative;
+    padding-left: 240rpx;
+    width: 100%;
+    height: 100%;
+}
+
+.item-content view {
+    padding: 10rpx 0;
+    margin: 0;
+    height: auto;
+    width: 520rpx;
+    line-height: 40rpx;
+    font-size: 26rpx;
+}
+
+.member-image {
+    position: relative;
+    width: 100%;
+    height: 240rpx;
+    padding: 30rpx 0 0;
+    /* margin-bottom: 20rpx; */
+    text-align: center;
+    background: white;
+}
+
+.member-image>image:first-child {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    width: 180rpx;
+    height: 180rpx;
+    border-radius: 50%;
+    background: #f4f4f4;
+}
+
+.member-image>image:nth-child(2) {
+    position: absolute;
+    left: 425rpx;
+    top: 170rpx;
+    width: 40rpx;
+    height: 40rpx;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.member-image view {
+    position: relative;
+    padding: 0;
+    margin-top: 10rpx;
+    color: #b0b0b0;
+    font-size: 26rpx;
+}
+
+
+/********** information section **********/
+
+.intro-section {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0rpx;
+    background: white;
+    padding: 20rpx 0;
+}
+
+.intro-item {
+    width: 100%;
+    height: 88rpx;
+    line-height: 88rpx;
+    padding: 0;
+    margin: 0;
+    font-size: 26rpx;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.intro-item>view {
+    display: inline-block;
+    padding: 0;
+    margin: 0 10rpx;
+    line-height: 88rpx;
+    vertical-align: top;
+    color: #333333;
+}
+
+.item-key {
+    width: 140rpx;
+    text-align: right;
+    font-weight: bold;
+}
+
+.item-value {
+    max-width: 560rpx;
+    text-align: left;
+}
+
+
+/***********bottom button area ***********/
+
+.intro-section.member {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+
+/********** selector part ************/
+
+.item-value>view {
+    display: inline-block;
+    position: relative;
+    background: #f4f4f4;
+    color: #333333;
+    width: 550rpx;
+    height: 54rpx;
+    line-height: 54rpx;
+    border-radius: 10rpx;
+    padding: 0 20rpx;
+}
+
+.intro-section.member .item-value>view {
+    background: transparent;
+}
+
+
+/******** voting info part ***********/
+
+.voting-info {
+    width: 100%;
+    height: 120rpx;
+    display: flex;
+    background: white;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20rpx;
+}
+
+.voting-info>view {
+    position: relative;
+    flex: 25%;
+}
+
+.voting-info>view>view {
+    width: 100%;
+    font-size: 26rpx;
+    text-align: center;
+    height: 44rpx;
+}
+
+
+/************* submit button area *****************/
+
+.member-row {
+    width: 100%;
+    margin: 20rpx 0 0;
+    padding: 50rpx 0;
+    background: transparent;
+    border: none;
+}
+
+.member-button {
+    width: 100%;
+    padding: 0;
+    margin: 30rpx 0;
+    text-align: center;
+}
+
+button.member-submit-button {
+    display: inline-block;
+    width: 240rpx;
+    height: 74rpx;
+    line-height: 74rpx;
+    color: white;
+    background: #6cab3b;
+    font-size: 30rpx;
+    font-weight: bold;
+    margin: 0 30rpx;
+    border-radius: 12rpx;
+}
+
+button.member-submit-button.applied {
+    background: white;
+    border: 1px solid #6cab3b;
+    color: #6cab3b;
+}
+
+button.member-submit-button.waiting {
+    background: transparent;
+    color: #6cab3b;
+    border: none;
+}

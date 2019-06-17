@@ -1,0 +1,53 @@
+<!-- template-introduction -->
+<template name="template-member">
+    <view class="member-row" wx:for="{{allItems.members}}" wx:key="index" wx:if="{{item.m_state!=0}}">
+        <!-- my Team member Info -->
+        <block wx:if="{{allItems.myInfo.user_id == allItems.user_id}}">
+            <view class="member-info" bindtap="onclick_menuitem" data-type="memberItem" data-value="{{item.id}}" data-team="{{item.team_id}}">                
+                <image class="member-icon" style="border-radius: 50%;" mode="aspectFit" src="{{(item.m_logo!='')?(allItems.serverUploadRoot + item.m_logo):(allItems.serverImageRoot +'man02@2x.png')}}"></image>
+                <view class="member-name">
+                    <text>{{item.m_name}}</text>
+                </view>
+                <view class="member-number">{{(item.m_number!='')?(item.m_number+'号'):''}}</view>
+            </view>
+            <view class="member-info buttons">
+                <view wx:if="{{item.m_state==1}}" style="background: #ef641c;">管理员</view>
+                <view wx:if="{{item.m_pos!=''}}">{{item.m_pos}}</view>
+                <view wx:if="{{item.m_state==3}}" class="apply-member-button" bindtap="onclick_menuitem" data-type="memberItem" data-value="{{item.id}}" data-team="{{item.team_id}}">审核</view>
+                <view class="button-delete" wx:if="{{allItems.isEditting}}">
+                    <image wx:if="{{index!=0}}" mode="aspectFit" src="../../../images/Emptied.png" bindtap="onclick_button" data-type="deleteMember" data-value="{{item.id}}"></image>
+                </view>
+            </view>
+        </block>
+        <!-- other team member info -->
+        <block wx:if="{{allItems.myInfo.user_id != allItems.user_id && allItems.m_state!=3}}">
+            <view class="member-info" bindtap="onclick_menuitem" data-type="memberItem" data-value="{{item.id}}" data-team="{{item.team_id}}">
+                <image class="member-icon" style="border-radius: 50%;" mode="aspectFit" src="{{(item.m_logo!='')?(allItems.serverUploadRoot + item.m_logo):(allItems.serverImageRoot +'man02@2x.png')}}"></image>
+                <view class="member-name">
+                    <text>{{item.m_name}}</text>
+                </view>
+                <view class="member-number">{{(item.m_number!='')?(item.m_number+'号'):''}}</view>
+            </view>
+            <view class="member-info buttons" bindtap="onclick_menuitem" data-type="memberItem" data-value="{{item.id}}" data-team="{{item.team_id}}">
+                <view wx:if="{{item.m_state==1}}" style="background: #ef641c;">管理员</view>
+                <view wx:if="{{item.m_pos!=''}}">{{item.m_pos}}</view>
+            </view>
+        </block>
+    </view>
+    <view class="member-row">
+        <view class="member-button" wx:if="{{allItems.team_id!=0}}">
+            <!-- my team member operation -->
+            <block wx:if="{{allItems.myInfo.user_id == allItems.user_id}}">
+                <button class="member-submit-button" wx:if="{{allItems.isEditting}}" bindtap="onclick_button" data-type="finishEditMember">完成</button>
+                <button class="member-submit-button" wx:if="{{!allItems.isEditting}}" bindtap="onclick_button" data-type="editMember">编辑</button>
+                <button class="member-submit-button" wx:if="{{!allItems.isEditting}}" bindtap="onclick_button" data-type="addMember">创建球员</button>
+            </block>
+            <!-- other team member operation -->
+            <block wx:if="{{allItems.myInfo.user_id != allItems.user_id}}">
+                <button class="member-submit-button" wx:if="{{allItems.memberState==allItems.ST.none}}" bindtap="onclick_button" data-type="applyMemberInfo">申请加入</button>
+                <button class="member-submit-button applied" wx:if="{{allItems.memberState==allItems.ST.general}}" bindtap="onclick_button" data-type="viewMemberInfo">已加入</button>
+                <button class="member-submit-button waiting" wx:if="{{allItems.memberState==allItems.ST.inApplying}}">审核中</button>
+            </block>
+        </view>
+    </view>
+</template>

@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+
+<!-- Include Editor style. -->
+<!--<link href="/node_modules/froala-editor/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />-->
+<!--<link href="/node_modules/froala-editor/css/froala_style.min.css" rel="stylesheet" type="text/css" />-->
+
+<link rel="stylesheet" href="/assets/ace/jquery-ui.custom.min.css"/>
+<link rel="stylesheet" href="/assets/ace/ace.min.css"/>
+
+<link rel="stylesheet" href="/assets/croppie/croppie.css" type="text/css">
+
+<link rel="stylesheet" type="text/css" href="/assets/main/css/organizer-competition.css">
+<style>
+    img {
+        cursor: pointer;
+    }
+    #img_view_modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+        z-index: 99999;
+    }
+
+    /* Modal Content (image) */
+    #img_view_modal .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    /* Add Animation */
+    #img_view_modal .modal-content {
+        -webkit-animation-name: zoom;
+        -webkit-animation-duration: 0.6s;
+        animation-name: zoom;
+        animation-duration: 0.6s;
+    }
+
+    @-webkit-keyframes zoom {
+        from {-webkit-transform:scale(0)}
+        to {-webkit-transform:scale(1)}
+    }
+
+    @keyframes zoom {
+        from {transform:scale(0)}
+        to {transform:scale(1)}
+    }
+
+    /* The Close Button */
+    #img_view_modal .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    #img_view_modal .close:hover,
+    #img_view_modal .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* 100% Image Width on Smaller Screens */
+    @media only screen and (max-width: 700px){
+        #img_view_modal .modal-content {
+            width: 100%;
+        }
+    }
+    .wysiwyg-toolbar {
+        border: 1px solid #BBC0CA;
+    }
+    .fa-times-circle {
+        padding-top: 10px;
+        padding-left: 15px;
+        position: absolute;
+        color: orangered;
+        cursor: pointer;
+    }
+</style>
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper" style="background: white;">
+        <div class="container">
+            <input type="hidden" id="competition_id" value="<%= (isEdit)?competition.id:'' %>">
+            <input type="hidden" id="competition_type" value="<%= (isEdit)?competition.c_type:'' %>">
+            <div class="competition-row" style="padding: 2% 0 0 0;">
+                <span>如果您需要从已经创建的赛事复制赛事信息，请选择您要复制信息的赛事：</span>
+                <select id="import-competition">
+                    <option value="none">不从其他赛事复制</option>
+                    <% for (let all_index = 0; all_index < all_competitions.length; all_index++) { %>
+                        <option value="<%= all_competitions[all_index].id %>" <%= (isEdit &&
+                                all_competitions[all_index].id == competition.id)? "selected":"" %>>
+                            <%= all_competitions[all_index].c_name %>
+                        </option>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赛事LOGO：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <div class="competition-logo-image">
+                                <img src="<%= (isEdit) ? competition.c_logo : '/assets/main/images/default-placeholder-200x200.png' %>"
+                                     id="c_logo_image" onclick="big_image_preview(event)">
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="vertical-align: bottom;" onclick="$('#crop-image-modal').modal()">上传LOGO图片</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">活动类型：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <select id="active_type">
+                                <option value="1">足球</option>
+                                <option value="2">other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赛事名称：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" placeholder="请输入赛事名称（最多30个字）" id="c_name" value="<%= (isEdit)?competition.c_name:'' %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赛制：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <select id="c_system">
+                                <option value="0">请选择</option>
+                                <% for (let index = 0; index < 9; index++) { %>
+                                    <option value="<%= index+3 %>" <%= (isEdit&&competition.c_system==index+3)?'selected':'' %>><%= index+3 %>人制</option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赛季：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" placeholder="请输入赛季，如：2018-2019" id="c_season" value="<%= (isEdit)?competition.c_season:'' %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赛事类型：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <select id="c_type">
+                                <option value="0">请选择</option>
+                                <option value="1" <%= (isEdit&&competition.c_type==1)?'selected':'' %>>联赛（单循环）</option>
+                                <option value="2" <%= (isEdit&&competition.c_type==2)?'selected':'' %>>联赛（双循环）</option>
+                                <option value="3" <%= (isEdit&&competition.c_type==3)?'selected':'' %>>杯赛—小组赛（单循环）+ 淘汰赛</option>
+                                <option value="4" <%= (isEdit&&competition.c_type==4)?'selected':'' %>>杯赛—小组赛（双循环）+ 淘汰赛</option>
+                                <option value="5" <%= (isEdit&&competition.c_type==5)?'selected':'' %>>杯赛—淘汰赛</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赛事起止日期：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" class="half-input datepicker" id="c_s_t" placeholder="请选择"
+                                   value="<%= (isEdit)?competition.c_start_time:'' %>" readonly>
+                            <span>至</span>
+                            <input type="text" class="half-input datepicker" id="c_e_t" placeholder="请选择"
+                                   value="<%= (isEdit)?competition.c_end_time:'' %>" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">报名起止日期：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" class="half-input datepicker" id="a_s_t" placeholder="请选择"
+                                   value="<%= (isEdit)?competition.c_applying_start_time:'' %>" readonly>
+                            <span>至</span>
+                            <input type="text" class="half-input datepicker" id="a_e_t" placeholder="请选择"
+                                   value="<%= (isEdit)?competition.c_applying_end_time:'' %>" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">报名费：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="number" class="half-input" id="c_fee" placeholder="请输入金额" value="<%= (isEdit)?competition.c_fee:'' %>">
+                            <span>元</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">报名费支付方式：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="radio" name="payment_type" id="offline_pay" <%= (isEdit&&competition.c_payment_type==2)?'checked':'' %>> 线下支付
+                            <input type="radio" name="payment_type" id="wechat_pay" <%= (isEdit)?(competition.c_payment_type==1)?'checked':'':'checked' %>> 微信支付
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赛事场地（选填）：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" placeholder="请输入场地名称（最多10个字）" id="c_place" value="<%= (isEdit)?competition.c_place:'' %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赛事举办地：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <span>省份：</span>
+                            <select class="half-input" id="c_province">
+                                <% for (let province_index = 0; province_index < provinces.length; province_index++) { %>
+                                    <option value="<%= provinces[province_index].province_id %>"
+                                            <%= (isEdit&&provinces[province_index].province_id==competition.c_province.province_id)?'selected':'' %>>
+                                        <%= provinces[province_index].province %></option>
+                                <% } %>
+                            </select>
+                            <span>城市：</span>
+                            <select class="half-input" id="c_city">
+                                <% for (let city_index = 0; city_index < cities.length; city_index++) { %>
+                                    <option value="<%= cities[city_index].city_id %>"
+                                            <%= (isEdit&&cities[city_index].city_id==competition.c_city.city_id)?'selected':'' %>>
+                                        <%= cities[city_index].city %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">主办方：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" placeholder="请输入主办方名称（最多20个字）" class="c-organizer-name" name="organizer_name0"
+                                   value="<%= (isEdit)?competition.c_organizer[0]:'' %>">
+                            <button class="btn btn-primary btn-sm add-more-name-btn" data-type="organizer_name">增加</button>
+                        </div>
+                        <% if (isEdit&&competition.c_organizer.length>1){
+                            for (let organizerIndex = 1; organizerIndex < competition.c_organizer.length; organizerIndex++) { %>
+                            <div class="competition-item-content">
+                                <input type="text" placeholder="请输入主办方名称（最多20个字）" class="c-organizer-name" name="organizer_name<%= organizerIndex %>"
+                                       value="<%= competition.c_organizer[organizerIndex] %>">
+                                <i class="fa fa-times-circle fa-lg" onclick="remove_name_item(this)"></i>
+                            </div>
+                            <% }
+                        }%>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">主办方联系电话：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" placeholder="请输入电话号码" id="c_organizer_phone" value="<%= (isEdit)?competition.c_organizer_phone:'' %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">承办方（选填）：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" placeholder="请输入承办方名称（最多20个字）" class="c-manager-name" name="manager_name0"
+                                   value="<%= (isEdit&&competition.c_manager.length>0)?competition.c_manager[0]:'' %>">
+                            <button class="btn btn-primary btn-sm add-more-name-btn" data-type="manager_name">增加</button>
+                        </div>
+                        <% if (isEdit&&competition.c_manager.length>1){
+                        for (let managerIndex = 1; managerIndex < competition.c_manager.length; managerIndex++) { %>
+                            <div class="competition-item-content">
+                                <input type="text" placeholder="请输入主办方名称（最多20个字）" class="c-manager-name" name="manager_name<%= managerIndex %>"
+                                       value="<%= competition.c_manager[managerIndex] %>">
+                                <i class="fa fa-times-circle fa-lg" onclick="remove_name_item(this)"></i>
+                            </div>
+                        <% }
+                        }%>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">协办方（选填）：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" placeholder="请输入协办方名称（最多20个字）" name="cooperator_name0" class="c-cooperator-name"
+                                   value="<%= (isEdit&&competition.c_cooperator.length>0)?competition.c_cooperator[0]:'' %>">
+                            <button class="btn btn-primary btn-sm add-more-name-btn" data-type="cooperator_name">增加</button>
+                        </div>
+                        <% if (isEdit&&competition.c_cooperator.length>1){
+                        for (let cooperatorIndex = 1; cooperatorIndex < competition.c_cooperator.length; cooperatorIndex++) { %>
+                            <div class="competition-item-content">
+                                <input type="text" placeholder="请输入主办方名称（最多20个字）" class="c-cooperator-name" name="cooperator_name<%= cooperatorIndex %>"
+                                       value="<%= competition.c_cooperator[cooperatorIndex] %>">
+                                <i class="fa fa-times-circle fa-lg" onclick="remove_name_item(this)"></i>
+                            </div>
+                        <% }
+                        }%>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赞助商（选填）：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <input type="text" placeholder="请输入赞助商名称（最多20个字）" class="c-helper-name" name="helper_name0"
+                                   value="<%= (isEdit&&competition.c_helper.length>0)?competition.c_helper[0]:'' %>">
+                            <button class="btn btn-primary btn-sm add-more-name-btn" data-type="helper_name">增加</button>
+                        </div>
+                        <% if (isEdit&&competition.c_helper.length>1){
+                        for (let helperIndex = 1; helperIndex < competition.c_helper.length; helperIndex++) { %>
+                            <div class="competition-item-content">
+                                <input type="text" placeholder="请输入主办方名称（最多20个字）" class="c-helper-name" name="helper_name<%= helperIndex %>"
+                                       value="<%= competition.c_helper[helperIndex] %>">
+                                <i class="fa fa-times-circle fa-lg" onclick="remove_name_item(this)"></i>
+                            </div>
+                        <% }
+                        }%>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="competition-item-title">赞助商轮播图（选填）：</div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="competition-item-content">
+                            <button class="btn btn-primary btn-sm" onclick="$('#c_helper_intro_images').val(''); $('#c_helper_intro_images').click()">增加</button>
+                            <input type="file" id="c_helper_intro_images" style="display: none" multiple onchange="preview_intro_images(event)"
+                                   accept=".png, .jpg, .jpeg, .gif">
+                            <div class="competition-row" id="prev_intro_images">
+                                <% if (isEdit) {
+                                    for (let introIndex=0; introIndex<competition.c_helper_images.length; introIndex++) { %>
+                                    <div class="competition-item-image">
+                                        <img src="<%= competition.c_helper_images[introIndex] %>" onclick="big_image_preview(event)">
+                                        <i class="fa fa-close" onclick="remove_image_item(this)"></i>
+                                    </div>
+                                    <% }
+                                    } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p>赛事简介（选填）：</p>
+                        <div class="wysiwyg-editor" id="c_intro_competition"><%- (isEdit)?JSON.parse(competition.c_intro_competition):''; %></div>
+                    </div>
+                    <div class="col-md-4">
+                        <p>规程介绍（选填）：</p>
+                        <div class="wysiwyg-editor" id="c_intro_progress"><%- (isEdit)?JSON.parse(competition.c_intro_progress):''; %></div>
+                    </div>
+                    <div class="col-md-4">
+                        <p>赞助商介绍（选填）：</p>
+                        <div class="wysiwyg-editor" id="c_intro_helper"><%- (isEdit)?JSON.parse(competition.c_intro_helper):''; %></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competition-row" style="padding: 5% 0">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="competition-actions">
+                            <button class="btn btn-primary" onclick="competition_save(1, <%= isEdit %>)">保存</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="competition-actions">
+                            <button class="btn btn-warning" onclick="competition_save(2, <%= isEdit %>)">保存并发布</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="competition-actions">
+                            <a href="/"><button  class="btn btn-default" >取消</button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- end of container -->
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+<!-- Crop Image Modal -->
+<div id="crop-image-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 style="text-align: center">LOGO</h3>
+                <div class="form-group" style="overflow: auto;">
+                    <div id="upload-origin" style="width:100%;"></div>
+                </div>
+                <input type="file" id="upload-crop" style="display:none;" accept=".png, .jpg, .jpeg, .gif"/>
+                <div class="row">
+                    <div class="col-md-6">
+                        <button class="btn btn-primary form-control" onclick="$('#upload-crop').click();">选择图片</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-primary form-control" data-dismiss="modal">裁剪</button>
+                    </div>
+                </div>
+            </div><!-- end modal-bpdy -->
+        </div><!-- end modal-content -->
+    </div><!-- end modal-dialog -->
+</div>
+<!-- Image View Modal -->
+<div id="img_view_modal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="img_view">
+</div>
+<!-- Change Competition Type Confirm Modal -->
+<div id="type_confirm_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4 style="text-align: center; color: red">如果改变赛事类型，将重新生成赛程，之前编辑的比赛数据将全部删除，请确认是否改变赛事类型？</h4>
+            </div>
+            <input type="hidden" id="is_published_value">
+            <input type="hidden" id="is_edit_value">
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" id="type_confirm_modal_unpublish"
+                            onclick="competition_save_pre(1, true)" data-dismiss="modal">确定</button>
+                    <button type="button" class="btn btn-primary" id="type_confirm_modal_publish"
+                            onclick="competition_save_pre(2, true)" data-dismiss="modal">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<% include ../partials/foot.ejs %>
+
+<script src="/assets/ace/jquery-ui.custom.min.js"></script>
+<script src="/assets/ace/jquery.hotkeys.index.min.js"></script>
+<script src="/assets/ace/bootstrap-wysiwyg.min.js"></script>
+<!-- ace scripts -->
+<script src="/assets/ace/ace-elements.min.js"></script>
+<script src="/assets/ace/ace.min.js"></script>
+<script type="text/javascript">
+    jQuery(function ($) {
+
+        function showErrorAlert(reason, detail) {
+            var msg = '';
+            if (reason === 'unsupported-file-type') {
+                msg = "Unsupported format " + detail;
+            } else {
+                //console.log("error uploading file", reason, detail);
+            }
+            $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                '<strong>File upload error</strong> ' + msg + ' </div>').prependTo('#alerts');
+        }
+
+        // $('#t_editor1').ace_wysiwyg();//this will create the default editor will all buttons
+
+        //but we want to change a few buttons colors for the third style
+        for (let i = 0; i < 3; i++) {
+            let intro_id = '#c_intro_competition';
+            if (i === 1) intro_id = '#c_intro_progress';
+            else if (i === 2) intro_id = '#c_intro_helper';
+            $(intro_id).ace_wysiwyg({
+                toolbar:
+                    [
+                        'font',
+                        null,
+                        'fontSize',
+                        null,
+                        {name: 'bold', className: 'btn-info'},
+                        {name: 'italic', className: 'btn-info'},
+                        {name: 'strikethrough', className: 'btn-info'},
+                        {name: 'underline', className: 'btn-info'},
+                        null,
+                        {name: 'insertunorderedlist', className: 'btn-success'},
+                        {name: 'insertorderedlist', className: 'btn-success'},
+                        {name: 'outdent', className: 'btn-purple'},
+                        {name: 'indent', className: 'btn-purple'},
+                        null,
+                        {name: 'justifyleft', className: 'btn-primary'},
+                        {name: 'justifycenter', className: 'btn-primary'},
+                        {name: 'justifyright', className: 'btn-primary'},
+                        {name: 'justifyfull', className: 'btn-inverse'},
+                        null,
+                        {name: 'createLink', className: 'btn-pink'},
+                        {name: 'unlink', className: 'btn-pink'},
+                        null,
+                        {name: 'insertImage', className: 'btn-success'},
+                        null,
+                        'foreColor',
+                        null,
+                        'backColor',
+                        null,
+                        {name: 'undo', className: 'btn-grey'},
+                        {name: 'redo', className: 'btn-grey'}
+                    ],
+                'wysiwyg': {
+                    fileUploadError: showErrorAlert
+                }
+            }).prev().addClass('wysiwyg-style1');
+        }
+
+        //RESIZE IMAGE
+
+        //Add Image Resize Functionality to Chrome and Safari
+        //webkit browsers don't have image resize functionality when content is editable
+        //so let's add something using jQuery UI resizable
+        //another option would be opening a dialog for user to enter dimensions.
+        if (typeof jQuery.ui !== 'undefined' && ace.vars['webkit']) {
+
+            var lastResizableImg = null;
+
+            function destroyResizable() {
+                if (lastResizableImg == null) return;
+                lastResizableImg.resizable("destroy");
+                lastResizableImg.removeData('resizable');
+                lastResizableImg = null;
+            }
+
+            var enableImageResize = function () {
+                $('.wysiwyg-editor')
+                    .on('mousedown', function (e) {
+                        var target = $(e.target);
+                        if (e.target instanceof HTMLImageElement) {
+                            if (!target.data('resizable')) {
+                                target.resizable({
+                                    aspectRatio: e.target.width / e.target.height,
+                                });
+                                target.data('resizable', true);
+
+                                if (lastResizableImg != null) {
+                                    //disable previous resizable image
+                                    lastResizableImg.resizable("destroy");
+                                    lastResizableImg.removeData('resizable');
+                                }
+                                lastResizableImg = target;
+                            }
+                        }
+                    })
+                    .on('click', function (e) {
+                        if (lastResizableImg != null && !(e.target instanceof HTMLImageElement)) {
+                            destroyResizable();
+                        }
+                    })
+                    .on('keydown', function () {
+                        destroyResizable();
+                    });
+            };
+
+            enableImageResize();
+        }
+
+
+    });
+</script>
+
+<script type="text/javascript" src="/assets/croppie/croppie.js"></script>
+<script type="text/javascript" src="/assets/croppie/upload_img.js"></script>
+
+<!-- Initialize the editor. -->
+<script>
+    $(function() {
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        })
+    });
+    function upload_editor_images(is_published, is_edit) {
+        let imgTags = $('.wysiwyg-editor').find('img');
+        let img_arr = [];
+        let img_tags = [];
+        for (let i = 0; i < imgTags.length; i++) {
+            let src = $(imgTags[i]).attr('src');
+            if (src.length > 1000) {
+                img_arr.push(src);
+                img_tags.push(imgTags[i]);
+            }
+        }
+        if (img_arr.length > 0) {
+            $.ajax({
+                url: '/common/upload-editor-image',
+                method: 'post',
+                data: {
+                    img_data: img_arr
+                },
+                success: function (res) {
+                    if (res.status === 'success') {
+                        let r_imgs = res.img_urls;
+                        for (let j = 0; j < r_imgs.length; j++) {
+                            $(img_tags[j]).attr('src', r_imgs[j]);
+                        }
+                        call_save_competition(is_published, is_edit);
+                    }
+                },
+                error: function (err) {
+                    console.log("error: ", err);
+                    return false;
+                }
+            });
+        } else {
+            call_save_competition(is_published, is_edit)
+        }
+    }
+    function call_save_competition(is_published, is_edit) {
+        if (!is_edit) {
+            competition_save_pre(is_published, is_edit);
+        } else {
+            let c_type = $('#competition_type').val();
+            let edit_type = $('#c_type').val();
+            if (c_type == edit_type) competition_save_pre(is_published, is_edit);
+            else {
+                if (is_published == 1) {
+                    $('#type_confirm_modal_publish').css('display', 'none');
+                    $('#type_confirm_modal_unpublish').css('display', 'inline-block');
+                }
+                else {
+                    $('#type_confirm_modal_publish').css('display', 'inline-block');
+                    $('#type_confirm_modal_unpublish').css('display', 'none');
+                }
+                $('#type_confirm_modal').modal();
+            }
+        }
+    }
+    $('#import-competition').on('change', function () {
+        let c_id = this.value;
+        if (c_id === 'none') return;
+        $.ajax({
+            url: '/common/load-competition-data',
+            method: 'post',
+            data: {
+                c_id: c_id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    load_competition_data(res.competition);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    });
+    function load_competition_data(competition) {
+        console.log(competition);
+        $('#c_logo_image').attr('src', competition.c_logo);
+        $('#active_type').val(competition.c_active_type);
+        $('#c_name').val(competition.c_name);
+        $('#c_system').val(competition.c_system);
+        $('#c_season').val(competition.c_season);
+        $('#c_type').val(competition.c_type);
+        $('#c_s_t').val(competition.c_start_time)
+        $('#c_e_t').val(competition.c_end_time)
+        $('#a_s_t').val(competition.c_applying_start_time)
+        $('#a_e_t').val(competition.c_applying_end_time)
+        $('#c_fee').val(competition.c_fee)
+        if (competition.c_payment_type === 1) $('#wechat_pay').prop('checked', true);
+        else $('#offline_pay').prop('checked', true);
+        $('#c_place').val(competition.c_place);
+        $('#c_province').val(competition.c_province.province_id);
+        $('#c_province').attr('data-cur-city', competition.c_city.city_id);
+        $('#c_province').trigger('change');
+        $('#c_organizer_phone').val(competition.c_organizer_phone);
+        $('input[name="organizer_name0"]').val(competition.c_organizer[0]);
+        if (competition.c_organizer.length > 1) {
+            for (let i = 1; i < competition.c_organizer.length; i++) {
+                ($('button[data-type="organizer_name"]')[0]).click();
+                $('input[name="organizer_name'+i+'"]').val(competition.c_organizer[i]);
+            }
+        }
+        $('input[name="manager_name0"]').val(competition.c_manager[0]);
+        if (competition.c_manager.length > 1) {
+            for (let i = 1; i < competition.c_manager.length; i++) {
+                ($('button[data-type="manager_name"]')[0]).click();
+                $('input[name="manager_name'+i+'"]').val(competition.c_manager[i]);
+            }
+        }
+        $('input[name="cooperator_name0"]').val(competition.c_cooperator[0]);
+        if (competition.c_cooperator.length > 1) {
+            for (let i = 1; i < competition.c_cooperator.length; i++) {
+                ($('button[data-type="cooperator_name"]')[0]).click();
+                $('input[name="cooperator_name'+i+'"]').val(competition.c_cooperator[i]);
+            }
+        }
+        $('input[name="helper_name0"]').val(competition.c_helper[0]);
+        if (competition.c_cooperator.length > 1) {
+            for (let i = 1; i < competition.c_helper.length; i++) {
+                ($('button[data-type="helper_name"]')[0]).click();
+                $('input[name="helper_name'+i+'"]').val(competition.c_helper[i]);
+            }
+        }
+        if (competition.c_helper_images.length > 0) {
+            $('#prev_intro_images').html('');
+            for (let j = 0; j < competition.c_helper_images.length; j++) {
+                let dom_nodes = $($.parseHTML('<div class="competition-item-image"><img onclick="big_image_preview(event)"/><i ' +
+                    'class="fa fa-close" onclick="remove_image_item(this)"></i></div>'));
+                dom_nodes.find('img').attr('src', competition.c_helper_images[j]);
+                dom_nodes.appendTo('#prev_intro_images');
+            }
+        }
+        $('#c_intro_competition').html(JSON.parse(competition.c_intro_competition));
+        $('#c_intro_progress').html(JSON.parse(competition.c_intro_progress));
+        $('#c_intro_helper').html(JSON.parse(competition.c_intro_helper));
+    }
+    $('#c_province').on('change', function () {
+        let province_id = this.value;
+        let curCity = $(this).attr('data-cur-city');
+        $.ajax({
+            url: '/common/get_cities_from_province',
+            method: 'post',
+            data: {
+                province_id: province_id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    let cities_html = '';
+                    var isExist = false;
+                    for (let i = 0; i < res.cities.length; i++) {
+                        cities_html += '<option value="' + res.cities[i].city_id + '">' + res.cities[i].city +'</option>'
+                        if(curCity === res.cities[i].city_id) isExist = true;
+                    }
+                    $('#c_city').html(cities_html);
+                    if(isExist) $('#c_city').val(curCity);
+                }
+            }
+        })
+    })
+    function preview_logo(evt) {
+        let reader = new FileReader();
+        reader.onload = function (evt) {
+            $(".competition-logo-image img").attr("src", evt.target.result);
+        };
+        reader.readAsDataURL(evt.target.files[0]);
+    }
+    function preview_intro_images(evt) {
+        for (let i = 0; i < evt.target.files.length; i++) {
+            let realNameStr = getFilenameFromURL(evt.target.files[i].name);
+            let type = getFiletypeFromURL(realNameStr);
+            if (type != 'jpg' && type != 'jpeg' && type != 'png' && type != 'gif') {
+                showAlert('图片格式不正确..');
+                return;
+            }
+        }
+        let prev_image_len = $('#prev_intro_images .competition-item-image').length;
+        if ((prev_image_len + evt.target.files.length) > 5 || evt.target.files.length === 0) {
+            showAlert('请输入最多5图片');
+            return;
+        }
+        for (let i = 0; i < evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let dom_nodes = $($.parseHTML('<div class="competition-item-image"><img onclick="big_image_preview(event)"/><i ' +
+                    'class="fa fa-close" onclick="remove_image_item(this)"></i></div>'));
+                dom_nodes.find('img').attr('src', event.target.result);
+                dom_nodes.appendTo('#prev_intro_images');
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+    }
+    function remove_image_item(ele) {
+        $(ele).parent().remove();
+    }
+    $('.add-more-name-btn').on('click', function () {
+        let type = $(this).attr('data-type');
+        let curCnt = $(this).parent().parent().find('.competition-item-content').length;
+        let dom_name = '<div class="competition-item-content" data-id="'+curCnt+'"></div>';
+        $(this).parent().parent().append(dom_name)
+        $(this).parent().parent().find('.competition-item-content[data-id="'+curCnt+'"]').html($(this).parent().html()
+            + '<i class="fa fa-times-circle fa-lg" onclick="remove_name_item(this)"></i>');
+        $(this).parent().parent().find('.competition-item-content[data-id="'+curCnt+'"] button').remove();
+        $(this).parent().parent().find('.competition-item-content[data-id="'+curCnt+'"] input').val('');
+        let inputItems = $(this).parent().parent().find('input');
+        for(let i = 0; i<inputItems.length; i++){
+            $(inputItems[i]).attr('name', type+''+i);
+            $(inputItems[i]).parent().attr('data-id', i);
+        }
+    });
+    function competition_save(is_published, is_edit) {
+        upload_editor_images(is_published, is_edit)
+    }
+    function competition_save_pre(is_published, is_edit) {
+        let logo_img = $('#c_logo_image').attr('src');
+        if (logo_img === '/assets/main/images/default-placeholder-200x200.png') {
+            showAlert('请输入LOGO投票');
+            return;
+        }
+        let active_type = $('#active_type').val();
+        let c_name = $('#c_name').val();
+        if (c_name === '' || c_name.length > 30) {
+            showAlert("请输入赛事名称（最多30个字）");
+            return;
+        }
+        let c_system = $('#c_system').val();
+        if (c_system === '0') {
+            showAlert('请选择赛制');
+            return;
+        }
+        let c_season = $('#c_season').val();
+        let season_pattern = /[0-9]{4}-[0-9]{4}/
+        if (!season_pattern.test(c_season)) {
+            showAlert('请输入赛季，如：2018-2019');
+            return;
+        }
+        let c_type = $('#c_type').val();
+        if (c_type === '0') {
+            showAlert('请选择赛事类型');
+            return;
+        }
+        let c_s_t = $('#c_s_t').val(); let c_e_t = $('#c_e_t').val();
+        if (c_e_t < c_s_t) {
+            showAlert('开始日期不能晚于结束日期');
+            return;
+        }
+        let a_s_t = $('#a_s_t').val(); let a_e_t = $('#a_e_t').val();
+        if (a_e_t < a_s_t) {
+            showAlert('开始日期不能晚于结束日期');
+            return;
+        } else if (a_s_t > c_e_t) {
+            showAlert('报名时间错误')
+            return;
+        }
+        let c_fee = $('#c_fee').val();
+        if (c_fee === '') {
+            showAlert('请输入金额');
+            return;
+        }
+        let payment_method = 1;
+        if ($('#offline_pay').prop('checked')) {
+            payment_method = 2;
+        }
+        let c_place = $('#c_place').val();
+        if (c_place.length > 10) {
+            showAlert('请输入场地名称（最多10个字）');
+            return;
+        }
+        let c_province = $('#c_province').val();
+        let c_city = $('#c_city').val();
+        let organizer_name_tags = $('.c-organizer-name');
+        let organizer_names = [];
+        for (let organizer_name_index = 0; organizer_name_index < organizer_name_tags.length; organizer_name_index++) {
+            let organizer_name = $(organizer_name_tags[organizer_name_index]).val();
+            if (organizer_name === '' || organizer_name.length > 20) {
+                showAlert('请输入主办方名称（最多20个字）');
+                return;
+            }
+            organizer_names.push(organizer_name);
+        }
+        let c_organizer_phone = $('#c_organizer_phone').val();
+        if (!checkValidPhone(c_organizer_phone)) {
+            showAlert('电话号码错误');
+            return;
+        }
+        let manager_name_tags = $('.c-manager-name');
+        let manager_names = [];
+        for (let manager_name_index = 0; manager_name_index < manager_name_tags.length; manager_name_index++) {
+            let manager_name = $(manager_name_tags[manager_name_index]).val();
+            if (manager_name.length > 20) {
+                showAlert('请输入承办方名称（最多20个字）');
+                return;
+            }
+            if (manager_name !== "") manager_names.push(manager_name)
+        }
+        let cooperator_name_tags = $('.c-cooperator-name');
+        let cooperator_names = [];
+        for (let cooperator_name_index = 0; cooperator_name_index < cooperator_name_tags.length; cooperator_name_index++) {
+            let cooperator_name = $(cooperator_name_tags[cooperator_name_index]).val();
+            if (cooperator_name.length > 20) {
+                showAlert('请输入协办方名称（最多20个字）');
+                return;
+            }
+            if (cooperator_name !== "") cooperator_names.push(cooperator_name)
+        }
+        let helper_name_tags = $('.c-helper-name');
+        let helper_names = [];
+        for (let helper_name_index = 0; helper_name_index < helper_name_tags.length; helper_name_index++) {
+            let helper_name = $(helper_name_tags[helper_name_index]).val();
+            if (helper_name.length > 20) {
+                showAlert('请输入赞助商名称（最多20个字）');
+                return;
+            }
+            if (helper_name !== "") helper_names.push(helper_name)
+        }
+        let intro_images = [];
+        let intro_image_tags = $('#prev_intro_images img');
+        for (let intro_index = 0; intro_index < intro_image_tags.length; intro_index ++) {
+            let imgItem =  $(intro_image_tags[intro_index]).attr('src');
+            if (imgItem !== '/assets/main/images/default-placeholder-200x200.png') {
+                intro_images.push(imgItem)
+            }
+        }
+        let c_intro_competition = $('#c_intro_competition').html();
+        let c_intro_progress = $('#c_intro_progress').html();
+        let c_intro_helper = $('#c_intro_helper').html();
+
+        let data = {
+            c_logo: logo_img,
+            c_active_type: active_type,  // 1: 足球
+            c_name: c_name,
+            c_system: c_system,
+            c_season: c_season,
+            c_type: c_type,
+            c_start_time: c_s_t,
+            c_end_time: c_e_t,
+            c_applying_start_time: a_s_t,
+            c_applying_end_time: a_e_t,
+            c_fee: c_fee,
+            c_payment_type: payment_method,
+            c_place: c_place,
+            c_province: c_province,
+            c_city: c_city,
+            c_organizer: organizer_names,
+            c_organizer_phone: c_organizer_phone,
+            c_manager: manager_names,
+            c_cooperator: cooperator_names,
+            c_helper: helper_names,
+            c_helper_images: intro_images,
+            c_intro_competition: c_intro_competition,
+            c_intro_progress: c_intro_progress,
+            c_intro_helper: c_intro_helper,
+            is_published: is_published
+        }
+        let url = '/organizer/add-competition';
+        if (is_edit) {
+            let competitionID = $('#competition_id').val();
+            url = '/organizer/edit-competition/' + competitionID;
+        }
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    location.href = '/organizer'
+                    // history.back();
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+
+    function big_image_preview(ele) {
+        console.log(ele);
+        $('#img_view_modal').css('display', 'block');
+        let img = ele.target.src;
+        $('#img_view_modal #img_view').attr('src', img);
+    }
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        $('#img_view_modal').css('display', 'none');
+    }
+    function remove_name_item(ele) {
+        let parentElem = $(ele).parent().parent();
+        $(ele).parent().remove();
+        let inputItems = parentElem.find('input');
+        let type = parentElem.find('button').attr('data-type');
+        for(let i = 0; i<inputItems.length; i++){
+            $(inputItems[i]).attr('name', type+''+i);
+            $(inputItems[i]).parent().attr('data-id', i);
+        }
+    }
+</script>
+</body>
+</html>

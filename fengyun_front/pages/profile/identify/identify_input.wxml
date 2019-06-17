@@ -1,0 +1,22 @@
+<view>
+    <view class="identify_input-container">
+        <view class="identify_input-item">
+            <view class="identify_input-title">赛事认证:</view>
+            <input class="identify_input-input" value="{{identify_nickname}}" disabled></input>
+        </view>
+        <view class="identify_input-item">
+            <view class="identify_input-title">联系人:</view>
+            <input class="identify_input-input" type="text" bindinput="onInputIdentify" data-type="name" value="{{identify_name}}" placeholder="请输入您的姓名"></input>
+        </view>
+        <view class="identify_input-item">
+            <view class="identify_input-title">联系电话:</view>
+            <input class="identify_input-input" type="digit" maxlength="11" bindinput="onInputIdentify" data-type="phone" value="{{identify_phone}}" placeholder="请输入您的电话"></input>
+        </view>
+        <view class="identify_input-item">
+            <view class="identify_input-title">验证码:</view>
+            <input class="identify_input-input" type="digit" maxlength="8" bindinput="onInputIdentify" data-type="code" value="{{identify_code}}" placeholder="单行输入"></input>
+            <button class="identify-send-code-btn" bindtap="send_sms" disabled="{{(sms_state==1)?'true':''}}">{{(sms_state==0)?sms_button_text[0]:(second_count+sms_button_text[1])}}</button>
+        </view>
+    </view>
+    <view class="identify_input-btn" bindtap="submit_identify">提交认证信息</view>
+</view>

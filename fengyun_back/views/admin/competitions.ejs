@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-admin.css">
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="admin-right-row">
+            <a class="btn btn-warning" href="javascript:" onclick="window.history.back()">返回</a>
+        </div>
+        <div class="admin-filter">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div style="text-align: right">
+                            <select id="filter_name">
+                                <option value="organizer">主办方</option>
+                                <option value="competition">赛事名称</option>
+                            </select>
+                            <input type="text" id="filter_name_value" placeholder="请输入">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="text-align: center">
+                            <select id="filter_active_type">
+                                <option value="0">活动类型</option>
+                                <option value="1">足球</option>
+                            </select>
+                            <select id="filter_province">
+                                <option value="all">省份</option>
+                                <% for (let k1 = 0; k1 < provinces.length; k1++) { %>
+                                    <option value="<%= provinces[k1]._id.province_id %>"><%= provinces[k1]._id.province %></option>
+                                <% } %>
+                            </select>
+                            <select id="filter_city">
+                                <option value="all">城市</option>
+                                <% for (let k2 = 0; k2 < cities.length; k2++) { %>
+                                    <option value="<%= cities[k2]._id.city_id %>"><%= cities[k2]._id.city %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="text-align: left">
+                            <div style="text-align: center">
+                                <select id="filter_post_status">
+                                    <option value="all">发布状态</option>
+                                    <option value="yes">是</option>
+                                    <option value="no">否</option>
+                                </select>
+                                <select id="filter_order">
+                                    <option value="all">置顶状态</option>
+                                    <option value="yes">是</option>
+                                    <option value="no">否</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end of row -->
+                <div class="admin-right-row">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div style="text-align: center">
+                                <label id="from">认证时间</label>
+                                <input type="text" class="datepicker" id="from_date" readonly>
+                                <label id="to">至</label>
+                                <input type="text" class="datepicker" id="to_date" readonly>
+                                <button class="btn btn-info btn-sm" id="date_clear">清除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div style="text-align: center">
+                                <button class="btn btn-info btn-sm" style="width: 100px" onclick="reload_table(1)">查询</button>
+                                <button class="btn btn-info btn-sm" style="width: 100px" onclick="exportTable('赛事列表')">导出</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end of container -->
+        </div>
+        <!-- end of admin-filter -->
+        <!-- admin competition table -->
+        <div class="box-body">
+            <table class="table table-bordered admin-tables" id="admin_competition_table">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>主办方</th>
+                    <th>赛事名称</th>
+                    <th>赛季</th>
+                    <th>活动类型</th>
+                    <th>赛事类型</th>
+                    <th>开赛时间</th>
+                    <th>结束时间</th>
+                    <th>省份</th>
+                    <th>城市</th>
+                    <th>发布状态</th>
+                    <th>置顶</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <!-- competitions -->
+                <tbody>
+                <% for (let i = 0; i < competitions.length; i++) { %>
+                    <tr>
+                        <td><%= i + 1 %></td>
+                        <td><%= competitions[i].organizer[0].name %></td>
+                        <td class="competition-info" id="<%= competitions[i].id %>" data-organizer-id="<%= competitions[i].organizer[0].id %>">
+                            <%= competitions[i].c_name %></td>
+                        <td><%= competitions[i].c_season %></td>
+                        <td><%= (competitions[i].c_active_type == 1) ? '足球' : 'Other' %></td>
+                        <td>
+                            <% if (competitions[i].c_type == 1) { %>联赛（单循环）
+                            <% } else if (competitions[i].c_type == 2)  { %>
+                                联赛（双循环）
+                            <% } else if (competitions[i].c_type == 3) { %>
+                                杯赛—小组赛（单循环）+ 淘汰赛
+                            <% } else if (competitions[i].c_type == 4) { %>
+                                杯赛—小组赛（双循环）+ 淘汰赛
+                            <% } else if (competitions[i].c_type == 5) { %>
+                                杯赛—淘汰赛
+                            <% } %>
+                        </td>
+                        <td><%= competitions[i].c_start_time %></td>
+                        <td><%= competitions[i].c_end_time %></td>
+                        <td><%= competitions[i].c_province.province %></td>
+                        <td><%= competitions[i].c_city.city %></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" data-id="<%= competitions[i].id %>" <%= (competitions[i].is_published == 1) ? '' : 'checked'; %>
+                                       onchange="switch_tab_change(this)"><span class="slider round"></span>
+                            </label></td>
+                        <td class="place-select-box">
+                            <div class="round">
+                                <input class="place-checkbox" data-id="<%= competitions[i].id %>" type="checkbox" id="checkbox<%= i %>"
+                                        <%= (competitions[i].c_order === 1) ? 'checked' : '' %> onchange="competition_order(this)"/>
+                                <label for="checkbox<%= i %>"></label>
+                            </div>
+                        </td>
+                        <td class="organizer-operation">
+                            <a href="/organizer/edit-competition/<%= competitions[i].id %>/<%=competitions[i].c_organizer_id%>">编辑</a>
+                            <a href="/organizer/applying/<%= competitions[i].id %>/<%=competitions[i].c_organizer_id%>">报名管理</a>
+                            <a href="/organizer/games/<%= competitions[i].id %>/<%=competitions[i].c_organizer_id%>">比赛管理</a>
+                            <a href="/organizer/ranking/<%= competitions[i].id %>/<%=competitions[i].c_organizer_id%>">积分榜</a>
+                            <a href="/organizer/shooter/<%= competitions[i].id %>/<%=competitions[i].c_organizer_id%>">射手榜</a>
+                            <a href="/organizer/advertise/<%= competitions[i].id %>/<%=competitions[i].c_organizer_id%>">公告管理</a>
+                            <a href="/organizer/voting/<%= competitions[i].id %>/<%=competitions[i].c_organizer_id%>">赛事投票</a>
+                            <a href="javascript:" onclick="delete_competition(this)">删除</a></td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+            <% if (pages > 0) { %>
+                <ul class="pagination justify-content-center">
+                    <% if (current == 1) { %>
+                        <li class="page-item disabled"><a class="page-link">首页</a></li>
+                    <% } else { %>
+                        <li class="page-item"><a class="page-link" href="javascript:">首页</a></li>
+                    <% } %>
+                    <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+                    <% if (i !== 1) { %>
+                        <li class="page-item disabled"><a class="page-link">...</a></li>
+                    <% } %>
+                    <% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                        <% if (i == current) { %>
+                            <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                        <% } else { %>
+                            <li class="page-item"><a class="page-link" href="javascript:"><%= i %></a></li>
+                        <% } %>
+                        <% if (i == Number(current) + 2 && i < pages) { %>
+                            <li class="page-item disabled"><a class="page-link">...</a></li>
+                        <% } %>
+                    <% } %>
+                    <% if (current == pages) { %>
+                        <li class="page-item disabled"><a class="page-link">尾页</a></li>
+                    <% } else { %>
+                        <li class="page-item"><a class="page-link" href="javascript:">尾页</a></li>
+                    <% } %>
+                </ul>
+            <% } %>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+
+<!-- Competition Delete Modal -->
+<div id="competition_delete_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="competition_delete_row_id">
+                <input type="hidden" id="modal_organizer_id">
+                <input type="hidden" id="modal_com_id">
+                <h3 style="text-align: center">删除后，数据将无法恢复。 确定删除吗？</h3>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="competition_delete_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<% include ../partials/foot.ejs %>
+<script>
+    $('.datepicker').datepicker({
+        format: 'yyyy-mm-dd'
+    });
+    $('#date_clear').on('click', function () {
+        $('#from_date').val('');
+        $('#to_date').val('');
+    });
+
+    function switch_tab_change(ele) {
+        let is_published = $(ele).prop('checked') === true ? 2 : 1;
+        let c_id = $(ele).attr('data-id');
+        $.ajax({
+            url: '/organizer/change-competition-state',
+            method: 'post',
+            data: {
+                c_id: c_id,
+                is_published: is_published
+            },
+            success: function (res) {
+                if (res.status === 'success') showAlert(res.message, true);
+                else showAlert(res.message);
+            }
+        })
+    }
+
+    function competition_order(ele) {
+        let c_id = $(ele).attr('data-id');
+        $.ajax({
+            url: '/admin-change-competition-order',
+            method: 'post',
+            data: {
+                c_id: c_id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    location.reload();
+                }
+                else showAlert(res.message);
+            }
+        })
+    }
+
+    function display_cities(cities) {
+        $('#filter_city option').remove();
+        let cities_html = '<option value="all">城市</option>';
+        for (let i = 0; i < cities.length; i++) {
+            cities_html += '<option value="' + cities[i].city_id + '">' + cities[i].city + '</option>';
+        }
+        $('#filter_city').html(cities_html);
+    }
+
+    $('#filter_province').on('change', function () {
+        let existCities = JSON.parse('<%- JSON.stringify(cities) %>');
+        let exist_cities = [];
+        for (let e1 = 0; e1 < existCities.length; e1++) {
+            exist_cities.push(existCities[e1]._id);
+        }
+        let province_id = this.value;
+        if (province_id === 'all') {
+            display_cities(exist_cities);
+            return;
+        }
+        $.ajax({
+            url: '/common/get_cities_from_province',
+            method: 'post',
+            data: {
+                province_id: province_id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    let cities = [];
+                    for (let i = 0; i < res.cities.length; i++) {
+                        if (exist_cities.findIndex(x => x.city_id === res.cities[i].city_id) >= 0) cities.push(res.cities[i])
+                    }
+                    display_cities(cities);
+                }
+            }
+        })
+    })
+
+    function reload_table(cur_page) {
+        let data = {
+            table_name: 'competition',
+            filter_name: $('#filter_name').val(),
+            filter_name_value: $('#filter_name_value').val(),
+            filter_active_type: $('#filter_active_type').val(),
+            filter_province: $('#filter_province').val(),
+            filter_city: $('#filter_city').val(),
+            filter_post_status: $('#filter_post_status').val(),
+            filter_order: $('#filter_order').val(),
+            from_date: $('#from_date').val(),
+            to_date: $('#to_date').val(),
+            cur_page: cur_page
+        }
+        $.ajax({
+            url: '/common/search-and-pagination',
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    display_competitions(res.search_result, cur_page, res.page_rows, res.total_pages);
+                    custom_pagination(cur_page, res.total_pages);
+                }
+            }
+        });
+    }
+
+    function display_competitions(competitions, current, page_rows, total_pages) {
+        $('#admin_competition_table tbody tr').remove();
+        if (current === '首页') current = 1
+        else if (current === '尾页') current = total_pages
+        else current = parseInt(current);
+        let tbody_tags = "";
+        for (let index = 0; index < competitions.length; index++) {
+            tbody_tags += '<tr><td>' + (index+page_rows*(current-1) + 1) + '</td>';
+            tbody_tags += '<td>' + competitions[index].organizer[0].name + '</td>';
+            tbody_tags += '<td class="competition-info" id="' + competitions[index].id + '" data-organizer-id="'
+                + competitions[index].organizer[0].id + '">' + competitions[index].c_name + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_season + '</td>';
+            if (competitions[index].c_active_type === 1) tbody_tags += '<td>足球</td>';
+            else tbody_tags += '<td>Other</td>';
+            if (competitions[index].c_type === 1) tbody_tags += '<td>联赛（单循环）</td>';
+            else if (competitions[index].c_type === 2) tbody_tags += '<td>联赛（双循环）</td>';
+            else if (competitions[index].c_type === 3) tbody_tags += '<td>杯赛—小组赛（单循环）+ 淘汰赛</td>';
+            else if (competitions[index].c_type === 4) tbody_tags += '<td>杯赛—小组赛（双循环）+ 淘汰赛</td>';
+            else if (competitions[index].c_type === 5) tbody_tags += '<td>杯赛—淘汰赛</td>';
+            tbody_tags += '<td>' + competitions[index].c_start_time + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_end_time + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_province.province + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_city.city + '</td>';
+            if (competitions[index].is_published === 2) {
+                tbody_tags += '<td><label class="switch"><input type="checkbox" data-id="' + competitions[index].id
+                    + '" onchange="switch_tab_change(this)" checked><span class="slider round"></span></label></td>';
+            }else {
+                tbody_tags += '<td><label class="switch"><input type="checkbox" data-id="' + competitions[index].id
+                    + '" onchange="switch_tab_change(this)"><span class="slider round"></span></label></td>';
+            }
+            if (competitions[index].c_order === 1) {
+                tbody_tags += '<td class="place-select-box"><div class="round"><input class="place-checkbox" data-id="'
+                    + competitions[index].id + '" type="checkbox" id="checkbox' + index.toString()
+                    + '" onchange="competition_order(this)" checked/><label for="checkbox' + index.toString() + '"></label></div></td>';
+            } else {
+                tbody_tags += '<td class="place-select-box"><div class="round"><input class="place-checkbox" data-id="'
+                    + competitions[index].id + '" type="checkbox" id="checkbox' + index.toString()
+                    + '" onchange="competition_order(this)"/><label for="checkbox' + index.toString() + '"></label></div></td>';
+            }
+            tbody_tags += '<td class="organizer-operation"><a href="javascript:">编辑</a><a href="javascript:">报名管理</a>'
+                + '<a href="javascript:">比赛管理</a><a href="javascript:">积分榜</a><a href="javascript:">射手榜</a>'
+                + '<a href="javascript:">公告管理</a><a href="javascript:">赛事投票</a>'
+                + '<a href="javascript:" onclick="delete_competition(this)">删除</a></td></tr>';
+        }
+        $("#admin_competition_table tbody").append(tbody_tags);
+    }
+    function delete_competition(ele) {
+        let com_id = $(ele).parent().parent().find('.competition-info').attr('id');
+        let organizer_id = $(ele).parent().parent().find('.competition-info').attr('data-organizer-id');
+        $('#modal_com_id').val(com_id);
+        $('#modal_organizer_id').val(organizer_id);
+        $('#competition_delete_modal').modal()
+    }
+    function competition_delete_confirm() {
+        let com_id = $('#modal_com_id').val();
+        let organizer_id = $('#modal_organizer_id').val();
+        console.log(com_id, organizer_id);
+        $.ajax({
+            url: 'organizer/delete-competition',
+            method: 'post',
+            data: {
+                c_id: com_id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+
+                    $('#admin_competition_table tbody tr td[id="'+com_id+'"][data-organizer-id="'+organizer_id+'"]').parent().remove();
+                    $('#competition_delete_modal').modal('toggle');
+                } else showAlert(res.message);
+            }
+        });
+    }
+</script>
+</body>
+</html>

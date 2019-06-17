@@ -1,0 +1,106 @@
+/** template introduction **/
+
+
+/******** voting info part ***********/
+
+.voting-info {
+    width: 100%;
+    height: 120rpx;
+    display: flex;
+    background: white;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20rpx;
+}
+
+.voting-info>view {
+    position: relative;
+    flex: 25%;
+}
+
+.voting-info>view>view {
+    width: 100%;
+    font-size: 26rpx;
+    text-align: center;
+    height: 44rpx;
+}
+
+
+/************* data-schedule-section part **************/
+
+.schedule-section {
+    position: relative;
+    width: 100%;
+    height: 210rpx;
+    display: flex;
+    margin-bottom: 2rpx;
+    background: white;
+}
+
+.schedule-status {
+    position: absolute;
+    right: 0;
+    top: 10rpx;
+    width: 80rpx;
+    height: 24rpx;
+    line-height: 24rpx;
+    font-size: 20rpx;
+    background: #888888;
+    border-top-left-radius: 8rpx;
+    border-bottom-left-radius: 8rpx;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.schedule-status.status1 {
+    background: #6cab3b;
+}
+
+.schedule-item {
+    position: relative;
+    text-align: center;
+    flex: 35%;
+}
+
+.schedule-item.score {
+    flex: 30%;
+}
+
+.schedule-icon {
+    width: 100rpx;
+    height: 100rpx;
+    margin: 30rpx 0 12rpx;
+    border-radius: 50%;
+}
+
+.schedule-title {
+    width: 100%;
+    font-size: 28rpx;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+.schedule-title.score {
+    font-size: 42rpx;
+    color: #df4848;
+    margin: 45rpx 0 20rpx;
+    font-weight: bold;
+}
+
+.schedule-title.score.status1 {
+    color: #888888;
+}
+
+.schedule-title.score.status2 {
+    color: #888888;
+}
+
+.schedule-title.desc {
+    font-size: 24rpx;
+    color: #888888;
+    margin: 10rpx 0;
+}

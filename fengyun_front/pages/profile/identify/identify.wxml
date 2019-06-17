@@ -1,0 +1,14 @@
+<view class="container">
+    <view class="identify-container">
+        <view class="identify-title">赛事主办方入驻本协议需遵循以下条约：</view>
+        <view class="identify-text">1、赛事主办方不能发布违反中华人民共和国法律法规的内容，一经发现，取消其使用权，向有关部门举报并扣除其押金。</view>
+        <view class="identify-text">2、赛事主办方发布的赛事有关费用需要说明清楚，一旦与消费者发生费用纠纷，产生与本平台技术服务无关的损失，由赛事主办方承担，本平台不负责赔偿。</view>
+        <view class="identify-text">3、通过本平台获取的用户个人信息有保密义务，不得滥用，如有举报则平台有权取消使用资格，并向有关部门举报。</view>
+
+        <navigator url="identify_input" hover-class="none">
+            <view class="identify-btn" bindtap="check_identify">
+                <text>同意</text>
+            </view>
+        </navigator>
+    </view>
+</view>

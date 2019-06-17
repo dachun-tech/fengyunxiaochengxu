@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="container">
+            <div style="padding: 3% 1% 0 0; text-align: right;">
+                <a class="btn btn-primary" href="/organizer/add-delete-advertise/<%= competition.id %>" style="width: 150px;">新增公告</a>
+            </div>
+
+            <input type="hidden" id="competition_id" value="<%= competition.id %>">
+            <input type="hidden" id="competition_name" value="<%= competition.c_name %>">
+            <div class="box-body">
+                <table class="table table-bordered organizer-tables" id="advertise_table">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>标题</th>
+                        <th>赛事名称</th>
+                        <th>发布者</th>
+                        <th>发布时间</th>
+                        <th>发布状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for (let index = 0; index < advertises.length; index++) {%>
+                        <tr>
+                            <td><%= index+1 %></td>
+                            <td><%= advertises[index].ad_title %></td>
+                            <td><%= competition.c_name %></td>
+                            <td><%= advertises[index].ad_poster_name %></td>
+                            <td class="td-ad-post-time"><%= advertises[index].ad_post_time %></td>
+                            <td><label class="switch">
+                                    <input type="checkbox" data-id="<%= advertises[index].id %>" <%= (advertises[index].ad_state == 1)?'':'checked'; %>
+                                           onchange="switch_tab_change(this)">
+                                    <span class="slider round"></span>
+                                </label></td>
+                            <td class="organizer-operation">
+                                <a href="/organizer/edit-advertise/<%= advertises[index].id %>">编辑</a>
+                                <a href="javascript:" onclick="delete_advertise('<%= advertises[index].id %>')">删除</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+                <% if (pages > 0) { %>
+                    <ul class="pagination justify-content-center">
+                        <% if (current == 1) { %>
+                            <li class="page-item disabled"><a class="page-link">首页</a></li>
+                        <% } else { %>
+                            <li class="page-item"><a class="page-link" href="javascript:">首页</a></li>
+                        <% } %>
+                        <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+                        <% if (i !== 1) { %>
+                            <li class="page-item disabled"><a class="page-link">...</a></li>
+                        <% } %>
+                        <% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                            <% if (i == current) { %>
+                                <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="javascript:"><%= i %></a></li>
+                            <% } %>
+                            <% if (i == Number(current) + 2 && i < pages) { %>
+                                <li class="page-item disabled"><a class="page-link">...</a></li>
+                            <% } %>
+                        <% } %>
+                        <% if (current == pages) { %>
+                            <li class="page-item disabled"><a class="page-link">尾页</a></li>
+                        <% } else { %>
+                            <li class="page-item"><a class="page-link" href="javascript:">尾页</a></li>
+                        <% } %>
+                    </ul>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+
+<!-- delete confirm modal -->
+<div class="modal fade" id="delete_advertise_modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="delete_advertise_id">
+                <h4 style="text-align: center">删除后，数据将无法恢复</h4>
+                <h4 style="text-align: center">确定删除吗？</h4>
+                <div class="delete-modal-row" style="padding: 3%">
+                    <div class="delete-modal-btn" style="text-align: center">
+                        <button type="button" class="btn btn-info" id="delete_success" onclick="delete_advertise_success()">确定</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../partials/foot.ejs %>
+
+<script>
+    $(function () {
+        $('.td-ad-post-time').each(function () {
+            let time = $(this).text();
+            $(this).text(china_time(time))
+        })
+    });
+    function switch_tab_change(ele) {
+        let ad_state = $(ele).prop('checked') === true ? 2 : 1;
+        let ad_id = $(ele).attr('data-id');
+        $.ajax({
+            url: '/organizer/change-advertise-state',
+            method: 'post',
+            data: {
+                ad_id: ad_id,
+                ad_state: ad_state
+            },
+            success: function (res) {
+                if (res.status === 'success') showAlert(res.message, true);
+                else showAlert(res.message);
+            }
+        })
+    }
+    function make_new_table(advertises, current, page_rows, total_pages) {
+        $("#advertise_table tbody tr").remove();
+        let competition_name = $('#competition_name').val();
+        if (current === '首页') current = 1
+        else if (current === '尾页') current = total_pages
+        else current = parseInt(current);
+        let tbody_tags = "";
+        for (let index = 0; index < advertises.length; index++) {
+            tbody_tags += '<tr><td>' + (index+page_rows*(current-1) + 1) + '</td>';
+            tbody_tags += '<td>' + advertises[index].ad_title + '</td>';
+            tbody_tags += '<td>' + competition_name + '</td>';
+            tbody_tags += '<td>' + advertises[index].ad_poster_name + '</td>';
+            tbody_tags += '<td class="td-ad-post-time">' + advertises[index].ad_post_time + '</td>';
+            tbody_tags += '<td><label class="switch">';
+            if (advertises[index].ad_state === 1) {
+                tbody_tags += '<input type="checkbox" data-id="' + advertises[index].id + '" onchange="switch_tab_change(this)">';
+            } else {
+                tbody_tags += '<input type="checkbox" data-id="' + advertises[index].id + '" checked onchange="switch_tab_change(this)">';
+            }
+            tbody_tags += '<span class="slider round"></span></label></td>'
+            tbody_tags += '<td class="organizer-operation"><a href="/organizer/edit-advertise/' + advertises[index].id +'">编辑</a>'
+                + '<a href="javascript:" onclick="delete_advertise(\'' + advertises[index].id + '\')">删除</a></td></tr>';
+        }
+        $("#advertise_table tbody").append(tbody_tags);
+        $('.td-ad-post-time').each(function () {
+            let time = $(this).text();
+            $(this).text(china_time(time))
+        })
+    }
+
+    // submit requests
+    function reload_table(cur_page) {
+        let c_id = $('#competition_id').val();
+        $.ajax({
+            url: '/common/pagination',
+            method: 'post',
+            data: {
+                table_name: 'advertise',
+                c_id: c_id,
+                cur_page: cur_page
+            },
+            success: function (res) {
+                if (res.status === "success") {
+                    make_new_table(res.page_content, cur_page, page_rows, res.total_pages);
+                    custom_pagination(cur_page, res.total_pages)
+                } else {
+                    console.log("failed")
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+
+    function delete_advertise(id) {
+        console.log(id);
+        $('#delete_advertise_id').val(id);
+        $('#delete_advertise_modal').modal();
+    }
+
+    function delete_advertise_success() {
+        let ad_id = $('#delete_advertise_id').val();
+        let com_id = $('#competition_id').val();
+        $.ajax({
+            url: '/organizer/add-delete-advertise/' + com_id,
+            method: 'post',
+            data: {
+                method_type: 'delete',
+                ad_id: ad_id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    $('#delete_advertise_modal').modal('toggle');
+                    setTimeout(function () {
+                        location.reload()
+                    }, 1000);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

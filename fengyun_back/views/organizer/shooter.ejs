@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+<link rel="stylesheet" type="text/css" href="/assets/main/css/organizer-competition.css">
+<style>
+    #shooter_table td input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        text-align: center;
+    }
+
+    #autocomplete-list {
+        position: absolute;
+        background: gold;
+        min-width: 150px;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .modal-content {
+        border-radius: 5px;
+    }
+
+    .modal-footer button {
+        width: 120px;
+    }
+</style>
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div style="padding: 3% 0 0 1%">
+            <h3 style="text-align: center"><%= competition.c_name %></h3>
+            <div style="text-align: right; padding-right: 15px; margin-top: -30px">
+                <a href="javascript:history.back()" class="btn btn-primary">返回赛事信息页面</a>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <table class="table table-bordered organizer-tables" id="shooter_table">
+                <thead>
+                <tr>
+                    <th style="width: 25%">球员姓名</th>
+                    <th style="width: 10%">号码</th>
+                    <th style="width: 25%">所属球队</th>
+                    <th style="width: 10%">进球总数</th>
+                    <th style="width: 10%">点球数</th>
+                    <th style="width: 5%">排名</th>
+                    <th style="width: 15%">操作</th>
+                </tr>
+                </thead>
+                <!-- shooters -->
+                <tbody>
+                <% for (let i = 0; i < shooters.length; i++) { %>
+                    <tr id="<%= shooters[i].m_id %>">
+                        <td class="m-name">
+                            <span><%= shooters[i].m_name %></span>
+                            <input class="m-name-input" style="display: none" value="<%= shooters[i].m_name %>" onblur="td_disable(this)">
+                        </td>
+                        <td class="m-number"><%= shooters[i].m_number %></td>
+                        <td class="t-full-name"><%= shooters[i].t_full_name %></td>
+                        <td class="total-score" data-order="<%= shooters[i].total_score %>">
+                            <span><%= shooters[i].total_score %></span>
+                            <input class="total-score-input" value="<%= shooters[i].total_score %>" style="display: none" onblur="td_disable(this)">
+                        </td>
+                        <td class="sub-score" data-order="<%= shooters[i].sub_score %>">
+                            <span><%= shooters[i].sub_score %></span>
+                            <input class="sub-score-input" value="<%= shooters[i].sub_score %>" style="display: none" onblur="td_disable(this)">
+                        </td>
+                        <td class="shooter-order"></td>
+                        <td class="organizer-operation">
+                            <a href="javascript:" onclick="set_system_data(this)"><span style="word-break: keep-all">恢复为系统数据</span></a>
+                            <a href="javascript:" onclick="shooter_delete(this)"><span style="word-break: keep-all">删除</span></a>
+                        </td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+<!--            <div style="text-align: right; padding: 2% 1%">-->
+<!--                <div class="row">-->
+<!--                    <div class="col-md-4 col-sm-4"></div>-->
+<!--                    <div class="col-md-4 col-sm-4" style="text-align: center">-->
+<!--                        <button class="btn btn-warning" style="width: 120px;" onclick="shooter_table_save(this)">保存</button>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-4 col-sm-4" style="text-align: right">-->
+<!--                        <button class="btn btn-primary" style="width: 120px;" onclick="add_new_shooter()">新增</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+        <input type="hidden" id="shooter_total_members" value="<%= JSON.stringify(total_members) %>">
+        <input type="hidden" id="competition_id" value="<%= competition.id %>">
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+
+<!-- Set System Data Modal -->
+<div id="set_system_data_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="shooter_system_row_id">
+                <h3 style="text-align: center">删除后，数据将无法恢复。 确定删除吗？</h3>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="set_system_data_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Shooter Delete Modal -->
+<div id="shooter_delete_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="shooter_delete_row_id">
+                <h3 style="text-align: center">删除后，数据将无法恢复。 确定删除吗？</h3>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="shooter_delete_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<% include ../partials/foot.ejs %>
+<script>
+    let total_member_ids = [];
+    let total_member_names = [];
+    let total_member_numbers = [];
+    let total_member_teams = [];
+    $(function () {
+        sort_shooter_table();
+        let total_members = JSON.parse($('#shooter_total_members').val());
+        for (let i = 0; i < total_members.length; i++) {
+            total_member_ids.push(total_members[i].m_id);
+            total_member_names.push(total_members[i].m_name);
+            total_member_numbers.push(total_members[i].m_number);
+            total_member_teams.push(total_members[i].t_full_name);
+        }
+    })
+    function td_edit(el) {
+        $(el).find('input').css("display", "block");
+        $(el).find('span').css("display", "none");
+        $(el).find('input').focus();
+        window.getSelection().removeAllRanges();
+        $(el).css('background', 'transparent');
+        if ($(el).attr('class') === 'm-name') 
+            autocomplete_func($(el).find('input')[0], total_member_names);
+    }
+    function td_disable(el) {
+        setTimeout(function () {
+            let val = $(el).val();
+            $(el).parent().find('span').text(val);
+            let node = $(el).parent();
+            if (node.attr('class') === 'm-name') {
+                let index = total_member_names.indexOf(val);
+                if (index === -1) {
+                    showAlert('请选择可用的球员姓名');
+                    node.css('background', 'red');
+                } else {
+                    node.parent().attr('id', total_member_ids[index]);
+                    node.parent().find('td.m-number').html(total_member_numbers[index]);
+                    node.parent().find('td.t-full-name').html(total_member_teams[index]);
+                }
+            } else if (node.attr('class') === 'total-score' || node.attr('class') === 'sub-score') {
+                if (cell_score(val)) {
+                    showAlert('请填写数字');
+                    node.css('background', 'red');
+                } else {
+                    node.attr('data-order', val);
+                }
+            }
+        }, 170);
+        $(el).parent().find('span').css('display', 'block');
+        $(el).css('display', 'none');
+    }
+    function sort_shooter_table() {
+        let sA = [3, 4];
+        let table_rows = $('#shooter_table tbody')[0];
+        let table, rows, switching, x, y, i, shouldSwitch;
+        table = table_rows;
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 0; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName('TD');
+                y = rows[i+1].getElementsByTagName('TD');
+                if (parseInt(x[sA[0]].getAttribute('data-order').toLowerCase()) < parseInt(y[sA[0]].getAttribute('data-order').toLowerCase())) {
+                    shouldSwitch = true;
+                    break;
+                } else if (parseInt(x[sA[0]].getAttribute('data-order').toLowerCase()) === parseInt(y[sA[0]].getAttribute('data-order').toLowerCase())) {
+                    if (parseInt(x[sA[1]].getAttribute('data-order').toLowerCase()) > parseInt(y[sA[1]].getAttribute('data-order').toLowerCase())) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+        for (let j = 0; j < rows.length; j++) {
+            rows[j].getElementsByTagName('TD')[5].innerHTML = j + 1;
+        }
+    }
+    function set_system_data(ele) {
+        let id = $(ele).parent().parent().attr('id');
+        $('#shooter_system_row_id').val(id);
+        $('#set_system_data_modal').modal();
+    }
+    function shooter_delete(ele) {
+        let id = $(ele).parent().parent().attr('id');
+        $('#shooter_delete_row_id').val(id);
+        $('#shooter_delete_modal').modal();
+    }
+    function set_system_data_confirm() {
+        let m_id = $('#shooter_system_row_id').val();
+        let data = {
+            member_id: m_id,
+        }
+        $.ajax({
+            url: '/common/get-shooter-system-data',
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    console.log(res.result);
+                    $('#' + m_id).find('.total-score span').text(res.result.total_score);
+                    $('#' + m_id).find('.total-score').attr('data-order', res.result.total_score);
+                    $('#' + m_id).find('.total-score input').val(res.result.total_score);
+                    $('#' + m_id).find('.sub-score span').text(res.result.sub_score);
+                    $('#' + m_id).find('.sub-score').attr('data-order', res.result.sub_score);
+                    $('#' + m_id).find('.sub-score input').val(res.result.sub_score);
+                    $('#set_system_data_modal').modal('toggle');
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+    function shooter_delete_confirm() {
+        let id = $('#shooter_delete_row_id').val();
+        console.log(id);
+        $('#shooter_table tbody #' + id).remove();
+        $('#shooter_delete_modal').modal('toggle');
+    }
+    function add_new_shooter() {
+        let new_id = 'new_ranking_' + new Date().getTime();
+        let row_tags = '<tr id="' + new_id + '">'
+            + '<td class="m-name" ondblclick="td_edit(this)">'
+            + '<span></span><input class="m-name-input" style="display: none" value="" onblur="td_disable(this)"></td>'
+            + '<td class="m-number"></td>'
+            + '<td class="t-full-name"></td>'
+            + '<td class="total-score" data-order="" ondblclick="td_edit(this)">'
+            + '<span></span><input class="total-score-input" value="" style="display: none" onblur="td_disable(this)"></td>'
+            + '<td class="sub-score" data-order="" ondblclick="td_edit(this)">'
+            + '<span></span><input class="sub-score-input" value="" style="display: none" onblur="td_disable(this)">'
+            + '</td><td class="shooter-order"></td>'
+            + '<td class="organizer-operation">'
+            + '<a href="javascript:" onclick="set_system_data(this)"><span style="word-break: keep-all">恢复为系统数据</span></a>'
+            + '<a href="javascript:" onclick="shooter_delete(this)"><span style="word-break: keep-all">删除</span></a></td></tr>';
+        $('#shooter_table tbody').append(row_tags);
+    }
+    function shooter_table_save() {
+        let c_id = $('#competition_id').val();
+        let table_trs = $('#shooter_table tbody tr');
+        let table_data = [];
+        for (let i = 0; i < table_trs.length; i++) {
+            let row = $(table_trs[i]);
+            let item = {};
+            if (cell_id(row.attr('id')) || cell_name(row.find('.m-name span').text())) {
+                showAlert('请选择可用的球员姓名');
+                row.find('.m-name').css('background', 'red');
+                return;
+            }
+            item.m_id = row.attr('id');
+            if (cell_score(row.find('.total-score span').text())) {
+                showAlert('请填写数字');
+                row.find('.total-score').css('background', 'red');
+                return;
+            }
+            item.total_score = row.find('.total-score span').text();
+            if (cell_score(row.find('.sub-score span').text())) {
+                showAlert('请填写数字');
+                row.find('.sub-score').css('background', 'red');
+                return;
+            }
+            item.sub_score = row.find('.sub-score span').text();
+            table_data.push(item);
+        }
+        let data = {
+            competition_id: c_id,
+            shooter_array: table_data
+        }
+        $.ajax({
+            url: '/organizer/add-shooter',
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                } else showAlert(res.message);
+            }
+        })
+    }
+
+    function cell_score(text) {
+        return (text === "" || !checkValidNumber(Number(text)));
+    }
+    function cell_name(text) {
+        return (total_member_names.indexOf(text) === -1)
+    }
+    function cell_id(text) {
+        return (total_member_ids.indexOf(text) === -1)
+    }
+</script>
+</body>
+</html>

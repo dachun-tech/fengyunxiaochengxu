@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="container">
+            <div style="padding: 3% 1% 0 0; text-align: right;">
+                <a href="/organizer/add-delete-vote/<%= competition.id %>"><button class="btn btn-primary" style="width: 150px;">新增投票</button></a>
+            </div>
+            <input type="hidden" id="competition_id" value="<%= competition.id %>">
+            <input type="hidden" id="competition_name" value="<%= competition.c_name %>">
+
+            <div class="box-body">
+                <table class="table table-bordered organizer-tables" id="vote_table">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>投票标题</th>
+                        <th>赛事名称</th>
+                        <th>开始时间</th>
+                        <th>结果时间</th>
+                        <th>投票方式</th>
+                        <th>发布状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for (let index = 0; index < votes.length; index++) {%>
+                        <tr id="<%= votes[index].id %>">
+                            <td><%= index+1 %></td>
+                            <td><%= votes[index].v_title %></td>
+                            <td><%= competition.c_name %></td>
+                            <td class="vote-time"><%= votes[index].v_start_time %></td>
+                            <td class="vote-time"><%= votes[index].v_end_time %></td>
+                            <td><%= votes[index].v_method.method_text + votes[index].v_method.method_value %>次</td>
+                            <td><label class="switch">
+                                    <input type="checkbox" data-id="<%= votes[index].id %>" <%= (votes[index].v_state == 1)?'':'checked'; %>
+                                           onchange="switch_tab_change(this)">
+                                    <span class="slider round"></span>
+                                </label></td>
+                            <td class="organizer-operation">
+                                <a href="/organizer/edit-vote/<%= votes[index].id %>">编辑</a>
+                                <a href="/organizer/view-vote/<%= votes[index].id %>">查看投票数据</a>
+                                <a href="javascript:" onclick="delete_vote('<%= votes[index].id %>')">删除</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+                <% if (pages > 0) { %>
+                    <ul class="pagination justify-content-center">
+                        <% if (current == 1) { %>
+                            <li class="page-item disabled"><a class="page-link">首页</a></li>
+                        <% } else { %>
+                            <li class="page-item"><a class="page-link" href="javascript:">首页</a></li>
+                        <% } %>
+                        <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+                        <% if (i !== 1) { %>
+                            <li class="page-item disabled"><a class="page-link">...</a></li>
+                        <% } %>
+                        <% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                            <% if (i == current) { %>
+                                <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="javascript:"><%= i %></a></li>
+                            <% } %>
+                            <% if (i == Number(current) + 2 && i < pages) { %>
+                                <li class="page-item disabled"><a class="page-link">...</a></li>
+                            <% } %>
+                        <% } %>
+                        <% if (current == pages) { %>
+                            <li class="page-item disabled"><a class="page-link">尾页</a></li>
+                        <% } else { %>
+                            <li class="page-item"><a class="page-link" href="javascript:">尾页</a></li>
+                        <% } %>
+                    </ul>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+
+<!-- Shooter Delete Modal -->
+<div id="vote_delete_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="vote_delete_row_id">
+                <h3 style="text-align: center">删除后，数据将无法恢复。 确定删除吗？</h3>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="vote_delete_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<% include ../partials/foot.ejs %>
+<script>
+    $(function () {
+        convert_to_china_time();
+    })
+    function convert_to_china_time() {
+        $('.vote-time').each(function () {
+            let time = $(this).text();
+            $(this).text(china_time(time))
+        })
+    }
+    function switch_tab_change(ele) {
+        let v_state = $(ele).prop('checked') === true ? 2 : 1;
+        let v_id = $(ele).attr('data-id');
+        $.ajax({
+            url: '/organizer/change-vote-state',
+            method: 'post',
+            data: {
+                v_id: v_id,
+                v_state: v_state
+            },
+            success: function (res) {
+                if (res.status === 'success') showAlert(res.message, true);
+                else showAlert(res.message);
+            }
+        })
+    }
+    function reload_table(cur_page) {
+        let c_id = $('#competition_id').val();
+        $.ajax({
+            url: '/common/pagination',
+            method: 'post',
+            data: {
+                table_name: 'vote',
+                c_id: c_id,
+                cur_page: cur_page
+            },
+            success: function (res) {
+                if (res.status === "success") {
+                    make_new_table(res.page_content, cur_page, page_rows, res.total_pages);
+                    custom_pagination(cur_page, res.total_pages)
+                } else {
+                    console.log("failed")
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+    function make_new_table(votes, current, page_rows, total_pages) {
+        $("#vote_table tbody tr").remove();
+        let competition_name = $('#competition_name').val();
+        if (current === '首页') current = 1
+        else if (current === '尾页') current = total_pages
+        else current = parseInt(current);
+        let tbody_tags = "";
+        for (let index = 0; index < votes.length; index++) {
+            tbody_tags += '<tr><td>' + (index+page_rows*(current-1) + 1) + '</td>';
+            tbody_tags += '<td>' + votes[index].v_title + '</td>';
+            tbody_tags += '<td>' + competition_name + '</td>';
+            tbody_tags += '<td class="vote-time">' + votes[index].v_start_time + '</td>';
+            tbody_tags += '<td class="vote-time">' + votes[index].v_end_time + '</td>';
+            tbody_tags += '<td>' + votes[index].v_method.method_text + votes[index].v_method.method_value + '次</td>';
+            tbody_tags += '<td><label class="switch">';
+            if (votes[index].v_state === 1) {
+                tbody_tags += '<input type="checkbox" data-id="' + votes[index].id + '" onchange="switch_tab_change(this)">';
+            } else {
+                tbody_tags += '<input type="checkbox" data-id="' + votes[index].id + '" checked onchange="switch_tab_change(this)">';
+            }
+            tbody_tags += '<span class="slider round"></span></label></td>'
+            tbody_tags += '<td class="organizer-operation"><a href="/organizer/edit-vote/' + votes[index].id +'">编辑</a>'
+                + '<a href="/organizer/view-votes/' + votes[index].id + '">查看投票数据</a>'
+                + '<a href="javascript:" onclick="delete_vote(\'' + votes[index].id + '\')">删除</a></td></tr>';
+        }
+        $("#vote_table tbody").append(tbody_tags);
+        convert_to_china_time();
+    }
+    function delete_vote(id) {
+        console.log(id);
+        $('#vote_delete_row_id').val(id);
+        $('#vote_delete_modal').modal();
+    }
+    function vote_delete_confirm() {
+        let id = $('#vote_delete_row_id').val();
+        let com_id = $('#competition_id').val();
+        $.ajax({
+            url: '/organizer/add-delete-vote/' + com_id,
+            method: 'post',
+            data: {
+                v_id: id,
+                method_type: 'delete'
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    $('#vote_delete_modal').modal('toggle');
+                    $('#vote_table tbody #' + id).remove();
+                } else showAlert(res.message);
+            }
+        })
+    }
+</script>
+</body>
+</html>

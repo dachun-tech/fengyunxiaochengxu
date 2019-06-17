@@ -1,0 +1,77 @@
+/** template players **/
+
+.players-section {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background: white;
+    font-size: 22rpx;
+    color: #888888;
+    text-align: center;
+    margin-bottom: 1px;
+}
+
+.players-section .section-header {
+    font-size: 28rpx;
+    font-weight: bold;
+    width: 100%;
+    height: 88rpx;
+    line-height: 88rpx;
+    text-align: left;
+    color: #333333;
+    padding: 0 30rpx;
+}
+
+.section-row.players {
+    background: transparent;
+    color: #333333;
+    height: auto;
+    line-height: 34rpx;
+    padding: 20rpx 0 0;
+}
+
+.section-row.players:last-child {
+    padding-bottom: 30rpx;
+}
+
+.section-row.players>view {
+    text-align: center;
+    color: inherit;
+    flex: 50%;
+}
+
+.section-row.players>view:first-child {
+    border-right: 1px solid #d8d8d8;
+}
+
+.section-row.players .row-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60rpx;
+}
+
+.row-item>view {
+    flex: 45%;
+    text-align: left;
+}
+
+.row-item>view:first-child {
+    flex: 25%;
+    text-align: center;
+}
+
+.row-item>view:last-child {
+    flex: 30%;
+    text-align: center;
+}
+
+.item-number {
+    display: inline-block;
+    background: #333333;
+    color: white;
+    width: 40rpx;
+    height: 40rpx;
+    line-height: 40rpx;
+    border-radius: 50%;
+}

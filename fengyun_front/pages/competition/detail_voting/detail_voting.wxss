@@ -1,0 +1,194 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+@import "../../templates/fixedButtons/fixedButtons.wxss";
+@import "../../templates/shareImage/shareImage.wxss";
+@import "../../../wxParse/wxParse.wxss";
+
+/************** header view part *****************/
+
+.table-view {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    background: #f4f4f4;
+    padding: 0;
+}
+
+.voting-section {
+    position: relative;
+    width: 100%;
+    padding: 0;
+}
+
+.section-title {
+    width: 100%;
+    height: 100rpx;
+    line-height: 100rpx;
+    padding: 0 30rpx;
+    margin: 0;
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333333;
+    background: white;
+}
+
+.section-bg {
+    width: 100%;
+    height: 382rpx;
+    position: relative;
+}
+
+.section-bg image {
+    width: 100%;
+    height: 100%;
+}
+
+.section-time {
+    background: transparent;
+    height: 145rpx;
+    line-height: 140rpx;
+    width: 100%;
+    text-align: center;
+    color: #df4848;
+    font-size: 26rpx;
+    padding-top: 20rpx;
+}
+
+.section-info {
+    position: absolute;
+    z-index: 10;
+    left: 30rpx;
+    top: 370rpx;
+    width: 690rpx;
+    height: 150rpx;
+    border-radius: 20rpx;
+    background: white;
+    display: flex;
+}
+
+.section-info>view {
+    position: relative;
+    flex: 50%;
+    margin: 30rpx 0;
+}
+
+.section-info>view:first-child {
+    border-right: 1px solid #e8e8e8;
+}
+
+.section-info>view>view {
+    text-align: center;
+    width: 100%;
+    font-size: 28rpx;
+    color: #6cab3b;
+    margin: 0;
+}
+
+.section-info>view>view:last-child {
+    font-size: 30rpx;
+    font-weight: bold;
+    margin: 10rpx 0 0;
+}
+
+
+/******** apply section part ********/
+
+.info-section {
+    width: 100%;
+    margin-bottom: 20rpx;
+    padding: 15rpx 0;
+    background: white;
+}
+
+.info-section .section-title {
+    width: 680rpx;
+    height: 42rpx;
+    line-height: 42rpx;
+    padding: 0 12rpx;
+    margin: 20rpx 30rpx;
+    border-left: 8rpx solid #6cab3b;
+}
+
+.apply-info {
+    padding: 0 30rpx;
+    height: 120rpx;
+    line-height: 120rpx;
+    font-size: 24rpx;
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid #d8d8d8;
+    overflow: hidden;
+}
+
+.apply-info:last-child {
+    border: none;
+}
+
+.apply-info-cell {
+    align-self: flex-start;
+    flex: 80%;
+}
+
+.apply-info-cell image.info-icon {
+    width: 50rpx;
+    height: 50rpx;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 20rpx;
+}
+
+.info-type {
+    display: inline-block;
+    vertical-align: middle;
+    width: 420rpx;
+}
+
+.info-type view {
+    line-height: 1.5;
+}
+
+view.apply-info-button {
+    align-self: flex-center;
+    flex: 20%;
+    overflow: hidden;
+}
+
+.apply-info-button>view {
+    width: 100%;
+    text-align: center;
+    line-height: 1;
+    font-size: 20rpx;
+    color: #888888;
+}
+
+.apply-info-button>view>view {
+    display: inline-block;
+    margin: 15rpx 0 10rpx;
+    font-size: 26rpx;
+    font-weight: bold;
+    background: #6cab3b;
+    color: white;
+    width: 100%;
+    height: 60rpx;
+    line-height: 60rpx;
+    border-radius: 12rpx;
+}
+
+.apply-info-button>view>view.disabled {
+    background: #cccccc;
+}
+
+
+/******* intro section part ********/
+
+.intro-description {
+    padding: 0 30rpx;
+    line-height: 44rpx;
+    font-size: 26rpx;
+    width: 100%;
+    padding: 0 30rpx 20rpx;
+    margin: 0;
+    text-align: justify;
+}

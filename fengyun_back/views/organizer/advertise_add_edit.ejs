@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" href="/assets/ace/jquery-ui.custom.min.css"/>
+<link rel="stylesheet" href="/assets/ace/ace.min.css"/>
+
+<link rel="stylesheet" type="text/css" href="/assets/main/css/organizer-competition.css">
+<style>
+    .wysiwyg-toolbar {
+        border: 1px solid #BBC0CA;
+    }
+</style>
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="container">
+            <input type="hidden" id="advertise_id" value="<%= (isEdit) ? advertise.id : '' %>">
+            <input type="hidden" id="advertise_action" value="<%= (isEdit) ? 'edit' : 'add' %>">
+            <input type="hidden" id="advertise_action_id" value="<%= com_id %>">
+            <div style="padding: 5% 0;">
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">标题：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <input type="text" placeholder="单行输入（最多30字）" id="ad_title" value="<%= (isEdit) ? advertise.ad_title : '' %>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">赛事：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <select id="ad_competition">
+                                    <% for (let i = 0; i < competitions.length; i++) { %>
+                                        <option value="<%= competitions[i].id %>" <%= (isEdit && competitions[i].id == advertise.competition_id) ?
+                                                'selected' : '' %>><%= competitions[i].c_name %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">发布者（选填）：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <input type="text" placeholder="请输入发布者" id="ad_poster_name" value="<%= (isEdit) ? advertise.ad_poster_name : '' %>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">公告内容：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div style="max-width: 350px">
+                                <div class="wysiwyg-editor" id="ad_intro"><%- (isEdit) ? JSON.parse(advertise.ad_intro) : '' %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-10">
+                            <div class="competition-actions" style="text-align: left">
+                                <button class="btn btn-primary" style="margin-right: 5%" onclick="add_advertise('<%= isEdit %>')">保存</button>
+                                <a href="javascript:history.back();">
+                                    <button class="btn btn-default">取消</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+<% include ../partials/foot.ejs %>
+
+<script src="/assets/ace/jquery-ui.custom.min.js"></script>
+<script src="/assets/ace/jquery.hotkeys.index.min.js"></script>
+<script src="/assets/ace/bootstrap-wysiwyg.min.js"></script>
+<!-- ace scripts -->
+<script src="/assets/ace/ace-elements.min.js"></script>
+<script src="/assets/ace/ace.min.js"></script>
+<script type="text/javascript">
+    jQuery(function ($) {
+
+        function showErrorAlert(reason, detail) {
+            var msg = '';
+            if (reason === 'unsupported-file-type') {
+                msg = "Unsupported format " + detail;
+            } else {
+                //console.log("error uploading file", reason, detail);
+            }
+            $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                '<strong>File upload error</strong> ' + msg + ' </div>').prependTo('#alerts');
+        }
+
+        // $('#t_editor1').ace_wysiwyg();//this will create the default editor will all buttons
+
+        //but we want to change a few buttons colors for the third style
+        $('#ad_intro').ace_wysiwyg({
+            toolbar:
+                [
+                    'font',
+                    null,
+                    'fontSize',
+                    null,
+                    {name: 'bold', className: 'btn-info'},
+                    {name: 'italic', className: 'btn-info'},
+                    {name: 'strikethrough', className: 'btn-info'},
+                    {name: 'underline', className: 'btn-info'},
+                    null,
+                    {name: 'insertunorderedlist', className: 'btn-success'},
+                    {name: 'insertorderedlist', className: 'btn-success'},
+                    {name: 'outdent', className: 'btn-purple'},
+                    {name: 'indent', className: 'btn-purple'},
+                    null,
+                    {name: 'justifyleft', className: 'btn-primary'},
+                    {name: 'justifycenter', className: 'btn-primary'},
+                    {name: 'justifyright', className: 'btn-primary'},
+                    {name: 'justifyfull', className: 'btn-inverse'},
+                    null,
+                    {name: 'createLink', className: 'btn-pink'},
+                    {name: 'unlink', className: 'btn-pink'},
+                    null,
+                    {name: 'insertImage', className: 'btn-success'},
+                    null,
+                    'foreColor',
+                    null,
+                    {name: 'undo', className: 'btn-grey'},
+                    {name: 'redo', className: 'btn-grey'}
+                ],
+            'wysiwyg': {
+                fileUploadError: showErrorAlert
+            }
+        }).prev().addClass('wysiwyg-style1');
+
+
+        //RESIZE IMAGE
+
+        //Add Image Resize Functionality to Chrome and Safari
+        //webkit browsers don't have image resize functionality when content is editable
+        //so let's add something using jQuery UI resizable
+        //another option would be opening a dialog for user to enter dimensions.
+        if (typeof jQuery.ui !== 'undefined' && ace.vars['webkit']) {
+
+            var lastResizableImg = null;
+
+            function destroyResizable() {
+                if (lastResizableImg == null) return;
+                lastResizableImg.resizable("destroy");
+                lastResizableImg.removeData('resizable');
+                lastResizableImg = null;
+            }
+
+            var enableImageResize = function () {
+                $('.wysiwyg-editor')
+                    .on('mousedown', function (e) {
+                        var target = $(e.target);
+                        if (e.target instanceof HTMLImageElement) {
+                            if (!target.data('resizable')) {
+                                target.resizable({
+                                    aspectRatio: e.target.width / e.target.height,
+                                });
+                                target.data('resizable', true);
+
+                                if (lastResizableImg != null) {
+                                    //disable previous resizable image
+                                    lastResizableImg.resizable("destroy");
+                                    lastResizableImg.removeData('resizable');
+                                }
+                                lastResizableImg = target;
+                            }
+                        }
+                    })
+                    .on('click', function (e) {
+                        if (lastResizableImg != null && !(e.target instanceof HTMLImageElement)) {
+                            destroyResizable();
+                        }
+                    })
+                    .on('keydown', function () {
+                        destroyResizable();
+                    });
+            };
+
+            enableImageResize();
+        }
+
+
+    });
+</script>
+<script>
+    $(function () {
+        if ($('#advertise_action').val() === 'add') {
+            let ad_action_id = $('#advertise_action_id').val();
+            $('#ad_competition').val(ad_action_id);
+            $('#ad_competition').trigger('change');
+        }
+    });
+    function upload_editor_images(is_edit) {
+        let imgTags = $('.wysiwyg-editor').find('img');
+        let img_arr = [];
+        let img_tags = [];
+        for (let i = 0; i < imgTags.length; i++) {
+            let src = $(imgTags[i]).attr('src');
+            if (src.length > 1000) {
+                img_arr.push(src);
+                img_tags.push(imgTags[i]);
+            }
+        }
+        if (img_arr.length > 0) {
+            $.ajax({
+                url: '/common/upload-editor-image',
+                method: 'post',
+                data: {
+                    img_data: img_arr
+                },
+                success: function (res) {
+                    if (res.status === 'success') {
+                        let r_imgs = res.img_urls;
+                        for (let j = 0; j < r_imgs.length; j++) {
+                            $(img_tags[j]).attr('src', r_imgs[j]);
+                        }
+                        add_advertise_pre(is_edit);
+                    }
+                },
+                error: function (err) {
+                    console.log("error: ", err);
+                    return false;
+                }
+            });
+        } else {
+            add_advertise_pre(is_edit);
+        }
+    }
+
+    function add_advertise(is_edit) {
+        upload_editor_images(is_edit);
+    }
+
+    function add_advertise_pre(is_edit) {
+        let ad_title = $('#ad_title').val();
+        if (ad_title === '' || ad_title.length > 30) {
+            showAlert('单行输入（最多30字）');
+            return;
+        }
+        let competition_id = $('#ad_competition').val();
+        let ad_poster_name = $('#ad_poster_name').val();
+        let ad_intro = $('#ad_intro').html();
+        if (ad_intro === '') {
+            showAlert('请输入公告内容');
+            return;
+        }
+        let url = '/organizer/add-delete-advertise/' + $('#advertise_action_id').val();
+        let method_type = 'add';
+        if (is_edit === 'true') {
+            let advertiseID = $('#advertise_id').val();
+            url = '/organizer/edit-advertise/' + advertiseID;
+            method_type = 'edit';
+        }
+        let data = {
+            ad_title: ad_title,
+            c_id: competition_id,
+            ad_poster_name: ad_poster_name,
+            ad_intro: ad_intro,
+            method_type: method_type
+        };
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/organizer/advertise/' + competition_id;
+                    }, 1000)
+                } else {
+                    showAlert(res.message)
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

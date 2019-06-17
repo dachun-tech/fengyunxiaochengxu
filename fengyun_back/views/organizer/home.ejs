@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div style="text-align: right; padding: 2% 2% 0 0">
+            <a class="btn btn-info" href="/organizer/add-competition" style="width: 150px">新增赛事</a>
+        </div>
+        <!-- organizer competition table -->
+        <div class="box-body">
+            <table class="table table-bordered organizer-tables" id="organizer_competition_table">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>赛事名称</th>
+                    <th>赛季</th>
+                    <th>LOGO</th>
+                    <th>活动类型</th>
+                    <th>赛事类型</th>
+                    <th>开赛时间</th>
+                    <th>结束时间</th>
+                    <th>省份</th>
+                    <th>城市</th>
+                    <th>发布状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <!-- competitions -->
+                <tbody>
+                <% for (let i = 0; i < competitions.length; i++) { %>
+                    <tr id="<%= competitions[i].id %>">
+                        <td><%= i + 1 %></td>
+                        <td><%= competitions[i].c_name %></td>
+                        <td><%= competitions[i].c_season %></td>
+                        <td class="td-logo">
+                            <img src="<%= competitions[i].c_logo %>" /></td>
+                        <td><%= (competitions[i].c_active_type == 1)?'足球':'Other' %></td>
+                        <td><% if (competitions[i].c_type == 1) { %>联赛（单循环）<% } else if (competitions[i].c_type == 2)  { %>
+                                联赛（双循环）<% } else if (competitions[i].c_type == 3) { %>
+                                杯赛—小组赛（单循环）+ 淘汰赛<% } else if (competitions[i].c_type == 4) {%>
+                                杯赛—小组赛（双循环）+ 淘汰赛<% } else if (competitions[i].c_type == 5) { %>
+                                杯赛—淘汰赛<% } %></td>
+                        <td><%= competitions[i].c_start_time %></td>
+                        <td><%= competitions[i].c_end_time %></td>
+                        <td><%= competitions[i].c_province.province %></td>
+                        <td><%= competitions[i].c_city.city %></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" data-id="<%= competitions[i].id %>" <%= (competitions[i].is_published == 1)?'':'checked'; %>
+                                       onchange="switch_tab_change(this)"><span class="slider round"></span>
+                            </label></td>
+                        <td class="organizer-operation">
+                            <a href="/organizer/edit-competition/<%= competitions[i].id %>">编辑</a>
+                            <a href="/organizer/applying/<%= competitions[i].id %>">报名管理</a>
+                            <a href="/organizer/games/<%= competitions[i].id %>">比赛管理</a>
+                            <a href="/organizer/ranking/<%= competitions[i].id %>">积分榜</a>
+                            <a href="/organizer/shooter/<%= competitions[i].id %>">射手榜</a>
+                            <a href="/organizer/advertise/<%= competitions[i].id %>">公告管理</a>
+                            <a href="/organizer/voting/<%= competitions[i].id %>">赛事投票</a>
+                            <a href="javascript:" onclick="delete_competition('<%= competitions[i].id %>')">删除</a></td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+            <% if (pages > 0) { %>
+                <ul class="pagination justify-content-center">
+                    <% if (current == 1) { %>
+                        <li class="page-item disabled"><a class="page-link">首页</a></li>
+                    <% } else { %>
+                        <li class="page-item"><a class="page-link" href="javascript:">首页</a></li>
+                    <% } %>
+                    <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+                    <% if (i !== 1) { %>
+                        <li class="page-item disabled"><a class="page-link">...</a></li>
+                    <% } %>
+                    <% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                        <% if (i == current) { %>
+                            <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                        <% } else { %>
+                            <li class="page-item"><a class="page-link" href="javascript:"><%= i %></a></li>
+                        <% } %>
+                        <% if (i == Number(current) + 2 && i < pages) { %>
+                            <li class="page-item disabled"><a class="page-link">...</a></li>
+                        <% } %>
+                    <% } %>
+                    <% if (current == pages) { %>
+                        <li class="page-item disabled"><a class="page-link">尾页</a></li>
+                    <% } else { %>
+                        <li class="page-item"><a class="page-link" href="javascript:">尾页</a></li>
+                    <% } %>
+                </ul>
+            <% } %>
+        </div>
+
+        <div style="text-align: right; padding: 1% 2% 0 0">
+            <a class="btn btn-info" href="/organizer/place-management" style="width: 150px">场地管理</a>
+        </div>
+        <div style="text-align: right; padding: 1% 2% 0 0">
+            <a class="btn btn-warning" href="javascript:" style="width: 150px" onclick="$('#feedback_modal').modal()">意见反馈</a>
+        </div>
+
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+<!-- Feedback modal -->
+<div class="modal fade" id="feedback_modal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" id="feedback_content" rows="7" placeholder="请告诉我们您希望看到的改进，或是您遇到的问题，我们将第一时间给您回复，谢谢！"></textarea>
+                <div>
+                    <h4>请留下您的邮箱，谢谢！</h4>
+                    <input id="feedback_email" placeholder="请输入您的邮箱">
+                </div>
+                <div class="identify-modal-row" style="padding: 5%">
+                    <div class="identify-modal-btn" style="text-align: center">
+                        <button type="button" class="btn btn-info" id="disable-success" onclick="send_feedback()" style="min-width: 150px;">确定</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" style="min-width: 150px;">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Competition Delete Modal -->
+<div id="competition_delete_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="competition_delete_row_id">
+                <h3 style="text-align: center">删除后，数据将无法恢复。 确定删除吗？</h3>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="competition_delete_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<% include ../partials/foot.ejs %>
+<script>
+    function delete_competition(id) {
+        $('#competition_delete_row_id').val(id);
+        $('#competition_delete_modal').modal();
+    }
+    function competition_delete_confirm() {
+        let id = $('#competition_delete_row_id').val();
+        console.log(id);
+        $.ajax({
+            url: 'organizer/delete-competition',
+            method: 'post',
+            data: {
+                c_id: id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    $('#organizer_competition_table tbody tr#' + id).remove();
+                    $('#competition_delete_modal').modal('toggle');
+                } else showAlert(res.message);
+            }
+        });
+
+    }
+    function send_feedback() {
+        let content = $('#feedback_content').val();
+        if (content === '') {
+            showAlert('请告诉我们您希望看到的改进，或是您遇到的问题，我们将第一时间给您回复，谢谢！');
+            return;
+        }
+        let email = $('#feedback_email').val();
+        if (email === '') {
+            showAlert('请输入您的邮箱');
+            return;
+        }
+        let data = {
+            email: email,
+            content: content
+        }
+        $('#feedback_modal').modal('toggle');
+        $.ajax({
+            url: '/organizer/add-feedback',
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') showAlert(res.message, true);
+                else showAlert(res.message);
+            }
+        })
+    }
+    function switch_tab_change(ele) {
+        let is_published = $(ele).prop('checked') === true ? 2 : 1;
+        let c_id = $(ele).attr('data-id');
+        $.ajax({
+            url: '/organizer/change-competition-state',
+            method: 'post',
+            data: {
+                c_id: c_id,
+                is_published: is_published
+            },
+            success: function (res) {
+                if (res.status === 'success') showAlert(res.message, true);
+                else showAlert(res.message);
+            }
+        })
+    }
+    function make_new_table(competitions, current, page_rows, total_pages) {
+        $("#organizer_competition_table tbody tr").remove();
+        if (current === '首页') current = 1
+        else if (current === '尾页') current = total_pages
+        else current = parseInt(current);
+        let tbody_tags = "";
+        for (let index = 0; index < competitions.length; index++) {
+            tbody_tags += '<tr><td>' + (index+page_rows*(current-1) + 1) + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_name + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_season + '</td>';
+            tbody_tags += '<td class="td-logo"><img src="' + competitions[index].c_logo + '"/></td>';
+            if (competitions[index].c_active_type == 1) tbody_tags += '<td>足球</td>';
+            else tbody_tags += '<td>Other</td>';
+            if (competitions[index].c_type == 1) {
+                tbody_tags += '<td>联赛（单循环）</td>';
+            } else if (competitions[index].c_type == 2) {
+                tbody_tags += '<td>联赛（双循环）</td>';
+            } else if (competitions[index].c_type == 3) {
+                tbody_tags += '<td>杯赛—小组赛（单循环）+ 淘汰赛</td>';
+            } else if (competitions[index].c_type == 4) {
+                tbody_tags += '<td>杯赛—小组赛（双循环）+ 淘汰赛</td>';
+            } else {
+                tbody_tags += '<td>杯赛—淘汰赛</td>';
+            }
+            tbody_tags += '<td>' + competitions[index].c_start_time + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_end_time + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_province.province + '</td>';
+            tbody_tags += '<td>' + competitions[index].c_city.city + '</td>';
+            tbody_tags += '<td><label class="switch">';
+            if (competitions[index].is_published === 1) {
+                tbody_tags += '<input type="checkbox" data-id="' + competitions[index].id + '" onchange="switch_tab_change(this)">';
+            } else {
+                tbody_tags += '<input type="checkbox" data-id="' + competitions[index].id + '" checked onchange="switch_tab_change(this)">';
+            }
+            tbody_tags += '<span class="slider round"></span></label></td>'
+            tbody_tags += '<td class="organizer-operation"><a href="/organizer/edit-competition/' + competitions[index].id +'">编辑</a>'
+                + '<a href="/organizer/applying/' + competitions[index].id +'">报名管理</a>'
+                + '<a href="/organizer/games/' + competitions[index].id +'">比赛管理</a>'
+                + '<a href="/organizer/ranking/' + competitions[index].id +'">积分榜</a>'
+                + '<a href="/organizer/shooter/' + competitions[index].id +'">射手榜</a>'
+                + '<a href="/organizer/advertise/' + competitions[index].id +'">公告管理</a>'
+                + '<a href="/organizer/voting/' + competitions[index].id +'">赛事投票</a>'
+                + '<a href="javascript:" onclick="delete_competition(\'' + competitions[index].id + '\')">删除</a></td></tr>';
+        }
+        $("#organizer_competition_table tbody").append(tbody_tags);
+    }
+    // submit requests
+    function reload_table(cur_page) {
+        $.ajax({
+            url: '/common/pagination',
+            method: 'post',
+            data: {
+                table_name: 'competition',
+                cur_page: cur_page
+            },
+            success: function (res) {
+                if (res.status === "success") {
+                    make_new_table(res.page_content, cur_page, page_rows, res.total_pages);
+                    custom_pagination(cur_page, res.total_pages);
+
+                } else {
+                    console.log("failed")
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+</script>
+</body>
+</html>

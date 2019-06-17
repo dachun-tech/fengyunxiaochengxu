@@ -1,0 +1,52 @@
+<!-- template-introduction -->
+<template name="template-introduction">
+    <view class="intro-section">
+        <view class="intro-item">
+            <view class="item-key">球队类型:</view>
+            <view class="item-value">{{allItems.t_type}}</view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">活动类型:</view>
+            <view class="item-value">{{allItems.actionTypeArr[allItems.action_type -1]}}</view>
+        </view>
+        <view class="intro-item">
+            <view class="item-key">所在城市:</view>
+            <view class="item-value">{{(allItems.t_province==allItems.t_city)?'':(allItems.t_province+' ')}}{{allItems.t_city}}</view>
+        </view>
+        <view class="intro-item" wx:if="{{allItems.t_colors[0]!='' || allItems.t_colors[1]!=''}}">
+            <view class="item-key">队服颜色:</view>
+            <view class="item-value">{{allItems.t_colors[0]!=''?('队服1:'+ allItems.t_colors[0]):'' }}{{(allItems.t_colors[0]!='' && allItems.t_colors[1]!='')?', ':'' }}{{allItems.t_colors[1]!=''?('队服2:'+ allItems.t_colors[1]):'' }}
+            </view>
+        </view>
+        <view class="intro-item" wx:if="{{allItems.helper_name!=''}}">
+            <view class="item-key">赞助商:</view>
+            <view class="item-value">{{allItems.helper_name}}</view>
+        </view>
+    </view>
+    <view class="intro-section">
+        <view class="section-title">风采展示</view>
+        <view class="intro-description" style="height: 320rpx;">
+            <swiper indicator-dots="{{true}}" autoplay="{{true}}" interval="{{5000}}" duration="{{500}}">
+                <block wx:for="{{allItems.t_images}}" wx:key="index">
+                    <swiper-item>
+                        <image class="swiper-image" mode="aspectFill" src="{{allItems.serverUploadRoot + item}}"  bindtap="previewImg" data-value="{{allItems.serverUploadRoot + item}}"/>
+                    </swiper-item>
+                </block>
+            </swiper>
+        </view>
+    </view>
+    <view class="intro-section">
+        <view class="section-title">简介</view>
+        <view class="intro-description">
+            <text>{{allItems.t_intro}}</text>
+        </view>
+        <!-- <view class="intro-button">
+            <button>查看全部</button>
+        </view> -->
+    </view>
+    <view class="intro-section" style="background: transparent;" wx:if="{{allItems.user_id==allItems.myInfo.user_id}}">
+        <view class="intro-button">
+            <button class="intro-submit-button" bindtap="onclick_button" data-type="editTeam" data-value="{{allItems.team_id}}">编辑</button>
+        </view>
+    </view>
+</template>

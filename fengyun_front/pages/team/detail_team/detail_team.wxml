@@ -1,0 +1,49 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<import src="../../templates/fixedButtons/fixedButtons.wxml"></import>
+<import src="template_introduction.wxml"></import>
+<import src="template_member.wxml"></import>
+<import src="template_data.wxml"></import>
+<import src="template_schedule.wxml"></import>
+<view class="container">
+    <view class="item-container">
+        <image class="item-image" style="border-radius: 50%;padding:0;" mode="aspectFit" src="{{(allItems.t_logo!='')?(allItems.serverUploadRoot + allItems.t_logo):'../../../images/team_logo02@2x.png'}}"></image>
+        <view class="item-content">
+            <view class="item-title">{{allItems.t_full_name}}</view>
+            <view class="item-info">
+                <view class="item-info-cell">
+                    <view class="info-type" style="font-size: 26rpx;" wx:if="{{allItems.t_created_time!=''}}">成立时间: {{allItems.t_created_time}}</view>
+                </view>
+                <view class="item-info-cell right {{allItems.isFavorite!=0?'status1':''}}" bindtap="onclick_button" data-type="favorite" data-value="{{allItems.isFavorite}}">
+                    <button  wx:if="{{allItems.t_created_time!=''}}">{{favoriteStr[allItems.isFavorite]}}</button>
+                </view>
+            </view>
+            <view class="item-info" style="top: 184rpx;">
+                <view class="item-info-cell" style="flex: 60%;"></view>
+                <view class="item-info-cell right text">粉丝: {{allItems.fav_count}}</view>
+            </view>
+        </view>
+    </view>
+    <view class='top-menu'>
+        <view class="menu-item {{menuSelected=='introduction'?'selected':''}}" bindtap="onclick_menuitem" data-type="introduction">
+            资料
+        </view>
+        <view class="menu-item {{menuSelected=='member'?'selected':''}}" bindtap="onclick_menuitem" data-type="member">
+            成员
+        </view>
+        <view class="menu-item {{menuSelected=='data'?'selected':''}}" bindtap="onclick_menuitem" data-type="data">
+            数据
+        </view>
+        <view class="menu-item {{menuSelected=='schedule'?'selected':''}}" bindtap="onclick_menuitem" data-type="schedule">
+            赛程
+        </view>
+    </view>
+    <view class="table-view">
+        <template is="template-introduction" wx:if="{{menuSelected=='introduction'}}" data="{{allItems}}"></template>
+        <template is="template-member" wx:if="{{menuSelected=='member'}}" data="{{allItems}}"></template>
+        <template is="template-data" wx:if="{{menuSelected=='data'}}" data="{{allItems,submenuSelected}}"></template>
+        <template is="template-schedule" wx:if="{{menuSelected=='schedule'}}" data="{{allItems}}"></template>
+    </view>
+    <template is="template-fixedButtons" data="{{is3IconExist}}"></template>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

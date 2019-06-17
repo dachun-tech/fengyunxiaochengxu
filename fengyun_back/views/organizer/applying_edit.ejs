@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+
+<link rel="stylesheet" type="text/css" href="/assets/main/css/organizer-competition.css">
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+
+<style>
+    img {
+        cursor: pointer;
+    }
+    #img_view_modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+        z-index: 99999;
+    }
+
+    /* Modal Content (image) */
+    #img_view_modal .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    /* Add Animation */
+    #img_view_modal .modal-content {
+        -webkit-animation-name: zoom;
+        -webkit-animation-duration: 0.6s;
+        animation-name: zoom;
+        animation-duration: 0.6s;
+    }
+
+    @-webkit-keyframes zoom {
+        from {-webkit-transform:scale(0)}
+        to {-webkit-transform:scale(1)}
+    }
+
+    @keyframes zoom {
+        from {transform:scale(0)}
+        to {transform:scale(1)}
+    }
+
+    /* The Close Button */
+    #img_view_modal .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    #img_view_modal .close:hover,
+    #img_view_modal .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* 100% Image Width on Smaller Screens */
+    @media only screen and (max-width: 700px){
+        #img_view_modal .modal-content {
+            width: 100%;
+        }
+    }
+</style>
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="container">
+            <input type="hidden" id="apply_id" value="<%= apply.id %>">
+            <input type="hidden" id="competition_id" value="<%= apply.competition.id %>">
+            <div style="padding: 5% 0;">
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">球队LOGO：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <div class="competition-logo-image">
+                                    <img src="<%= apply.team.t_logo %>" onclick="big_image_preview(event)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">球队名称：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content"><%= apply.team.t_full_name %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">球队类型：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content"><%= apply.team.t_type %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">活动类型：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content"><%= (apply.competition.c_active_type === 1)?'足球':'Unknown' %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">所在城市：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content"><%= apply.team.t_city %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">成立时间：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content"><%= apply.team.t_created_time.toString().slice(0, 4) + '年'
+                                + apply.team.t_created_time.toString().slice(5, 7) + '日' + apply.team.t_created_time.toString().slice(8, 10) %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">队服颜色：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                            <% for (let i = 0; i < apply.team.t_colors.length; i++) { %>
+                                <span style="padding-right: 10px">队服<%= i+1 %>: <%= apply.team.t_colors[i] %>; </span>
+                            <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">赞助商：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content"><%= apply.team.helper_name %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">风采展示：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <% for (let i = 0; i < apply.team.t_images.length; i++){ %>
+                                    <div class="competition-item-image">
+                                        <img src="<%= apply.team.t_images[i] %>" onclick="big_image_preview(event)">
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">球队简介：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content"><%= JSON.parse(apply.team.t_intro) %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">球队成员：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <div style="text-align: right">
+                                    <button class="btn btn-primary btn-sm" onclick="exportTable('球队成员')">导出表格</button>
+                                </div>
+                                <table class="table table-bordered organizer-tables" id="members_table">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>队内身份</th>
+                                        <th>姓名</th>
+                                        <th>性别</th>
+                                        <th>年龄</th>
+                                        <th>场上位置</th>
+                                        <th>号码</th>
+                                        <th>邮箱</th>
+                                        <th>身高</th>
+                                        <th>身份证号</th>
+                                        <th>联系电话</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <!-- competitions -->
+                                    <tbody>
+                                    <% for (let i = 0; i < apply.members.length; i++) {
+                                        if(apply.members[i].m_state==0 || apply.members[i].m_state==3) continue;
+                                    %>
+                                        <tr>
+                                            <td><%= i+1 %></td>
+                                            <td><%= (apply.members[i].m_state === 1)?'队长':'球员' %></td>
+                                            <td><%= apply.members[i].m_name %></td>
+                                            <td><%= (apply.members[i].m_gender == 1)?'男':'女' %></td>
+                                            <td><%= apply.members[i].m_age %></td>
+                                            <td><%= apply.members[i].m_pos %></td>
+                                            <td><%= apply.members[i].m_number %>号</td>
+                                            <td><%= apply.members[i].m_mail %></td>
+                                            <td><%= apply.members[i].m_tall %></td>
+                                            <td><%= apply.members[i].m_id_number %></td>
+                                            <td><%= apply.members[i].m_phone %></td>
+                                            <td><a href="javascript:"
+                                                   onclick="show_member_logo('<%= apply.members[i].m_name %>','<%= apply.members[i].m_logo %>')">查看照片</a>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% if (apply.a_state === 1) { %>
+                    <div class="competition-row">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="competition-item-title">
+                                    <h4>报名审核操作：</h4></div>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="competition-item-content">
+                                    <input type="hidden" id="verify_flag">
+                                    <button class="btn btn-warning" id="applying_verify_true" onclick="verify_applying(true)">审核通过</button>
+                                    <button class="btn btn-warning" id="applying_verify_false" onclick="verify_applying(false)">审核不通过</button>
+                                </div>
+                                <div class="competition-item-content" id="verify_false_reason_div" style="display: none">
+                                    <span>请填写不通过原因：</span><input type="text" placeholder="请输入（100字以内）" id="verify_false_reason">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <%} %>
+
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-10">
+                            <div class="competition-actions" style="text-align: left">
+                                <% if (apply.a_state === 1) { %>
+                                    <button class="btn btn-primary" style="margin-right: 5%" onclick="submit_applying()">确定</button>
+                                <%} %>
+                                <a href="javascript:history.back();"><button class="btn btn-default">返回</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+<!-- Image View Modal -->
+<div id="img_view_modal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="img_view">
+</div>
+<!-- delete confirm modal -->
+<div class="modal fade" id="show_member_logo_modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <div style="padding: 5%"><img id="show_member_logo_img" style="width: 100%; height: 100%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../partials/foot.ejs %>
+
+<script>
+    function show_member_logo(name, img) {
+        $('#show_member_logo_modal .modal-header h4').html(name);
+        $('#show_member_logo_img').attr('src', img);
+        $('#show_member_logo_modal').modal();
+    }
+    function verify_applying(flag) {
+        if (flag) {
+            $('#verify_flag').val('true');
+            $('#applying_verify_true').removeClass('btn-warning').addClass('btn-primary');
+            $('#applying_verify_false').removeClass('btn-primary').addClass('btn-warning');
+            $('#verify_false_reason_div').css('display', 'none');
+        } else {
+            $('#verify_flag').val('false');
+            $('#applying_verify_true').removeClass('btn-primary').addClass('btn-warning');
+            $('#applying_verify_false').removeClass('btn-warning').addClass('btn-primary');
+            $('#verify_false_reason_div').css('display', 'block');
+        }
+    }
+    function submit_applying() {
+        let a_id = $('#apply_id').val();
+        let a_state = $('#verify_flag').val();
+        if (a_state === "") {
+            showAlert('请选择审核通过如果审核不通过');
+            return;
+        }
+        let data = {};
+        if (a_state === 'false') {
+            let a_reason = $('#verify_false_reason').val();
+            if (a_reason.length > 100) {
+                showAlert('请输入（100字以内）');
+                return;
+            }
+            data = {
+                a_id: a_id,
+                a_state: a_state,
+                a_reason: a_reason
+            }
+        } else {
+            data = {
+                a_id: a_id,
+                a_state: a_state
+            }
+        }
+        console.log(data);
+        $.ajax({
+            url: '',
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/organizer/applying/' + $('#competition_id').val();
+                    }, 500);
+                } else showAlert(res.message);
+            }
+        });
+    }
+    function preview_intro_images(evt) {
+        if (evt.target.files.length > 5 || evt.target.files.length === 0) {
+            showAlert('请输入最多5图片');
+            return;
+        }
+        $('#prev_intro_images').html('');
+        for (let i = 0; i < evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let dom_nodes = $($.parseHTML('<div class="competition-item-image"><img onclick="big_image_preview(event)"/><i class="fa fa-close"></i></div>'));
+                dom_nodes.find('img').attr('src', event.target.result);
+                dom_nodes.appendTo('#prev_intro_images');
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+    }
+    function big_image_preview(ele) {
+        console.log(ele);
+        $('#img_view_modal').css('display', 'block');
+        let img = ele.target.src;
+        $('#img_view_modal #img_view').attr('src', img);
+    }
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        $('#img_view_modal').css('display', 'none');
+    }
+</script>
+</body>
+</html>

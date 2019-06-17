@@ -1,0 +1,34 @@
+/**index.wxss**/
+
+.status-image {
+    position: absolute;
+    left: 285rpx;
+    top: 148rpx;
+    width: 180rpx;
+    height: 199rpx;
+}
+
+.status-text {
+    position: absolute;
+    top: 430rpx;
+    width: 100%;
+    text-align: center;
+    height: 199rpx;
+    font-size: 30rpx;
+    color: #333333;
+}
+
+.button-submit {
+    position: absolute;
+    bottom: 100rpx;
+    left: 226rpx;
+    width: 300rpx;
+    height: 74rpx;
+    line-height: 74rpx;
+    border: 1px solid #6CAB3B;
+    border-radius: 12rpx;
+    color: #6CAB3B;
+    font-size: 30rpx;
+    font-weight: bold;
+    text-align: center;
+}

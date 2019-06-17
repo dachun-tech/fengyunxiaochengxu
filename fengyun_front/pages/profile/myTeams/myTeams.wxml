@@ -1,0 +1,36 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<view class="container">    
+    <view class="table-view">
+        <block wx:for="{{allItems.list}}" wx:key="index">
+            <view class="item-container" bindtap="onclick_button" data-type="go2TeamDetail" data-value="{{item.id}}">
+                <image class="item-image" mode="aspectFill" src="{{allItems.serverUploadRoot + item.t_logo}}"></image>
+                <view class="item-status-icon {{(false)?'mine':''}}">
+                    {{(false)?'我的球队':'查看'}}
+                </view>
+                <view class="item-content">
+                    <view class="item-title">{{item.t_full_name}}</view>
+                    <view class="item-info">
+                        <view class="item-info-cell">
+                            <view class="info-type" style="font-size: 24rpx;">类型: {{item.t_type}}</view>
+                        </view>
+                        <view class="item-info-cell right">
+                            <view class="info-type" style="font-size: 22rpx;">
+                                <button>{{(item.user_id==allItems.user_id)?'我创建的':'已加入'}}</button>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="item-info">
+                        <view class="item-info-cell">
+                            <view class="info-type" style="font-size: 26rpx;">
+                                成立时间: {{item.t_created_time}}
+                            </view>
+                        </view>
+                        <view class="item-info-cell text" style="">粉丝: {{item.favorite.length}}</view>
+                    </view>
+                </view>
+            </view>
+        </block>
+    </view>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

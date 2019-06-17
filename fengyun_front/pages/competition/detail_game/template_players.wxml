@@ -1,0 +1,44 @@
+<!-- template-introduction -->
+<template name="template-players">
+    <view class="players-section">
+        <view class="section-header">首发阵容</view>
+        <view class="section-row players">
+            <view wx:for="{{allItems.game.team_structure}}" wx:key="colId" wx:for-item="team">
+                <block wx:for="{{team}}" wx:key="index" wx:for-item="item" wx:if="{{item[1]=='首发'}}">
+                    <view class="row-item" bindtap="onclick_menuitem" data-type="memberItem" data-value="{{item[0]}}" data-team="{{item[6]}}">
+                        <view>
+                            <view class="item-number">{{item[5]}}</view>
+                        </view>
+                        <view>{{item[4]}}</view>
+                        <view>{{item[2]}}</view>
+                    </view>
+                </block>
+            </view>
+            <!-- <view>
+                <view class="row-item" wx:for="{{allItems.game.team_structure[1]}}" wx:key="index">
+                    <view>
+                        <view class="item-number">{{item[5]}}</view>
+                    </view>
+                    <view>{{item[4]}}</view>
+                    <view>{{item[2]}}</view>
+                </view>
+            </view> -->
+        </view>
+    </view>
+    <view class="players-section">
+        <view class="section-header">替补阵容</view>
+        <view class="section-row players">
+            <view wx:for="{{allItems.game.team_structure}}" wx:key="colId" wx:for-item="team">
+                <block wx:for="{{team}}" wx:key="index" wx:for-item="item" wx:if="{{item[1]=='替补'}}">
+                    <view class="row-item" bindtap="onclick_menuitem" data-type="memberItem" data-value="{{item[0]}}" data-team="{{item[6]}}">
+                        <view>
+                            <view class="item-number">{{item[5]}}</view>
+                        </view>
+                        <view>{{item[4]}}</view>
+                        <view>{{item[2]}}</view>
+                    </view>
+                </block>
+            </view>
+        </view>
+    </view>
+</template>

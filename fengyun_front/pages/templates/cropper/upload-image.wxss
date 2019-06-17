@@ -1,0 +1,21 @@
+.button-container {
+    position: absolute;
+    z-index: 10;
+    bottom: 0;
+    background: transparent;
+    width: 100%;
+    height: 150rpx;
+    text-align: center;
+}
+
+.finish-edit {
+    display: inline-block;
+    width: 200rpx;
+    margin: 0 30rpx;
+    height: 70rpx;
+    line-height: 70rpx;
+    border-radius: 12rpx;
+    font-size: 36rpx;
+    color: white;
+    background: #6CAB3B;
+}

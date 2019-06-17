@@ -1,0 +1,7 @@
+<!--index.wxml-->
+
+<view style='background-color:white'>
+  <image class="status-image" src="{{image_cancel_success_src}}" mode="aspectFill"> </image>
+  <view class="status-text" style="font-weight: bold;">{{cancel_sucess_text[kind]}}</view>
+  <button class="button-submit" bindtap="on_return">返回赛事详情页</button>
+</view>

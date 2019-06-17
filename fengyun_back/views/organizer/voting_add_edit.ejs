@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+
+<link rel="stylesheet" href="/assets/ace/jquery-ui.custom.min.css"/>
+<link rel="stylesheet" href="/assets/ace/ace.min.css"/>
+
+<link rel="stylesheet" type="text/css" href="/assets/main/css/organizer-competition.css">
+<style>
+    img {
+        cursor: pointer;
+    }
+
+    #img_view_modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0); /* Fallback color */
+        background-color: rgba(0, 0, 0, 0.9); /* Black w/ opacity */
+        z-index: 99999;
+    }
+
+    /* Modal Content (image) */
+    #img_view_modal .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    /* Add Animation */
+    #img_view_modal .modal-content {
+        -webkit-animation-name: zoom;
+        -webkit-animation-duration: 0.6s;
+        animation-name: zoom;
+        animation-duration: 0.6s;
+    }
+
+    @-webkit-keyframes zoom {
+        from {
+            -webkit-transform: scale(0)
+        }
+        to {
+            -webkit-transform: scale(1)
+        }
+    }
+
+    @keyframes zoom {
+        from {
+            transform: scale(0)
+        }
+        to {
+            transform: scale(1)
+        }
+    }
+
+    /* The Close Button */
+    #img_view_modal .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    #img_view_modal .close:hover,
+    #img_view_modal .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* 100% Image Width on Smaller Screens */
+    @media only screen and (max-width: 700px) {
+        #img_view_modal .modal-content {
+            width: 100%;
+        }
+    }
+
+    .wysiwyg-toolbar {
+        border: 1px solid #BBC0CA;
+    }
+</style>
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="container">
+            <input type="hidden" id="vote_id" value="<%= (isEdit) ? vote.id : '' %>">
+            <input type="hidden" id="vote_action" value="<%= (isEdit) ? 'edit' : 'add' %>">
+            <input type="hidden" id="vote_action_id" value="<%= com_id %>">
+            <div style="padding: 5% 0;">
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">投票标题：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <input type="text" placeholder="单行输入（最多30字）" id="v_title"
+                                       value="<%= (isEdit) ? vote.v_title : '' %>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">赛事：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <select id="v_competition" onchange="select_applied_teams(this)">
+                                    <option value="none">请输入赛事</option>
+                                    <% for (let i = 0; i < competitions.length; i++) { %>
+                                        <option value="<%= competitions[i].id %>" <%= (isEdit && competitions[i].id == vote.competition_id) ?
+                                                'selected' : '' %>><%= competitions[i].c_name %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">开始时间：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <input type="text" class="datepicker half-input" id="v_start_date"
+                                       style="margin-right: 3%"
+                                       value="<%= (isEdit) ? new Date(vote.v_start_time).toISOString().slice(0, 10) : '' %>"
+                                       readonly>
+                                <select id="v_start_hour" class="half-input">
+                                    <% for (let i = 0; i < 24; i++) { %>
+                                        <option value="<%= i %>" <%= (isEdit && i == new Date(vote.v_start_time).getHours()) ?
+                                                'selected' : '' %>><%= i %></option>
+                                    <% } %>
+                                </select><span> 时 </span>
+                                <select id="v_start_minute" class="half-input">
+                                    <% for (let j = 0; j < 60; j++) { %>
+                                        <option value="<%= j %>" <%= (isEdit && j == new Date(vote.v_start_time).getMinutes()) ?
+                                                'selected' : '' %>><%= j %></option>
+                                    <% } %>
+                                </select><span> 分 </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">结束时间：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <input type="text" class="datepicker half-input" id="v_end_date"
+                                       style="margin-right: 3%"
+                                       value="<%= (isEdit) ? new Date(vote.v_end_time).toISOString().slice(0, 10) : '' %>"
+                                       readonly>
+                                <select id="v_end_hour" class="half-input">
+                                    <% for (let i = 0; i < 24; i++) { %>
+                                        <option value="<%= i %>" <%= (isEdit && i == new Date(vote.v_end_time).getHours()) ?
+                                                'selected' : '' %>><%= i %></option>
+                                    <% } %>
+                                </select><span> 时 </span>
+                                <select id="v_end_minute" class="half-input">
+                                    <% for (let j = 0; j < 60; j++) { %>
+                                        <option value="<%= j %>" <%= (isEdit && j == new Date(vote.v_end_time).getMinutes()) ?
+                                                'selected' : '' %>><%= j %></option>
+                                    <% } %>
+                                </select><span> 分 </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">投票方式：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-row">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="place-select-box">
+                                            <div class="round">
+                                                <input type="checkbox" id="v_method1" onclick="change_v_method(this)"
+                                                        <%= (isEdit) ? ((vote.v_method.method_type === 1) ? 'checked' : '') : 'checked'; %>/>
+                                                <label for="v_method1"></label></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <span>每个微信号一共可以投：</span>
+                                        <input type="number" class="half-input" placeholder="请输入数字整数"
+                                               id="v_method1_value"
+                                               value="<%= (isEdit && vote.v_method.method_type === 1) ? vote.v_method.method_value : '' %>"><span>&nbsp; 票</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="competition-row">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="place-select-box">
+                                            <div class="round">
+                                                <input type="checkbox" id="v_method2" onclick="change_v_method(this)"
+                                                        <%= (isEdit) ? ((vote.v_method.method_type === 2) ? 'checked' : '') : '' %>/>
+                                                <label for="v_method2"></label></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <span>每个微信号每天可以投：</span>
+                                        <input type="number" class="half-input" placeholder="请输入数字整数"
+                                               id="v_method2_value"
+                                               value="<%= (isEdit && vote.v_method.method_type === 2) ? vote.v_method.method_value : '' %>"><span>&nbsp; 票</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">赛事风采：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content">
+                                <div class="competition-item-content">
+                                    <button class="btn btn-primary btn-sm"
+                                            onclick="$('#c_helper_intro_images').val(''); $('#c_helper_intro_images').click()">
+                                        增加
+                                    </button>
+                                    <input type="file" id="c_helper_intro_images" style="display: none" multiple
+                                           onchange="preview_intro_images(event)"
+                                           accept=".png, .jpg, .jpeg, .gif">
+                                    <div class="competition-row" id="prev_intro_images">
+                                        <% if (isEdit) {
+                                        for (let introIndex = 0; introIndex < vote.v_images.length; introIndex++) { %>
+                                            <div class="competition-item-image">
+                                                <img src="<%= vote.v_images[introIndex] %>"
+                                                     onclick="big_image_preview(event)">
+                                                <i class="fa fa-close" onclick="remove_image_item(this)"></i>
+                                            </div>
+                                        <% }
+                                        } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title">投票规则：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div style="max-width: 350px">
+                                <div class="wysiwyg-editor"
+                                     id="v_intro"><%- (isEdit) ? JSON.parse(vote.v_intro) : '' %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="competition-item-title" style="padding-top: 10px;">投票对象选择：</div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="competition-item-content" id="applied_teams">
+                                <% if (isEdit) {
+                                for (let i = 0; i < applies.length; i++) {
+                                    if (applies[i].a_state != 2) continue;
+                                %>
+                                <div class="competition-row">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="v_team_names"><%= applies[i].team[0].t_full_name %></div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="place-select-box">
+                                                <div class="round">
+                                                    <input class="checkbox-teams"
+                                                           data-id="<%= applies[i].team[0].id %>" type="checkbox"
+                                                           id="checkbox<%= i %>" <%= (vote.v_teams.indexOf(applies[i].team[0].id) > -1) ? 'checked' : '' %>/>
+                                                    <label for="checkbox<%= i %>"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }
+                                } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="competition-row">
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-10">
+                            <div class="competition-actions" style="text-align: left">
+                                <button class="btn btn-primary" style="margin-right: 5%"
+                                        onclick="add_vote('<%= isEdit %>')">保存
+                                </button>
+                                <a href="javascript:history.back();">
+                                    <button class="btn btn-default">取消</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+<!-- Image View Modal -->
+<div id="img_view_modal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="img_view">
+</div>
+
+<% include ../partials/foot.ejs %>
+
+<script src="/assets/ace/jquery-ui.custom.min.js"></script>
+<script src="/assets/ace/jquery.hotkeys.index.min.js"></script>
+<script src="/assets/ace/bootstrap-wysiwyg.min.js"></script>
+<!-- ace scripts -->
+<script src="/assets/ace/ace-elements.min.js"></script>
+<script src="/assets/ace/ace.min.js"></script>
+
+<script type="text/javascript">
+    jQuery(function ($) {
+
+        function showErrorAlert(reason, detail) {
+            var msg = '';
+            if (reason === 'unsupported-file-type') {
+                msg = "Unsupported format " + detail;
+            } else {
+                //console.log("error uploading file", reason, detail);
+            }
+            $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                '<strong>File upload error</strong> ' + msg + ' </div>').prependTo('#alerts');
+        }
+
+        // $('#t_editor1').ace_wysiwyg();//this will create the default editor will all buttons
+
+        //but we want to change a few buttons colors for the third style
+        $('#v_intro').ace_wysiwyg({
+            toolbar:
+                [
+                    'font',
+                    null,
+                    'fontSize',
+                    null,
+                    {name: 'bold', className: 'btn-info'},
+                    {name: 'italic', className: 'btn-info'},
+                    {name: 'strikethrough', className: 'btn-info'},
+                    {name: 'underline', className: 'btn-info'},
+                    null,
+                    {name: 'insertunorderedlist', className: 'btn-success'},
+                    {name: 'insertorderedlist', className: 'btn-success'},
+                    {name: 'outdent', className: 'btn-purple'},
+                    {name: 'indent', className: 'btn-purple'},
+                    null,
+                    {name: 'justifyleft', className: 'btn-primary'},
+                    {name: 'justifycenter', className: 'btn-primary'},
+                    {name: 'justifyright', className: 'btn-primary'},
+                    {name: 'justifyfull', className: 'btn-inverse'},
+                    null,
+                    {name: 'createLink', className: 'btn-pink'},
+                    {name: 'unlink', className: 'btn-pink'},
+                    null,
+                    {name: 'insertImage', className: 'btn-success'},
+                    null,
+                    'foreColor',
+                    null,
+                    'backColor',
+                    null,
+                    {name: 'undo', className: 'btn-grey'},
+                    {name: 'redo', className: 'btn-grey'}
+                ],
+            'wysiwyg': {
+                fileUploadError: showErrorAlert
+            }
+        }).prev().addClass('wysiwyg-style1');
+
+
+        //RESIZE IMAGE
+
+        //Add Image Resize Functionality to Chrome and Safari
+        //webkit browsers don't have image resize functionality when content is editable
+        //so let's add something using jQuery UI resizable
+        //another option would be opening a dialog for user to enter dimensions.
+        if (typeof jQuery.ui !== 'undefined' && ace.vars['webkit']) {
+
+            var lastResizableImg = null;
+
+            function destroyResizable() {
+                if (lastResizableImg == null) return;
+                lastResizableImg.resizable("destroy");
+                lastResizableImg.removeData('resizable');
+                lastResizableImg = null;
+            }
+
+            var enableImageResize = function () {
+                $('.wysiwyg-editor')
+                    .on('mousedown', function (e) {
+                        var target = $(e.target);
+                        if (e.target instanceof HTMLImageElement) {
+                            if (!target.data('resizable')) {
+                                target.resizable({
+                                    aspectRatio: e.target.width / e.target.height,
+                                });
+                                target.data('resizable', true);
+
+                                if (lastResizableImg != null) {
+                                    //disable previous resizable image
+                                    lastResizableImg.resizable("destroy");
+                                    lastResizableImg.removeData('resizable');
+                                }
+                                lastResizableImg = target;
+                            }
+                        }
+                    })
+                    .on('click', function (e) {
+                        if (lastResizableImg != null && !(e.target instanceof HTMLImageElement)) {
+                            destroyResizable();
+                        }
+                    })
+                    .on('keydown', function () {
+                        destroyResizable();
+                    });
+            };
+
+            enableImageResize();
+        }
+
+
+    });
+</script>
+<script>
+    $(function () {
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+        if ($('#vote_action').val() === 'add') {
+            let v_action_id = $('#vote_action_id').val();
+            $('#v_competition').val(v_action_id);
+            $('#v_competition').trigger('change');
+        }
+    });
+
+    function select_applied_teams(ele) {
+        let c_id = $(ele).val();
+        if (c_id === 'none') return;
+        $.ajax({
+            url: '/common/get-applied-teams-from-competition',
+            method: 'POST',
+            data: {
+                c_id: c_id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    let html_tags = '';
+                    for (let i = 0; i < res.result.length; i++) {
+                        if (res.result[i].a_state != 2) continue;
+                        let team = res.result[i].team[0];
+                        html_tags += '<div class="competition-row"><div class="row">' +
+                            '<div class="col-md-3"><div class="v_team_names">' + team.t_full_name + '</div></div>' +
+                            '<div class="col-md-1"><div class="place-select-box"><div class="round">' +
+                            '<input class="checkbox-teams" data-id="' + team.id + '" type="checkbox" id="checkbox' + i.toString() + '" />' +
+                            '<label for="checkbox' + i.toString() + '"></label>' +
+                            '</div></div></div>' +
+                            '</div></div>';
+                    }
+                    $('#applied_teams').html(html_tags);
+                } else showAlert(res.message)
+            }
+        });
+    }
+
+    function upload_editor_images() {
+        let imgTags = $('.wysiwyg-editor').find('img');
+        let img_arr = [];
+        let img_tags = [];
+        for (let i = 0; i < imgTags.length; i++) {
+            let src = $(imgTags[i]).attr('src');
+            if (src.length > 1000) {
+                img_arr.push(src);
+                img_tags.push(imgTags[i]);
+            }
+        }
+        if (img_arr.length > 0) {
+            $.ajax({
+                url: '/common/upload-editor-image',
+                method: 'post',
+                data: {
+                    img_data: img_arr
+                },
+                success: function (res) {
+                    if (res.status === 'success') {
+                        let r_imgs = res.img_urls;
+                        for (let j = 0; j < r_imgs.length; j++) {
+                            $(img_tags[j]).attr('src', r_imgs[j]);
+                        }
+                        add_vote_pre();
+                    }
+                },
+                error: function (err) {
+                    console.log("error: ", err);
+                    return false;
+                }
+            });
+        } else {
+            add_vote_pre();
+        }
+    }
+
+    function add_vote() {
+        upload_editor_images();
+    }
+
+    function change_v_method(ele) {
+        let flag = $(ele).prop('checked');
+        if (!flag) {
+            $(ele).prop('checked', true);
+            return;
+        }
+        let method = $(ele).attr('id');
+        if (method === 'v_method1') $('#v_method2').prop('checked', false);
+        else $('#v_method1').prop('checked', false);
+    }
+
+    function add_vote_pre() {
+        let is_edit_flag = JSON.parse('<%= JSON.stringify(isEdit) %>');
+        let method_type = 'add';
+        let url = '/organizer/add-delete-vote/' + $('#vote_action_id').val();
+        if (is_edit_flag === true) {
+            method_type = 'edit';
+            url = '/organizer/edit-vote/' + $('#vote_id').val();
+        }
+        let v_title = $('#v_title').val();
+        if (v_title === '' || v_title.length > 30) {
+            showAlert('单行输入投票标题（最多30字）');
+            return;
+        }
+        let c_id = $('#v_competition').val();
+        if (c_id === 'none') {
+            showAlert('请输入赛事');
+            return;
+        }
+        let v_start_date = $('#v_start_date').val();
+        if (v_start_date === '') {
+            showAlert('请输入开始时间');
+            return;
+        }
+        let v_end_date = $('#v_end_date').val();
+        if (v_end_date === '') {
+            showAlert('请输入结束时间');
+            return;
+        }
+        let v_start_hours = $('#v_start_hour').val();
+        let v_start_minutes = $('#v_start_minute').val();
+        let v_end_hours = $('#v_end_hour').val();
+        let v_end_minutes = $('#v_end_minute').val();
+        let v_images = [];
+        let images_tags = $('#prev_intro_images img');
+        for (let intro_index = 0; intro_index < images_tags.length; intro_index++) {
+            let imgItem = $(images_tags[intro_index]).attr('src');
+            if (imgItem !== '/assets/main/images/default-placeholder-200x200.png') {
+                v_images.push(imgItem);
+            }
+        }
+        if (v_images.length === 0) {
+            showAlert('请输入赛事风采');
+            return;
+        }
+        let v_intro = $('#v_intro').html();
+        let v_teams = [];
+        $('.checkbox-teams:checked').each(function () {
+            let team_id = $(this).attr('data-id');
+            v_teams.push(team_id);
+        });
+        if (v_teams.length === 0) {
+            showAlert('请输入投票对象选择');
+            return;
+        }
+        let v_method_type = 1;
+        let v_method_value = 0;
+        if ($('#v_method1').prop('checked')) {
+            v_method_type = 1;
+            v_method_value = parseInt($('#v_method1_value').val());
+        } else {
+            v_method_type = 2;
+            v_method_value = parseInt($('#v_method2_value').val());
+        }
+        if (Number.isNaN(v_method_value) || v_method_value === 0) {
+            showAlert("请输入数字整数");
+            return;
+        }
+        let data = {
+            method_type: method_type,
+            v_title: v_title,
+            c_id: c_id,
+            v_start_date: v_start_date,
+            v_start_hours: v_start_hours,
+            v_start_minutes: v_start_minutes,
+            v_end_date: v_end_date,
+            v_end_hours: v_end_hours,
+            v_end_minutes: v_end_minutes,
+            v_method_type: v_method_type,
+            v_method_value: v_method_value,
+            v_images: v_images,
+            v_intro: v_intro,
+            v_teams: v_teams
+        }
+        console.log(data);
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/organizer/voting/' + c_id;
+                    }, 500);
+                } else showAlert(res.message);
+            }
+        });
+    }
+
+    function preview_intro_images(evt) {
+        if (evt.target.files.length === 0) {
+            console.log("cancel selecting images...");
+            return;
+        }
+        for (let i = 0; i < evt.target.files.length; i++) {
+            let realNameStr = getFilenameFromURL(evt.target.files[i].name);
+            let type = getFiletypeFromURL(realNameStr);
+            if (type != 'jpg' && type != 'jpeg' && type != 'png' && type != 'gif') {
+                showAlert('图片格式不正确..');
+                return;
+            }
+        }
+        let prev_image_len = $('#prev_intro_images .competition-item-image').length;
+        if ((prev_image_len + evt.target.files.length) > 5) {
+            showAlert('请输入最多5图片');
+            return;
+        }
+        for (let i = 0; i < evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                let dom_nodes = $($.parseHTML('<div class="competition-item-image"><img ' +
+                    'onclick="big_image_preview(event)"/><i class="fa fa-close" onclick="remove_image_item(this)"></i></div>'));
+                dom_nodes.find('img').attr('src', event.target.result);
+                dom_nodes.appendTo('#prev_intro_images');
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+        $(evt).val('');
+    }
+
+    function remove_image_item(ele) {
+        $(ele).parent().remove();
+    }
+
+    function big_image_preview(ele) {
+        console.log(ele);
+        $('#img_view_modal').css('display', 'block');
+        let img = ele.target.src;
+        $('#img_view_modal #img_view').attr('src', img);
+    }
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        $('#img_view_modal').css('display', 'none');
+    }
+</script>
+</body>
+</html>

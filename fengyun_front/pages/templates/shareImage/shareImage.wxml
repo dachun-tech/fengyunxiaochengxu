@@ -1,0 +1,9 @@
+<template name="template-shareImage">
+    <cover-view class="canvas-container" bindtap="onclick_button" data-type="hideShareImage" wx:if="{{allItems.isShareImageShowed}}">
+        <cover-view class="show_canvas" wx:if="{{allItems.isShareImageShowed}}" style="width: width:{{allItems.shareImageWidth}}rpx;height:{{allItems.shareImageHeight}}rpx">
+            <cover-image class="canvas_image" wx:if="{{allItems.shareImagePath!=''}}" src="{{allItems.shareImagePath}}" bindtap="onclick_button" data-type="hideShareImage"></cover-image>
+        </cover-view>
+    </cover-view>
+    <cover-view class="status-message" wx:if="{{allItems.isShareMessageShowed}}">已保存至相册，记得分享哦</cover-view>
+    <canvas canvas-id="shareImg" style="width:{{allItems.shareImageWidth}}px;height:{{allItems.shareImageHeight}}px"></canvas>
+</template>

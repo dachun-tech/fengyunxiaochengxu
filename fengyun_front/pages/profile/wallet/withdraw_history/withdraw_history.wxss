@@ -1,0 +1,46 @@
+.withdraw_history-container {
+    min-height: calc(100vh);
+    width: 100%;
+}
+
+.cls_cost_item {
+    display: inline-block;
+    width: 100%;
+    padding: 20rpx;
+    margin-bottom: 2px;
+    background: white;
+    font-family: PingFangSC-Regular;
+}
+
+.cls_cost_label {
+    width: 100%;
+    font-size: 26rpx;
+    height: 57rpx;
+    line-height: 57rpx;
+    text-align: left;
+}
+
+.cls_cost_content,
+.cls_cost_title {
+    display: inline-block;
+    width: 400rpx;
+    font-size: 26rpx;
+    text-align: left;
+}
+
+.cls_cost_title {
+    width: 150rpx;
+    text-align: center;
+}
+
+.status_0 {
+    color: #489CE5;
+}
+
+.status_1 {
+    color: #6CAB3B;
+}
+
+.status_2 {
+    color: #d82222;
+}

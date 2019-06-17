@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+<link rel="stylesheet" type="text/css" href="/assets/main/css/organizer-competition.css">
+<style>
+    .organizer-tables td input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        text-align: center;
+    }
+
+    #autocomplete-list {
+        position: absolute;
+        background: gold;
+        min-width: 150px;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .modal-content {
+        border-radius: 5px;
+    }
+
+    .modal-footer button {
+        width: 120px;
+    }
+</style>
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div style="padding: 3% 0 0 1%">
+            <input type="hidden" id="competition_id" value="<%= competition.id %>">
+            <h3 style="text-align: center"><%= competition.c_name %></h3>
+            <div style="text-align: right; padding-right: 15px; margin-top: -30px">
+                <a href="javascript:history.back()" class="btn btn-primary">返回赛事信息页面</a>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <% for (let i = 0; i < rankings.length; i++) {
+                if (rankings[i].group_name !== 'none') { %>
+                    <h3 class="table-group-name"><%= rankings[i].group_name %> 组：</h3>
+                    <input type="hidden" id="group_name_<%= i %>" value="<%= rankings[i].group_name %>">
+                <% } else { %>
+                    <input type="hidden" id="group_name_<%= i %>" value="none">
+                <%} %>
+                <table class="table table-bordered organizer-tables" id="ranking_table_<%= i %>">
+                    <thead>
+                    <tr>
+                        <th style="width: 20%">球队</th>
+                        <th style="width: 10%">完成场次</th>
+                        <th style="width: 5%">胜场</th>
+                        <th style="width: 5%">平场</th>
+                        <th style="width: 5%">负场</th>
+                        <th style="width: 7%">进球</th>
+                        <th style="width: 5%">失球</th>
+                        <th style="width: 8%">净胜球</th>
+                        <th style="width: 10%">积分</th>
+                        <th style="width: 5%">排名</th>
+                        <th style="width: 20%">操作</th>
+                    </tr>
+                    </thead>
+                    <!-- rankings -->
+                    <tbody>
+                    <% for (let j = 0; j < rankings[i].group_data.length; j++) { %>
+                        <tr id="<%= rankings[i].group_data[j].team_id %>">
+                            <td class="team-name">
+                                <span><%= rankings[i].group_data[j].t_full_name %></span>
+                                <input class="team-name-input" style="display: none" value="<%= rankings[i].group_data[j].t_full_name %>" onblur="td_disable(this)">
+                            </td>
+                            <td class="total-count"><%= rankings[i].group_data[j].total_count %></td>
+                            <td class="win-count">
+                                <span><%= rankings[i].group_data[j].win_count %></span>
+                                <input class="win-count-input" style="display: none" value="<%= rankings[i].group_data[j].win_count %>" onblur="td_disable(this)">
+                            </td>
+                            <td class="draw-count">
+                                <span><%= rankings[i].group_data[j].draw_count %></span>
+                                <input class="draw-count-input" style="display: none" value="<%= rankings[i].group_data[j].draw_count %>" onblur="td_disable(this)">
+                            </td>
+                            <td class="lose-count">
+                                <span><%= rankings[i].group_data[j].lose_count %></span>
+                                <input class="lose-count-input" style="display: none" value="<%= rankings[i].group_data[j].lose_count %>" onblur="td_disable(this)">
+                            </td>
+                            <td class="win-score" data-order="<%= rankings[i].group_data[j].win_score %>">
+                                <span><%= rankings[i].group_data[j].win_score %></span>
+                                <input class="win-score-input" style="display: none" value="<%= rankings[i].group_data[j].win_score %>" onblur="td_disable(this)">
+                            </td>
+                            <td class="lose-score">
+                                <span><%= rankings[i].group_data[j].lose_score %></span>
+                                <input class="lose-score-input" style="display: none" value="<%= rankings[i].group_data[j].lose_score %>" onblur="td_disable(this)">
+                            </td>
+                            <td class="diff-score" data-order="<%= parseInt(rankings[i].group_data[j].win_score)
+                                - parseInt(rankings[i].group_data[j].lose_score) %>"><%= parseInt(rankings[i].group_data[j].win_score)
+                                - parseInt(rankings[i].group_data[j].lose_score) %></td>
+                            <td class="ranking-score" data-order="<%= parseInt(rankings[i].group_data[j].win_count) * 3
+                                + parseInt(rankings[i].group_data[j].draw_count) %>"><%= parseInt(rankings[i].group_data[j].win_count) * 3
+                                + parseInt(rankings[i].group_data[j].draw_count) %></td>
+                            <td class="ranking-order"></td>
+                            <td class="organizer-operation">
+                                <a href="javascript:" onclick="set_ranking_system_data(this)"><span style="word-break: keep-all">恢复为系统数据</span></a>
+                                <a href="javascript:" onclick="ranking_delete(this)"><span style="word-break: keep-all">删除</span></a>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+<!--                <div style="text-align: right; padding: 2% 1%">-->
+<!--                    <div class="row">-->
+<!--                        <div class="col-md-4 col-sm-4"></div>-->
+<!--                        <div class="col-md-4 col-sm-4" style="text-align: center">-->
+<!--                            <button class="btn btn-warning" style="width: 120px;" onclick="ranking_table_save('<%= i %>')">保存</button>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-4 col-sm-4" style="text-align: right">-->
+<!--                            <button class="btn btn-primary" style="width: 120px;" onclick="add_new_ranking('<%= i %>')">新增</button>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+            <% } %>
+            <input type="hidden" id="applied_team_ids" value="<%= JSON.stringify(applied_team_ids) %>">
+            <input type="hidden" id="applied_team_names" value="<%= JSON.stringify(applied_team_names) %>">
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+
+<!-- Set System Data Modal -->
+<div id="set_ranking_system_data_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="ranking_system_table_id">
+                <input type="hidden" id="ranking_system_row_id">
+                <h3 style="text-align: center">删除后，数据将无法恢复。 确定删除吗？</h3>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="set_ranking_system_data_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shooter Delete Modal -->
+<div id="ranking_delete_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="ranking_delete_table_id">
+                <input type="hidden" id="ranking_delete_row_id">
+                <h3 style="text-align: center">删除后，数据将无法恢复。 确定删除吗？</h3>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="ranking_delete_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<% include ../partials/foot.ejs %>
+<script>
+    let applied_team_ids = [];
+    let applied_team_names = [];
+    $(function () {
+        $('.organizer-tables').each(function () {
+            let table_id = $(this).attr('id');
+            order_ranking(table_id);
+        });
+        applied_team_ids = JSON.parse($('#applied_team_ids').val());
+        applied_team_names = JSON.parse($('#applied_team_names').val());
+        console.log("applied team ids", applied_team_ids);
+        console.log("applied team names", applied_team_names);
+    });
+    function td_edit(el) {
+        $(el).find('input').css("display", "block");
+        $(el).find('span').css("display", "none");
+        $(el).find('input').focus();
+        window.getSelection().removeAllRanges();
+        $(el).css('background', 'transparent');
+        if ($(el).attr('class') === 'team-name')
+            autocomplete_func($(el).find('input')[0], applied_team_names);
+    }
+    function td_disable(el) {
+        setTimeout(function () {
+            let val = $(el).val();
+            $(el).parent().find('span').text(val);
+            let node = $(el).parent();
+            if (node.attr('class') === 'team-name') {
+                let index = applied_team_names.indexOf(val);
+                if (index === -1) {
+                    showAlert('请选择可用的球队');
+                    node.css('background', 'red');
+                } else {
+                    node.parent().attr('id', applied_team_ids[index]);
+                }
+            } else {
+                if (cell_score(val)) {
+                    showAlert('请填写数字');
+                    node.css('background', 'red');
+                } else {
+                    node.attr('data-order', val);
+                    if (node.attr('class') === 'win-count' || node.attr('class') === 'draw-count' || node.attr('class') === 'lose-count') {
+                        define_counts(node);
+                    }
+                }
+            }
+        }, 170);
+        $(el).parent().find('span').css('display', 'block');
+        $(el).css('display', 'none');
+    }
+    function add_new_ranking(id) {
+        let new_id = 'new_ranking_' + new Date().getTime();
+        let tr_tags = '<tr id="' + new_id + '">'
+            + '<td class="team-name" ondblclick="td_edit(this)"><span></span>'
+            + '<input class="team-name-input" style="display: none" value="" onblur="td_disable(this)"></td>'
+            + '<td class="total-count"></td>'
+            + '<td class="win-count" ondblclick="td_edit(this)"><span></span>'
+            + '<input class="win-count-input" style="display: none" value="" onblur="td_disable(this)"></td>'
+            + '<td class="draw-count" ondblclick="td_edit(this)"><span></span>'
+            + '<input class="draw-count-input" style="display: none" value="" onblur="td_disable(this)"></td>'
+            + '<td class="lose-count" ondblclick="td_edit(this)"><span></span>'
+            + '<input class="lose-count-input" style="display: none" value="" onblur="td_disable(this)"></td>'
+            + '<td class="win-score" data-order="" ondblclick="td_edit(this)"><span></span>'
+            + '<input class="win-score-input" style="display: none" value="" onblur="td_disable(this)"></td>'
+            + '<td class="lose-score" ondblclick="td_edit(this)"><span></span>'
+            + '<input class="lose-score-input" style="display: none" value="" onblur="td_disable(this)"></td>'
+            + '<td class="diff-score" data-order=""></td>'
+            + '<td class="ranking-score" data-order=""></td><td class="ranking-order"></td>'
+            + '<td class="organizer-operation">'
+            + '<a href="javascript:" onclick="set_ranking_system_data(this)"><span style="word-break: keep-all">恢复为系统数据</span></a>'
+            + '<a href="javascript:" onclick="ranking_delete(this)"><span style="word-break: keep-all">删除</span></a></td></tr>';
+        $('#ranking_table_' + id + ' tbody').append(tr_tags);
+    }
+    function ranking_table_save(id) {
+        let group_name = $('#group_name_' + id).val();
+        let c_id = $('#competition_id').val();
+        let tbody_tags = $('#ranking_table_' + id + ' tbody tr');
+        let table_data = [];
+        for (let i = 0; i < tbody_tags.length; i++) {
+            let tr = $(tbody_tags[i]);
+            let t_id = tr.attr('id'); let t_name = tr.find('.team-name span').text();
+            if (cell_id(t_id) || cell_name(t_name)) {
+                showAlert('请选择可用的球队');
+                tr.find('.team-name').css('background', 'red');
+                return;
+            }
+            let total_count = tr.find('.total-count').text();
+            let win_count = tr.find('.win-count span').text();
+            if (cell_score(win_count)) {
+                showAlert('请填写数字');
+                tr.find('.win-count').css('background', 'red');
+                return;
+            }
+            let draw_count = tr.find('.draw-count span').text();
+            if (cell_score(draw_count)) {
+                showAlert('请填写数字');
+                tr.find('.draw-count').css('background', 'red');
+                return;
+            }
+            let lose_count = tr.find('.lose-count span').text();
+            if (cell_score(lose_count)) {
+                showAlert('请填写数字');
+                tr.find('.lose-count').css('background', 'red');
+                return;
+            }
+            let win_score = tr.find('.win-score span').text();
+            if (cell_score(win_score)) {
+                showAlert('请填写数字');
+                tr.find('.win-score').css('background', 'red');
+                return;
+            }
+            let lose_score = tr.find('.lose-score span').text();
+            if (cell_score(lose_score)) {
+                showAlert('请填写数字');
+                tr.find('.lose-score').css('background', 'red');
+                return;
+            }
+            let ranking_item = {group_name: group_name, team_id: t_id, total_count: total_count, win_count: win_count,
+                draw_count: draw_count, lose_count: lose_count, win_score: win_score, lose_score: lose_score};
+            table_data.push(ranking_item);
+        }
+        console.log(table_data);
+        if (table_data.length === 0) {
+            showAlert('Empty Data');
+            return;
+        }
+        $.ajax({
+            url: '/organizer/ranking/' + c_id,
+            method: 'post',
+            data: {
+                id: id,
+                table_data: table_data
+            },
+            success: function (res) {
+                if (res.status === 'success') showAlert(res.message, true);
+                else showAlert(res.message);
+            }
+        })
+    }
+    function set_ranking_system_data(el) {
+        let row_id = $(el).parent().parent().attr('id');
+        let table_id = $(el).parent().parent().parent().parent().attr('id');
+        $('#ranking_system_row_id').val(row_id);
+        $('#ranking_system_table_id').val(table_id);
+        $('#set_ranking_system_data_modal').modal();
+    }
+    function set_ranking_system_data_confirm() {
+        let c_id = $('#competition_id').val();
+        let table_id = $('#ranking_system_table_id').val();
+        let team_id = $('#ranking_system_row_id').val();
+        let data = {
+            c_id: c_id,
+            team_id: team_id,
+        }
+        $.ajax({
+            url: '/common/get-ranking-system-data',
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    console.log(res.result);
+                    let row = $('#' + table_id + ' #' + team_id);
+                    row.find('.win-count span').text(res.result.win_count);
+                    row.find('.draw-count span').text(res.result.draw_count);
+                    row.find('.lose-count span').text(res.result.lose_count);
+                    row.find('.win-score span').text(res.result.win_score);
+                    row.find('.win-score span').attr('data-order', res.result.win_score);
+                    row.find('.lose-score span').text(res.result.lose_score);
+                    row.find('.total-count').text(res.result.win_count + res.result.draw_count + res.result.lose_count);
+                    row.find('.diff-score').text(res.result.win_score - res.result.lose_score);
+                    row.find('.diff-score').attr('data-order', res.result.win_score - res.result.lose_score);
+                    row.find('.ranking-score').text(res.result.win_count * 3 + res.result.draw_count);
+                    row.find('.ranking-score').attr('data-order', res.result.win_count * 3 + res.result.draw_count);
+                    order_ranking(table_id);
+                    $('#set_ranking_system_data_modal').modal('toggle');
+                } else showAlert(res.message);
+            }
+        });
+    }
+    function ranking_delete(el) {
+        let row_id = $(el).parent().parent().attr('id');
+        let table_id = $(el).parent().parent().parent().parent().attr('id');
+        $('#ranking_delete_table_id').val(table_id);
+        $('#ranking_delete_row_id').val(row_id);
+        $('#ranking_delete_modal').modal();
+    }
+    function ranking_delete_confirm() {
+        let table_id = $('#ranking_delete_table_id').val();
+        let row_id = $('#ranking_delete_row_id').val();
+        $('#' + table_id + ' #' + row_id).remove();
+        $('#ranking_delete_modal').modal('toggle');
+    }
+    function order_ranking(table_id) {
+        let sA = [8, 7, 5];
+        let table_rows = $('#' + table_id + ' tbody');
+        if(table_rows.length>0){ table_rows = table_rows[0]}
+        else {return;}
+        let table, rows, switching, x, y, i, shouldSwitch;
+        table = table_rows;
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 0; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName('TD');
+                y = rows[i+1].getElementsByTagName('TD');
+                if (parseInt(x[sA[0]].getAttribute('data-order').toLowerCase()) < parseInt(y[sA[0]].getAttribute('data-order').toLowerCase())) {
+                    shouldSwitch = true;
+                    break;
+                } else if (parseInt(x[sA[0]].getAttribute('data-order').toLowerCase()) === parseInt(y[sA[0]].getAttribute('data-order').toLowerCase())) {
+                    if (parseInt(x[sA[1]].getAttribute('data-order').toLowerCase()) > parseInt(y[sA[1]].getAttribute('data-order').toLowerCase())) {
+                        shouldSwitch = true;
+                        break;
+                    } else if (parseInt(x[sA[2]].getAttribute('data-order').toLowerCase()) > parseInt(y[sA[2]].getAttribute('data-order').toLowerCase())) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+            switching = false;
+        }
+        for (let j = 0; j < rows.length; j++) {
+            rows[j].getElementsByTagName('TD')[9].innerHTML = j + 1;
+        }
+    }
+
+    function define_counts(node) {
+        let win_count_text = node.parent().find('.win-count span').text();
+        if (win_count_text === '') return;
+        let draw_count_text = node.parent().find('.draw-count span').text();
+        if (draw_count_text === '') return;
+        let win_count_val = parseInt(win_count_text);
+        let draw_count_val = parseInt(draw_count_text);
+        node.parent().find('.ranking-score').text(win_count_val * 3 + draw_count_val);
+        let lose_count_text = node.parent().find('.lose-count span').text();
+        if (lose_count_text === '') return;
+        let lose_count_val = parseInt(lose_count_text);
+        node.parent().find('.total-count').text(win_count_val + draw_count_val + lose_count_val);
+    }
+
+    function cell_score(text) {
+        return (text === "" || !checkValidNumber(Number(text)));
+    }
+    function cell_name(text) {
+        return (applied_team_names.indexOf(text) === -1)
+    }
+    function cell_id(text) {
+        return (applied_team_ids.indexOf(text) === -1)
+    }
+</script>
+</body>
+</html>

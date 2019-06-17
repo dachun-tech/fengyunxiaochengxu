@@ -1,0 +1,58 @@
+.user_info {
+    background: #FFFFFF;
+    height: 240rpx;
+    width: 100%;
+}
+
+.user_info_basic {
+    padding: 40rpx;
+    text-align: center;
+}
+
+.user_info image {
+    width: 100rpx;
+    height: 100rpx;
+    border-radius: 50rpx;
+}
+
+.user_name {
+    /*padding-top: 30rpx;*/
+    font-size: 30rpx;
+    font-weight: bold;
+}
+
+.user_info_list {
+    margin-top: 20rpx;
+    width: 100%;
+    background: white;
+}
+
+.auth-text {
+    position: relative;
+    width: calc(100% - 60rpx);
+    height: auto;
+    line-height: 1.7;
+    padding: 25rpx 30rpx;
+    font-family: PingFangSC-Regular;
+    font-size: 30rpx;
+    color: #333;
+    letter-spacing: 0.64rpx;
+    border-bottom: 1px solid #f4f4f4;
+}
+
+.auth-text image {
+    width: 40rpx;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+}
+
+.auth-text view {
+    display: inline-block;
+    padding-left: 62rpx;
+}

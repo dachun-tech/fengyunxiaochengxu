@@ -1,0 +1,50 @@
+.my_wallet_title {
+    background: #FFFFFF;
+    height: 250rpx;
+    width: 100%;
+    text-align: center;
+}
+.my_wallet_title_txt {
+    display: block;
+    font-family: PingFangSC-Regular;
+    font-size: 28rpx;
+    letter-spacing: 0.33rpx;
+    margin-top: 63rpx;
+}
+.my_account_balance {
+    display: block;
+    font-family: PingFangSC-Semibold;
+    font-size: 60rpx;
+    letter-spacing: 0.71rpx;
+    color: #6CAB3B;
+}
+.my_wallet_list {
+    margin-top: 20rpx;
+    width: 100%;
+    background: white;
+}
+.my_wallet_list_item {
+    position: relative;
+    width: 100%;
+    height: auto;
+    line-height: 1.5;
+    padding: 25rpx 30rpx;
+    font-family: PingFangSC-Regular;
+    font-size: 28rpx;
+    color: #333;
+    letter-spacing: 0.64rpx;
+    border-bottom: 1px solid #f4f4f4;
+}
+.my_wallet_list_item image {
+    width: 20rpx;
+    height: 30rpx;
+    display: inline-block;
+    right: 30rpx;
+    position: absolute;
+    top: 50%;
+    transform:translateY(-50%);
+    -webkit-transform:translateY(-50%);
+    -moz-transform:translateY(-50%);
+    -ms-transform:translateY(-50%);
+    -o-transform:translateY(-50%);
+}

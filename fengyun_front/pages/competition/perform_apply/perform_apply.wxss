@@ -1,0 +1,182 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+@import "../../templates/fixedButtons/fixedButtons.wxss";
+
+/************** bottom view part *****************/
+
+.table-view {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    min-height: 100vh;
+    background: #f4f4f4;
+    padding: 0;
+    overflow: hidden;
+}
+
+.intro-section {
+    width: 100%;
+    margin-bottom: 20rpx;
+    background: white;
+    padding: 15rpx 0;
+}
+
+.section-title {
+    width: 690rpx;
+    height: 42rpx;
+    line-height: 42rpx;
+    padding: 0 12rpx;
+    margin: 15rpx 0 30rpx 30rpx;
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333333;
+    border-left: 8rpx solid #6cab3b;
+}
+
+.section-title view {
+    font-size: 26rpx;
+    font-weight: 400;
+    display: inline-block;
+    margin-left: 30rpx;
+    width: 400rpx;
+}
+
+.intro-item {
+    width: 100%;
+    padding: 0;
+    margin: 26rpx 0;
+    font-size: 26rpx;
+}
+
+.intro-item>view {
+    display: inline-block;
+    padding: 0;
+    margin: 0 10rpx;
+    line-height: 48rpx;
+    vertical-align: top;
+    color: #333333;
+}
+
+view.item-key {
+    width: 140rpx;
+    text-align: center;
+    padding-left: 20rpx;
+    vertical-align: middle;
+}
+
+.item-value {
+    position: relative;
+    max-width: 560rpx;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.item-value input {
+    position: relative;
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+    padding: 0;
+    margin: 0;
+    font-size: 26rpx;
+    min-height: 42rpx;
+    height: 42rpx;
+    width: 560rpx;
+}
+
+.item-value>view {
+    position: relative;
+    background: #f4f4f4;
+    color: #333333;
+    width: 600rpx;
+    height: 54rpx;
+    line-height: 54rpx;
+    border-radius: 12rpx;
+    padding: 0 20rpx;
+}
+
+.item-value>view image {
+    position: absolute;
+    right: 16rpx;
+    top: 16rpx;
+    width: 16rpx;
+    height: 24rpx;
+}
+
+.intro-section.input .item-key {
+    width: 80rpx;
+}
+
+.intro-section.input .item-value {
+    max-width: 610rpx;
+}
+
+
+/****** submit button area********/
+
+.submit-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: white;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    font-weight: bold;
+}
+
+.submit-area view {
+    flex: 60%;
+    font-size: 32rpx;
+    height: 98rpx;
+    line-height: 98rpx;
+    padding: 0 30rpx;
+}
+
+.submit-area button {
+    flex: 40%;
+    background: #6cab3b;
+    color: white;
+    border-radius: 0;
+    font-size: 32rpx;
+    height: 98rpx;
+    line-height: 98rpx;
+    font-weight: bold;
+}
+
+
+/********** selector part ************/
+
+.team-selector {
+    position: absolute;
+    top: 602rpx;
+    left: 110rpx;
+    color: #333333;
+    width: 596rpx;
+    border-radius: 12rpx;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #d8d8d8;
+    max-height: 324rpx;
+}
+
+.selector-item {
+    position: relative;
+    background: #f4f4f4;
+    color: #333333;
+    width: 100%;
+    line-height: 54rpx;
+    padding: 0 20rpx;
+    border-top: 1px solid #d8d8d8;
+    font-size: 26rpx;
+}
+
+.selector-item:first-child {
+    border: none;
+}
+
+.selector-item.selected {
+    color: #6cab3b;
+}

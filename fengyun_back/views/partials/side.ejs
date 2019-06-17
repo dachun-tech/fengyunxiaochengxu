@@ -1,0 +1,21 @@
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <ul class="sidebar-menu">
+            <% if(session.user.role === 0) { %>
+                <li class="header">ADMIN</li>
+                <li class="treeview">
+                    <a href="/admin-organizer">
+                        <i class="fa fa-dashboard"></i> <span>用户管理</span>
+                    </a>
+                </li>
+                <li><a href="/admin/feedback"><i class="fa fa-book"></i> <span>意见反馈列表</span></a></li>
+            <% } else { %>
+                    <li class="header">主办方</li>
+                    <li><a href="/organizer"><i class="fa fa-th"></i> <span>赛事列表-足球</span></a></li>
+            <% } %>
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

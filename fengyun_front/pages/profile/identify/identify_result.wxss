@@ -1,0 +1,125 @@
+.identify_result-header {
+    height: 98rpx;
+    font-family: PingFangSC-Semibold;
+    font-size: 30rpx;
+    background: #F4F4F4;
+    position: relative;
+}
+
+.identify_result-header-false {
+    color: #489CE5;
+    position: absolute;
+    font-size: 30rpx;
+    font-weight: bold;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.identify_result-header-true {
+    color: #6CAB3B;
+    position: absolute;
+    font-size: 30rpx;
+    font-weight: bold;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.identify_result-item {
+    height: 88rpx;
+    width: 100%;
+    border-bottom: 1rpx solid #eaeaea;
+    padding: 0 30rpx;
+    font-size: 26rpx;
+    position: relative;
+}
+
+.identify_result-title {
+    display: inline-block;
+    position: absolute;
+    right: 606rpx;
+    font-size: 26rpx;
+    font-weight: bold;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.identify_result-content {
+    font-family: PingFangSC-Regular;
+    display: inline-block;
+    left: 164rpx;
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.identify_result-res {
+    padding: 40rpx 30rpx;
+}
+
+.description {
+    font-size: 22rpx;
+    color: #888888;
+    padding: 10rpx 0;
+}
+
+.contact-info {
+    padding: 10rpx 0;
+}
+
+.contact-phone {
+    display: inline-block;
+    font-size: 28rpx;
+    font-weight: bold;
+    padding-right: 20rpx;
+}
+
+.contact-url {
+    display: inline-block;
+    font-size: 26rpx;
+    font-weight: bold;
+    color: #6CAB3B;
+    padding-right: 20rpx;
+}
+
+.contact-title {
+    display: inline-block;
+    font-size: 28rpx;
+    font-weight: bold;
+    padding-right: 20rpx;
+}
+
+.contact-pwd {
+    display: inline-block;
+    font-size: 28rpx;
+    font-weight: bold;
+}
+
+.contact-copy {
+    display: inline-block;
+    width: 140rpx;
+    height: 44rpx;
+    line-height: 44rpx;
+    border-radius: 12rpx;
+    background: #6CAB3B;
+    font-size: 26rpx;
+    color: white;
+    text-align: center;
+}

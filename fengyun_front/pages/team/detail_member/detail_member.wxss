@@ -1,0 +1,12 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+@import "../../templates/fixedButtons/fixedButtons.wxss";
+.table-view {
+    position: absolute;
+    top: 0rpx;
+    width: 100%;
+    background: #f4f4f4;
+}
+
+@import "template_introduction.wxss";

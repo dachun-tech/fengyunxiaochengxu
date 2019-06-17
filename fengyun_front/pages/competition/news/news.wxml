@@ -1,0 +1,11 @@
+<view wx:for="{{newsarray}}" wx:key="{{index}}">
+  <view class='news-item-view'>
+    <view class='news-item-header'>
+      <view class='news-item-title' style="font-weight: bold;">{{item.n_title}}</view>
+      <view class='news-item-date'>{{item.submit_time}}</view>
+    </view>
+    <view class='news-item-text'>
+      <block>{{item.n_content}}</block>
+    </view>
+  </view>
+</view>

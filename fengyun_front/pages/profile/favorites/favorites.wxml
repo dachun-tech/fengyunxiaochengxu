@@ -1,0 +1,72 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<view class="container">
+    <view class="table-view">
+        <block wx:for="{{allItems.competitions}}" wx:key="index">
+            <view class="item-container" bindtap="onclick_button" data-type="go2CompetitionDetail" data-value="{{item.competition.id}}">
+                <image class="item-image" mode="aspectFill" src="{{allItems.serverUploadRoot + item.competition.c_logo}}"></image>
+                <view class="item-status-icon" wx:if="{{false}}">推荐</view>
+                <view class="item-content">
+                    <view class="item-title" style="margin-bottom: 10rpx;">
+                        {{item.competition.c_name}}
+                    </view>
+                    <view class="item-info">
+                        <view class="item-info-cell">
+                            <image class="info-icon" mode="aspectFill" src="../../../images/type@2x.png"></image>
+                            <view class="info-type" style="font-size: 24rpx;">
+                                {{statusArr[item.competition.c_active_type]}}
+                            </view>
+                        </view>
+                        <view class="item-info-cell right" wx:if="{{false}}">
+                            <image class="info-icon location" mode="aspectFill" src="../../../images/site@2x.png"></image>
+                            <view class="info-type" style="font-size: 22rpx;">
+                                {{item.competition.c_city.city}}
+                            </view>
+                        </view>
+                    </view>
+                    <view class="item-info">
+                        <view class="item-info-cell">
+                            <image class="info-icon" mode="aspectFill" src="../../../images/clock@2x.png"></image>
+                            <view class="info-type" style="font-size: 26rpx;">
+                                {{item.competition.c_start_time}} - {{item.competition.c_end_time}}
+                            </view>
+                        </view>
+                        <view class="item-info-cell text status{{index % 4+1}}" wx:if="{{false}}">
+                            {{statusArr[index % 4+1]}}
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </block>
+        <block wx:for="{{allItems.teams}}" wx:key="index">
+            <view class="item-container" bindtap="onclick_button" data-type="go2TeamDetail" data-value="{{item.team.id}}">
+                <image class="item-image" mode="aspectFill" src="{{allItems.serverUploadRoot + item.team.t_logo}}"></image>
+                <view class="item-status-icon {{(item.team.user_id == allItems.user_id)?'mine':''}}">
+                    {{(item.team.user_id == allItems.user_id)?'我的球队':'查看'}}
+                </view>
+                <view class="item-content">
+                    <view class="item-title">{{item.team.t_full_name}}</view>
+                    <view class="item-info team">
+                        <view class="item-info-cell">
+                            <view class="info-type" style="font-size: 24rpx;">类型: {{item.team.t_type}}</view>
+                        </view>
+                        <view class="item-info-cell right">
+                            <view class="info-type" style="font-size: 22rpx;">
+                                <button>已关注</button>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="item-info team">
+                        <view class="item-info-cell">
+                            <view class="info-type" style="font-size: 26rpx;">
+                                成立时间: {{item.team.t_created_time}}
+                            </view>
+                        </view>
+                        <view class="item-info-cell text" style="">粉丝: {{item.team.fav_count}}</view>
+                    </view>
+                </view>
+            </view>
+        </block>
+    </view>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

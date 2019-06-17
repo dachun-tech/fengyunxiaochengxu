@@ -1,0 +1,29 @@
+/************** fixed button area *******************/
+
+.fixed_button {
+    position: fixed;
+    bottom: 208rpx;
+    left: 676rpx;
+    width: 44rpx;
+    height: 44rpx;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    overflow: unset;
+}
+
+.fixed_button image {
+    position: absolute;
+    width: 44rpx;
+    height: 44rpx;
+    left: 0;
+    top: 0;
+}
+
+.fixed_button.share {
+    bottom: 134rpx;
+}
+
+.fixed_button.download {
+    bottom: 60rpx;
+}

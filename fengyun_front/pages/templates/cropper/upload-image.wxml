@@ -1,0 +1,6 @@
+<!-- Image Crop Template Page -->
+<image-cropper id="image-cropper" width="{{width}}" height="{{height}}" imgSrc="{{src}}" bindload="cropperload" bindimageload="loadimage" bindtapcut="clickcut"></image-cropper>
+<view class="button-container">
+    <button class="finish-edit" bindtap="onclick_button" data-type="finishEdit">完成</button>
+    <button class="finish-edit" bindtap="onclick_button" data-type="selectImage">选择图片</button>
+</view>

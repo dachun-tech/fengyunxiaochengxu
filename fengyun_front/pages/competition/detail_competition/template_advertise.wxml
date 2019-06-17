@@ -1,0 +1,37 @@
+<!-- template-introduction -->
+<template name="template-advertise">
+    <block wx:for="{{allItems.advertises}}" wx:key="index">
+        <view class="advertise-section" bindtap="onclick_menuitem" data-type="advertiseItem" data-value="{{item.id}}" data-itemtype="{{0}}">
+            <image class="advertise-image" mode="aspectFill" wx:if="{{true}}" src="../../../images/gonggao@2x.png"></image>
+            <image class="advertise-image" mode="aspectFill" wx:if="{{false}}" src="../../../images/toupiao@2x.png"></image>
+            <view class="advertise-content">
+                <view class="advertise-title">{{item.ad_title}}</view>
+                <view class="advertise-info">
+                    <view class="advertise-info-cell">
+                        <image class="info-icon" mode="aspectFill" src="../../../images/clock@2x.png"></image>
+                        <view class="info-type" style="font-size: 26rpx;">
+                            {{item.ad_post_time}}
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </block>
+    <block wx:for="{{allItems.votes}}" wx:key="index">
+        <view class="advertise-section" bindtap="onclick_menuitem" data-type="advertiseItem" data-value="{{item.id}}" data-itemtype="{{1}}">
+            <image class="advertise-image" mode="aspectFill" wx:if="{{false}}" src="../../../images/gonggao@2x.png"></image>
+            <image class="advertise-image" mode="aspectFill" wx:if="{{true}}" src="../../../images/toupiao@2x.png"></image>
+            <view class="advertise-content">
+                <view class="advertise-title">{{item.v_title}}</view>
+                <view class="advertise-info">
+                    <view class="advertise-info-cell">
+                        <image class="info-icon" mode="aspectFill" src="../../../images/clock@2x.png"></image>
+                        <view class="info-type" style="font-size: 26rpx;">
+                            {{item.v_start_time}} - {{item.v_end_time}}
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </block>
+</template>

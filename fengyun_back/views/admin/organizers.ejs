@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-admin.css">
+
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+    <% include ../partials/header.ejs %>
+    <% include ../partials/side.ejs %>
+
+    <div class="content-wrapper">
+        <section class="content-header" style="padding-bottom: 2%">
+            <div class="admin-header1">
+                <a href="/admin-competition"><button class="btn btn-info">赛事列表</button></a>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="admin-header2"><button class="btn btn-info btn-lg">主办方</button></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="admin-header2"><a href="/admin-team"><button class="btn btn-default btn-lg">球队</button></a></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="admin-header2"><a href="/admin-user"><button class="btn btn-default btn-lg">所有用户</button></a></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content body">
+            <div class="row-filter">
+                <div class="row" style="text-align: center">
+                    <div class="col-lg-5 col-md-12">
+                        <div class="row">
+                            <div class="col-lg-7 col-md-7">
+                                <div class="filter-item">
+                                    <select id="filter1">
+                                        <option value="nickname">昵称</option>
+                                        <option value="name">姓名</option>
+                                        <option value="phone">手机号码</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <input type="text" id="filter1_value" placeholder="请输入">
+                                </div>
+                            </div>
+                            <div class="col-lg-5 col-md-5">
+                                <div class="filter-item">
+                                    <select id="filter2">
+                                        <option value="0">认证状态</option>
+                                        <option value="1">认证中</option>
+                                        <option value="2">认证通过</option>
+                                        <option value="3">认证未通过</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <select id="filter3">
+                                        <option value="0">禁用状态</option>
+                                        <option value="1">未禁用</option>
+                                        <option value="2">已禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-12">
+                        <div class="row">
+                            <div class="col-lg-9 col-md-9">
+                                <div class="filter-item">
+                                    <label id="from">认证时间</label>
+                                    <input type="text" class="datepicker" id="from_date" readonly>
+                                    <label id="to">至</label>
+                                    <input type="text" class="datepicker" id="to_date" readonly>
+                                    <button class="btn btn-info btn-sm" id="date_clear" style="margin-top: -3px;" onclick="remove_search_times()">清除</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3">
+                                <div class="filter-item">
+                                    <button class="btn btn-info btn-sm" onclick="reload_table(1)">查询</button>
+                                    <button class="btn btn-info btn-sm" onclick="exportTable('主办方')">导出</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <table class="admin-tables table table-bordered" id="admin_organizer_table">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>头像</th>
+                        <th>昵称</th>
+                        <th>联系人姓名</th>
+                        <th>联系电话</th>
+                        <th>认证状态</th>
+                        <th>认证时间</th>
+                        <th>禁用状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <!-- organizers -->
+                    <tbody>
+                    <% for (let _i = 0; _i < organizers.length; _i++) { %>
+                        <tr>
+                            <td><%= _i + 1 %></td>
+                            <td class="table-avatar">
+                                <% if (organizers[_i].avatar === '') { %>
+                                    <img src="/assets/main/images/logo.png">
+                                <% } else { %>
+                                    <img src="<%= organizers[_i].avatar %>">
+                                <% } %>
+                            </td>
+                            <td><%= organizers[_i].nickname %></td>
+                            <td><%= organizers[_i].name %></td>
+                            <td><%= organizers[_i].phone %></td>
+                            <td><%= (organizers[_i].identify === 0)?'认证中':(organizers[_i].identify === 1)?'认证通过':'认证未通过'; %></td>
+                            <td class="id-time"><%= organizers[_i].id_time %></td>
+                            <td><%= (organizers[_i].disabledState)?'已禁用':'未禁用'; %></td>
+                            <td>
+                                <span class="operator-organizer">
+                                    <% if (organizers[_i].identify == 0) { %>
+                                        <a href="javascript:" onclick="identify_organizer('<%= organizers[_i].id %>', '<%= organizers[_i].phone %>')">审核</a>
+                                    <% } else { %>
+                                            <span>已审核</span>
+                                            <% if (organizers[_i].identify == 1) { %>
+                                                <a href="javascript:" onclick="reset_organizer('<%= organizers[_i].id %>', '<%= organizers[_i].phone %>')">重设密码</a>
+                                            <% } %>
+                                    <% } %>
+                                </span>
+                                <span class="operator-organizer">
+                                    <% if (organizers[_i].disabledState) { %>
+                                        <a href="javascript:" onclick="disable_organizer(false, '<%= organizers[_i].id %>')">启用</a>
+                                    <% } else { %>
+                                        <a href="javascript:" onclick="disable_organizer(true, '<%= organizers[_i].id %>')">禁用</a>
+                                    <% } %>
+                                </span>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+                <% if (pages > 0) { %>
+                    <ul class="pagination justify-content-center">
+                        <% if (current == 1) { %>
+                            <li class="page-item disabled"><a class="page-link">首页</a></li>
+                        <% } else { %>
+                            <li class="page-item"><a class="page-link" href="javascript:">首页</a></li>
+                        <% } %>
+                        <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+                        <% if (i !== 1) { %>
+                            <li class="page-item disabled"><a class="page-link">...</a></li>
+                        <% } %>
+                        <% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                            <% if (i == current) { %>
+                                <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="javascript:"><%= i %></a></li>
+                            <% } %>
+                            <% if (i == Number(current) + 2 && i < pages) { %>
+                                <li class="page-item disabled"><a class="page-link">...</a></li>
+                            <% } %>
+                        <% } %>
+                        <% if (current == pages) { %>
+                            <li class="page-item disabled"><a class="page-link">尾页</a></li>
+                        <% } else { %>
+                            <li class="page-item"><a class="page-link" href="javascript:">尾页</a></li>
+                        <% } %>
+                    </ul>
+                <% } %>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- identify organizer modal -->
+<div class="modal fade" id="identify-modal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">请审核</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="identify-modal-id">
+                <div class="identify-modal-row">
+                    <div class="row">
+                        <div class="col-sm-4" style="text-align: right">账号：</div>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="identify-modal-account-name" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="identify-modal-row">
+                    <div class="row">
+                        <div class="col-sm-4" style="text-align: right">密码：</div>
+                        <div class="col-sm-8"><input type="password" class="form-control" id="identify-modal-password" autocomplete="off"></div>
+                    </div>
+                </div>
+                <div class="identify-modal-row">
+                    <div class="row">
+                        <div class="col-sm-4" style="text-align: right">确认密码：</div>
+                        <div class="col-sm-8"><input type="password" class="form-control" id="identify-modal-confirm-password" autocomplete="off"></div>
+                    </div>
+                </div>
+                <div class="identify-modal-row">
+                    <div class="identify-modal-btn">
+                        <button type="button" class="btn btn-info" id="identify-success" onclick="identify_success()">通过</button>
+                        <button type="button" class="btn btn-default" id="identify-fail" onclick="identify_fail()">不通过</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- reset password organizer modal -->
+<div class="modal fade" id="reset-modal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">重设密码</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="reset-modal-id">
+                <div class="identify-modal-row">
+                    <div class="row">
+                        <div class="col-sm-4" style="text-align: right">账号：</div>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="reset-modal-account-name" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="identify-modal-row">
+                    <div class="row">
+                        <div class="col-sm-4" style="text-align: right">密码：</div>
+                        <div class="col-sm-8"><input type="password" class="form-control" id="reset-modal-password" autocomplete="off"></div>
+                    </div>
+                </div>
+                <div class="identify-modal-row">
+                    <div class="row">
+                        <div class="col-sm-4" style="text-align: right">确认密码：</div>
+                        <div class="col-sm-8"><input type="password" class="form-control" id="reset-modal-confirm-password" autocomplete="off"></div>
+                    </div>
+                </div>
+                <div class="identify-modal-row">
+                    <div class="identify-modal-btn">
+                        <button type="button" class="btn btn-info" id="reset-success" onclick="reset_password_confirm()">确定</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- disable operation -->
+
+<div class="modal fade" id="disable-organizer-modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="disable-organizer-modal-id">
+                <input type="hidden" id="disable-organizer-modal-flag">
+                <h3 style="text-align: center"></h3>
+                <div class="identify-modal-row">
+                    <div class="identify-modal-btn">
+                        <button type="button" class="btn btn-info" id="disable-success" onclick="disable_success()">确定</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd"
+    });
+    $(function () {
+        $('.id-time').each(function () {
+            let num = $(this).text();
+            $(this).text(china_time(num));
+        });
+    });
+    function reload_table(cur_page) {
+        let filter1 = $('#filter1').val();
+        let filter1_text = $('#filter1_value').val();
+        let filter2 = $('#filter2').val();
+        let filter3 = $('#filter3').val();
+        let from_date = $('#from_date').val();
+        let to_date = $('#to_date').val();
+        $.ajax({
+            url: '/common/search-and-pagination',
+            method: 'post',
+            data: {
+                table_name: 'organizer',
+                filter1: filter1,
+                filter1_text: filter1_text,
+                filter2: filter2,
+                filter3: filter3,
+                from_date: from_date,
+                to_date: to_date,
+                cur_page: cur_page,
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    display_organizers(res.search_result, cur_page, res.page_rows, res.total_pages);
+                    custom_pagination(cur_page, res.total_pages);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        });
+    }
+    function display_organizers(organizers, current, page_rows, total_pages) {
+        $('#admin_organizer_table tbody tr').remove();
+        if (current === '首页') current = 1
+        else if (current === '尾页') current = total_pages
+        else current = parseInt(current);
+        let tbody_tags = "";
+        for (let index = 0; index < organizers.length; index++) {
+            tbody_tags += '<tr><td>' + (index+page_rows*(current-1) + 1) + '</td>';
+            tbody_tags += '<td class="table-avatar"><img src="' + organizers[index].avatar + '"></td>';
+            tbody_tags += '<td>' + organizers[index].nickname + '</td>';
+            tbody_tags += '<td>' + organizers[index].name + '</td>';
+            tbody_tags += '<td>' + organizers[index].phone + '</td>';
+            if (organizers[index].identify === 0) {
+                tbody_tags += '<td>认证中</td>';
+            } else if (organizers[index].identify === 1) {
+                tbody_tags += '<td>认证通过</td>';
+            } else {
+                tbody_tags += '<td>认证未通过</td>';
+            }
+            tbody_tags += '<td class="id-time">' + organizers[index].id_time + '</td>';
+            if (organizers[index].disabledState) tbody_tags += '<td>已禁用</td>';
+            else tbody_tags += '<td>未禁用</td>';
+            if (organizers[index].identify === 0) {
+                tbody_tags += '<td><span class="operator-organizer"><a href="javascript:" onclick="identify_organizer(\'' + organizers[index].id
+                    + '\', \'' + organizers[index].phone + '\')">审核</a></span>';
+            } else {
+                tbody_tags += '<td><span class="operator-organizer"><span>已审核</span>';
+                if (organizers[index].identify == 1) tbody_tags += '<a href="javascript:" onclick="reset_organizer(\'' + organizers[index].id
+                    + '\', \'' + organizers[index].phone + '\')">重设密码</a>';
+                tbody_tags += '</span>';
+            }
+            if (organizers[index].disabledState) {
+                tbody_tags += '<span class="operator-organizer"><a href="javascript:" onclick="disable_organizer('
+                    + false + ', \'' + organizers[index].id + '\')">启用</a></span></td></tr>';
+            } else {
+                tbody_tags += '<span class="operator-organizer"><a href="javascript:" onclick="disable_organizer('
+                    + true + ', \'' + organizers[index].id + '\')">禁用</a></span></td></tr>';
+            }
+
+        }
+        $("#admin_organizer_table tbody").append(tbody_tags);
+        $('.id-time').each(function () {
+            let num = $(this).text();
+            $(this).text(china_time(num));
+        });
+    }
+    function remove_search_times() {
+        $('#from_date').val('');
+        $('#to_date').val('');
+    }
+    // open identify modal
+    function identify_organizer(id, phone) {
+        console.log(id, phone);
+        $('#identify-modal-id').val(id);
+        $('#identify-modal-account-name').val(phone);
+        $('#identify-modal').modal();
+    }
+    function reset_organizer(id, phone) {
+        $('#reset-modal-id').val(id);
+        $('#reset-modal-account-name').val(phone);
+        $('#reset-modal').modal();
+    }
+    function reset_password_confirm() {
+        let account_id = $('#reset-modal-id').val();
+        let account_name = $('#reset-modal-account-name').val();
+        let account_password = $('#reset-modal-password').val();
+        let account_confirm_password = $('#reset-modal-confirm-password').val();
+        let isnum = /^\d+$/.test(account_name);
+        if (account_name.length !== 11 || !isnum){
+            showAlert('账号应为11位数字');
+            return;
+        }
+        if (account_password === '') {
+            showAlert('请输入密码');
+            return;
+        }
+        if (account_password.length < 8 || account_password.length > 20) {
+            showAlert('密码应为8-20位');
+            return;
+        }
+        if (account_confirm_password === '') {
+            showAlert('请输入确认密码');
+            return;
+        }
+        if (account_password !== account_confirm_password) {
+            showAlert('密码和确认密码不一样');
+            return;
+        }
+        $('#reset-modal').modal('toggle');
+        $.ajax({
+            url: '/admin-reset-organizer',
+            method: 'POST',
+            data: {
+                account_id: account_id,
+                account_name: account_name,
+                account_password: account_password
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+    function disable_organizer(flag, id) {
+        console.log(flag, id);
+        let flag_str = 'true';
+        if (flag) {
+            $('#disable-organizer-modal .modal-header h4').html('禁用');
+            $('#disable-organizer-modal .modal-body h3').html('确定要禁用?');
+        } else {
+            $('#disable-organizer-modal .modal-header h4').html('启用');
+            $('#disable-organizer-modal .modal-body h3').html('确定要启用?');
+            flag_str = 'false';
+        }
+        $('#disable-organizer-modal-id').val(id);
+        $('#disable-organizer-modal-flag').val(flag_str);
+        $('#disable-organizer-modal').modal();
+    }
+    function disable_success() {
+        let account_id = $('#disable-organizer-modal-id').val();
+        let flag = $('#disable-organizer-modal-flag').val();
+        console.log(account_id, flag);
+        $('#disable-organizer-modal').modal('toggle');
+        $.ajax({
+            url: '/admin-organizer-disable',
+            method: 'POST',
+            data: {
+                account_id: account_id,
+                flag: flag
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload()
+                    }, 2000)
+                } else {
+                    showAlert(res.message)
+                }
+            }
+        })
+    }
+    function identify_success() {
+        let account_id = $('#identify-modal-id').val();
+        let account_name = $('#identify-modal-account-name').val();
+        let account_password = $('#identify-modal-password').val();
+        let account_confirm_password = $('#identify-modal-confirm-password').val();
+        let isnum = /^\d+$/.test(account_name);
+        if (account_name.length !== 11 || !isnum){
+            showAlert('账号应为11位数字');
+            return;
+        }
+        if (account_password === '') {
+            showAlert('请输入密码');
+            return;
+        }
+        if (account_password.length < 8 || account_password.length > 20) {
+            showAlert('密码应为8-20位');
+            return;
+        }
+        if (account_confirm_password === '') {
+            showAlert('请输入确认密码');
+            return;
+        }
+        if (account_password !== account_confirm_password) {
+            showAlert('密码和确认密码不一样');
+            return;
+        }
+        $('#identify-modal').modal('toggle');
+        $.ajax({
+            url: '/admin-identify-organizer',
+            method: 'POST',
+            data: {
+                account_id: account_id,
+                account_name: account_name,
+                account_password: account_password,
+                account_identify: 1
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload()
+                    }, 2000);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+    function identify_fail() {
+        let account_id = $('#identify-modal-id').val();
+        $.ajax({
+            url: '/admin-identify-organizer',
+            method: 'POST',
+            data: {
+                account_id: account_id,
+                account_identify: 2
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload()
+                    }, 2000);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

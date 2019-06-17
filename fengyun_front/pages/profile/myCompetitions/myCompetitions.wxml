@@ -1,0 +1,35 @@
+<!-- competition / index / index.wxml -->
+<import src="../../templates/getUserInfoModal/getUserInfoModal.wxml"></import>
+<view class="container">
+    <view class='index_top_view'>
+        <block wx:for="{{statusArr}}" wx:key="index">
+            <view class="menu-item {{index==curStatusId?'selected':''}}" bindtap="onclick_menuitem" data-value="{{index}}">{{item}}</view>
+        </block>
+    </view>
+    <view class="table-view">        
+        <block wx:for="{{allItems.list}}" wx:for-item="item" wx:key="index">
+            <view class="item-container" bindtap="onclick_button" data-type="go2Detail" data-value="{{item.id}}">
+                <image class="item-image" mode="aspectFill" src="{{(item.c_logo!='')?(allItems.serverUploadRoot + item.c_logo):(allItems.serverImageRoot+'man01@2x.png')}}"></image>
+                <view class="item-status-icon" wx:if="{{item.c_order==1}}">推荐</view>
+                <view class="item-content">
+                    <view class="item-title">{{item.c_name}}</view>
+                    <view class="item-info">
+                        <view class="item-info-cell">
+                            <image class="info-icon" mode="aspectFill" src="../../../images/type@2x.png"></image>
+                            <view class="info-type" style="font-size: 24rpx;">{{typeArr[item.c_active_type]}}</view>
+                        </view>
+                    </view>
+                    <view class="item-info">
+                        <view class="item-info-cell">
+                            <image class="info-icon" mode="aspectFill" src="../../../images/clock@2x.png"></image>
+                            <view class="info-type" style="font-size: 26rpx;">
+                                {{item.c_start_time}} - {{item.c_end_time}}
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </block>
+    </view>
+</view>
+<template is="get-user-template" wx:if="{{getUserInfoDisabled}}"></template>

@@ -1,0 +1,111 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+@import "../../templates/fixedButtons/fixedButtons.wxss";
+
+/*********** top title part **************/
+
+.schedule-section {
+    position: relative;
+    width: 100%;
+    height: 210rpx;
+    display: flex;
+    background: white;
+    margin: 0;
+}
+
+.schedule-item {
+    position: relative;
+    text-align: center;
+    flex: 35%;
+}
+
+.schedule-item.score {
+    flex: 30%;
+}
+
+.schedule-icon {
+    width: 100rpx;
+    height: 100rpx;
+    margin: 30rpx 0 12rpx;
+    border-radius: 50%;
+}
+
+.schedule-title {
+    width: 100%;
+    font-size: 28rpx;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+.schedule-title.score {
+    font-size: 42rpx;
+    color: #df4848;
+    margin: 45rpx 0 20rpx;
+    font-weight: bold;
+}
+
+.schedule-title.desc {
+    font-size: 24rpx;
+    color: #888888;
+    margin: 10rpx 0;
+}
+
+
+/**************  top menu part ***********************/
+
+.top-menu {
+    background: #ececec;
+    width: 100%;
+    height: 100rpx;
+    line-height: 100rpx;
+    text-align: center;
+}
+
+.menu-item {
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+    width: 180rpx;
+    height: 60rpx;
+    line-height: 60rpx;
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #6cab3b;
+    border-top: 1px solid #6cab3b;
+    border-bottom: 1px solid #6cab3b;
+    background: white;
+}
+
+.menu-item:first-child {
+    border-top-left-radius: 12rpx;
+    border-bottom-left-radius: 12rpx;
+    border-left: 1px solid #6cab3b;
+}
+
+.menu-item:last-child {
+    border-top-right-radius: 12rpx;
+    border-bottom-right-radius: 12rpx;
+    border-right: 1px solid #6cab3b;
+}
+
+.menu-item.selected {
+    background: #6cab3b;
+    color: white;
+}
+
+
+/************** bottom view part *****************/
+
+.table-view {
+    position: absolute;
+    top: 310rpx;
+    width: 100%;
+    background: #f4f4f4;
+}
+
+@import "template_progress.wxss";
+@import "template_analyse.wxss";
+@import "template_players.wxss";

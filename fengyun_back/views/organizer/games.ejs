@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+<link rel="stylesheet" type="text/css" href="/assets/main/css/organizer-competition.css">
+<style>
+    #federation_table td input, #non_federation_table td input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        text-align: center;
+    }
+
+    #autocomplete-list {
+        position: absolute;
+        background: gold;
+        min-width: 150px;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .modal-content {
+        border-radius: 5px;
+    }
+
+    .modal-footer button {
+        width: 120px;
+    }
+
+    #game_situation_modal select {
+        width: 180px;
+        height: 27px;
+    }
+
+    #game_situation_modal input {
+        width: 200px;
+    }
+
+    #game_situation_modal a {
+        color: red;
+    }
+
+    #game_structure_modal span {
+        padding: 0 7px;
+    }
+</style>
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div style="padding: 3% 0 0 1%">
+            <h3 style="text-align: center"><%= competition.c_name %></h3>
+            <div style="text-align: right; padding-right: 15px; margin-top: -30px">
+                <a href="javascript:history.back()" class="btn btn-primary">返回赛事信息页面</a>
+            </div>
+        </div>
+        <% if ([1, 2, 3, 4].indexOf(competition.c_type) !== -1) { %>
+            <div class="box-body">
+                <div class="competition-type">
+                    <% if (competition.c_type == 1 || competition.c_type == 2) { %>
+                    <div style="text-align: left; padding: 1% 0">
+                        <button class="btn btn-info" onclick="$('#auto_confirm_modal').modal()">自动生成赛程</button>
+                    </div>
+                        <button class="btn btn-primary" style="width: 100%;" disabled><%= (competition.c_type == 1) ? '联赛（单循环）' : '联赛（双循环）' %></button>
+                    <% } else if (competition.c_type == 3 || competition.c_type == 4) { %>
+                        <button class="btn btn-primary" style="width: 100%;" disabled><%= (competition.c_type == 3) ? '杯赛—小组赛（单循环）' : '杯赛—小组赛（双循环）' %></button>
+                        <div class="selecting-groups">
+                            <p>您可以在此处生成默认赛程，请先为每个球队选择分组:</p>
+
+                            <% for (let i = 0; i < applied_teams.length; i++) { %>
+                                <div class="competition-row">
+                                    <div class="col-md-2">
+                                        <div class="competition-item-title"><%= applied_teams[i].team.t_full_name %>:</div>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="competition-item-content checkbox-group">
+                                            <% for (let j = 0; j < team_groups.length; j++) { %>
+                                                <input type="radio" class="group_<%= i %>" name="group_<%= i %>"
+                                                       id="group<%= i + "_" + j %>" <%= (applied_teams[i].team.hasOwnProperty('t_group_name')
+                                                        && applied_teams[i].team.t_group_name === team_groups[j]) ? 'checked' : '' %>
+                                                       data-group-name="<%- team_groups[j] %>" data-team-name="<%- applied_teams[i].t_full_name %>"
+                                                >
+                                                <label for="group<%= i + "_" + j %>"><%= team_groups[j] %>组</label>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+
+                        </div>
+                        <div class="competition-row">
+                            <div class="col-md-2">
+                                <div class="competition-item-title"></div>
+                            </div>
+                            <div class="col-md-10">
+                                <div style="padding-left: 15px">
+                                    <button class="btn btn-info" onclick="auto_generate_games(true)">自动生成赛程</button>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                <table class="table table-bordered organizer-tables" id="federation_table">
+                    <thead>
+                    <tr>
+                        <th style="width: 5%">序号</th>
+                        <% if (competition.c_type == 3 || competition.c_type == 4) { %>
+                            <th style="width: 5%">分组</th>
+                        <% } %>
+                        <th style="width: 5%">轮次</th>
+                        <th style="width: 7%">比赛日期</th>
+                        <th style="width: 7%">开球时间</th>
+                        <th style="width: 13%">主队</th>
+                        <th style="width: 5%">比分</th>
+                        <th style="width: 13%">客队</th>
+                        <th style="width: 13%">比赛场地</th>
+                        <th style="width: 5%">阵容</th>
+                        <th style="width: 5%">赛况</th>
+                        <th style="width: 7%">比赛状态</th>
+                        <th style="width: 10%">操作</th>
+                    </tr>
+                    </thead>
+                    <!-- games -->
+                    <tbody>
+                    <%
+                        let game_tr_tags = '';
+                        let c_type = competition.c_type;
+                        let ii = 0;
+                        for (let i = 0; i < games.length; i++) {
+                            if (games[i].g_type == 3) continue;
+                            ii++;
+                            game_tr_tags += '<tr data-id="' + games[i].id + '"><td class="game-index-td">' + (ii) + '</td>';
+                            if (c_type == 3 || c_type == 4)
+                                game_tr_tags += '<td class="game-group-td" ondblclick="td_edit(this)" data-order="' + games[i].group_name
+                                        + '"><span>' + games[i].group_name + '</span><input class="game-group-input" style="display: none"'
+                                        + ' onblur="td_disable(this)" value="' + games[i].group_name + '"></td>';
+                            game_tr_tags += '<td class="game-round-td" ondblclick="td_edit(this)" data-order="' + games[i].g_round
+                                    + '"><span>' + games[i].g_round + '</span><input class="game-round-input" style="display: none" value=\''
+                                    + games[i].g_round + '\' onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-date-td" ondblclick="td_edit(this)" data-order="' + games[i].g_date
+                                    + '"><span>' + games[i].g_date + '</span><input class="game-date-input datepicker" style="display: none" value="'
+                                    + games[i].g_date + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-time-td" ondblclick="td_edit(this)" data-order="' + games[i].g_time
+                                    + '"><span>' + games[i].g_time + '</span><input class="game-time-input" style="display: none" value="'
+                                    + games[i].g_time + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-team1-td" ondblclick="td_edit(this)"><span>' + games[i].team1.t_full_name
+                                    + '</span><input class="game-team1-input" style="display: none" value="' + games[i].team1.t_full_name
+                                    + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-score-td" id="score_' + (ii) + '" ondblclick="td_edit(this)"><span>';
+                            if (games[i].team1_total_score == null || games[i].team1_total_score == undefined
+                                    || games[i].team2_total_score == null || games[i].team2_total_score == undefined) {
+                                game_tr_tags += '</span><input type="hidden"></td>';
+                            } else {
+                                game_tr_tags += games[i].team1_total_score;
+                                if (games[i].team1_sub_score != 0) game_tr_tags += '(' + games[i].team1_sub_score + ')';
+                                game_tr_tags += ':' + games[i].team2_total_score;
+                                if (games[i].team2_sub_score != 0) game_tr_tags += '(' + games[i].team2_sub_score + ')';
+                                game_tr_tags += '</span><input type="hidden" value=\'' + JSON.stringify([games[i].team1_total_score,
+                                    games[i].team2_total_score, games[i].team1_sub_score, games[i].team2_sub_score]) + '\'></td>';
+                            }
+                            game_tr_tags += '<td class="game-team2-td" ondblclick="td_edit(this)"><span>' + games[i].team2.t_full_name
+                                    + '</span><input class="game-team2-input" style="display: none" value="' + games[i].team2.t_full_name
+                                    + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-place-td" ondblclick="td_edit(this)"><span>' + games[i].g_place
+                                    + '</span><input class="game-place-input" style="display: none" value="' + games[i].g_place
+                                    + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-structure-td" id="structure_' + (ii) + '" ondblclick="td_edit(this)"><span>';
+                            if (games[i].team_structure.length != 0) game_tr_tags += '已编辑</span><input type="hidden" value=\''
+                                    + JSON.stringify(games[i].team_structure) + '\'></td>';
+                            else game_tr_tags += '</span><input type="hidden"></td>';
+                            game_tr_tags += '<td class="game-situation-td" id="situation_' + (ii) + '" ondblclick="td_edit(this)"><span>';
+                            if (games[i].g_situation.length != 0) game_tr_tags += '已编辑</span><input type="hidden" value=\''
+                                    + JSON.stringify(games[i].g_situation) + '\'></td>';
+                            else game_tr_tags += '</span><input type="hidden"></td>';
+                            if (games[i].g_state == 3) game_tr_tags += '<td class="game-state-td"><span>已结束</span></td>';
+                            else if (games[i].g_state == 2) game_tr_tags += '<td class="game-state-td"><span style="color: red">待更新结果</span></td>';
+                            else game_tr_tags += '<td class="game-state-td"><span>未开赛</span></td>';
+                            game_tr_tags += '<td class="organizer-operation">';
+                            game_tr_tags += '<input type="hidden" class="game-stream-value" id="stream_url_' + (ii) + '" value="' + games[i].g_stream + '">';
+                            game_tr_tags += '<a href="javascript:" class="game-stream" id="stream_' + (ii)
+                                    + '" onclick="set_stream_click(this)"><span style="word-break: keep-all">';
+                            if (games[i].g_stream == "") game_tr_tags += '直播设置</span></a>';
+                            else game_tr_tags += '已设置</span></a>';
+                            game_tr_tags += '<a href="javascript:" class="game-delete" id="game_delete_' + (ii)
+                                    + '" onclick="game_delete_click(this)"><span style="word-break: keep-all">删除</span></a></td></tr>';
+                        }
+                    %>
+                    <%- game_tr_tags %></tbody>
+                </table>
+                <div style="text-align: right; padding: 2% 1%">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4"></div>
+                        <div class="col-md-4 col-sm-4" style="text-align: center">
+                            <button class="btn btn-warning" style="width: 120px;" onclick="game_table_save(1, this)">保存</button>
+                        </div>
+                        <div class="col-md-4 col-sm-4" style="text-align: right">
+                            <button class="btn btn-success" style="width: 120px;" onclick="table_all_order(1)">更新排序</button>
+                            <button class="btn btn-primary" style="width: 120px;" onclick="add_new_game(1)">新增比赛</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+
+        <!--  淘汰赛   -->
+        <% if ([3, 4, 5].indexOf(competition.c_type) !== -1) { %>
+            <div class="box-body">
+                <div class="competition-type">
+                    <button class="btn btn-primary" style="width: 100%;" disabled>淘汰赛</button>
+                </div>
+                <table class="table table-bordered organizer-tables" id="non_federation_table">
+                    <thead>
+                    <tr>
+                        <th style="width: 5%">序号</th>
+                        <th style="width: 5%">阶段</th>
+                        <th style="width: 7%">比赛日期</th>
+                        <th style="width: 7%">开球时间</th>
+                        <th style="width: 13%">主队</th>
+                        <th style="width: 5%">比分</th>
+                        <th style="width: 13%">客队</th>
+                        <th style="width: 13%">比赛场地</th>
+                        <th style="width: 5%">阵容</th>
+                        <th style="width: 5%">赛况</th>
+                        <th style="width: 7%">比赛状态</th>
+                        <th style="width: 10%">操作</th>
+                    </tr>
+                    </thead>
+                    <!-- games -->
+                    <tbody>
+                    <%
+                        let game_tr_tags = '';
+                        let ii = 0;
+                        for (let i = 0; i < games.length; i++) {
+                            if (games[i].g_type != 3) continue;
+                            ii++;
+                            game_tr_tags += '<tr data-id="' + games[i].id + '"><td class="game-index-td">' + (ii) + '</td>';
+                            game_tr_tags += '<td class="game-non-round-td" ondblclick="td_edit(this)" data-order="' + games[i].g_stage
+                                    + '"><span>' + games[i].g_stage + '</span><input class="game-non-round-input" style="display: none" value="'
+                                    + games[i].g_stage + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-date-td" ondblclick="td_edit(this)" data-order="' + games[i].g_date
+                                    + '"><span>' + games[i].g_date + '</span><input class="game-date-input datepicker" style="display: none" value="'
+                                    + games[i].g_date + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-time-td" ondblclick="td_edit(this)" data-order="' + games[i].g_time
+                                    + '"><span>' + games[i].g_time + '</span><input class="game-time-input" style="display: none" value="'
+                                    + games[i].g_time + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-team1-td" ondblclick="td_edit(this)"><span>' + games[i].team1.t_full_name
+                                    + '</span><input class="game-team1-input" style="display: none" value="' + games[i].team1.t_full_name
+                                    + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-score-td" id="non_score_' + (ii) + '" ondblclick="td_edit(this)"><span>';
+                            if (games[i].team1_total_score == null || games[i].team1_total_score == undefined
+                                    || games[i].team2_total_score == null || games[i].team2_total_score == undefined) {
+                                game_tr_tags += '</span><input type="hidden"></td>';
+                            } else {
+                                game_tr_tags += games[i].team1_total_score;
+                                if (games[i].team1_sub_score != 0) game_tr_tags += '(' + games[i].team1_sub_score + ')';
+                                game_tr_tags += ':' + games[i].team2_total_score;
+                                if (games[i].team2_sub_score != 0) game_tr_tags += '(' + games[i].team2_sub_score + ')';
+                                game_tr_tags += '</span><input type="hidden" value=\'' + JSON.stringify([games[i].team1_total_score,
+                                    games[i].team2_total_score, games[i].team1_sub_score, games[i].team2_sub_score]) + '\'></td>';
+                            }
+                            game_tr_tags += '<td class="game-team2-td" ondblclick="td_edit(this)"><span>' + games[i].team2.t_full_name
+                                    + '</span><input class="game-team2-input" style="display: none" value="' + games[i].team2.t_full_name
+                                    + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-place-td" ondblclick="td_edit(this)"><span>' + games[i].g_place
+                                    + '</span><input class="game-place-input" style="display: none" value="' + games[i].g_place
+                                    + '" onblur="td_disable(this)"></td>';
+                            game_tr_tags += '<td class="game-structure-td" id="non_structure_' + (ii) + '" ondblclick="td_edit(this)"><span>';
+                            if (games[i].team_structure.length != 0) game_tr_tags += '已编辑</span><input type="hidden" value=\''
+                                    + JSON.stringify(games[i].team_structure) + '\'></td>';
+                            else game_tr_tags += '</span><input type="hidden"></td>';
+                            game_tr_tags += '<td class="game-situation-td" id="non_situation_' + (ii) + '" ondblclick="td_edit(this)"><span>';
+                            if (games[i].g_situation.length != 0) game_tr_tags += '已编辑</span><input type="hidden" value=\''
+                                    + JSON.stringify(games[i].g_situation) + '\'></td>';
+                            else game_tr_tags += '</span><input type="hidden"></td>';
+                            if (games[i].g_state == 3) game_tr_tags += '<td class="game-state-td"><span>已结束</span></td>';
+                            else if (games[i].g_state == 2) game_tr_tags += '<td class="game-state-td"><span style="color: red">待更新结果</span></td>';
+                            else game_tr_tags += '<td class="game-state-td"><span>未开赛</span></td>';
+                            game_tr_tags += '<td class="organizer-operation">';
+                            game_tr_tags += '<input type="hidden" class="game-stream-value" id="non_stream_url_' + (ii) + '" value="' + games[i].g_stream + '">';
+                            game_tr_tags += '<a href="javascript:" class="game-stream" id="non_stream_' + (ii)
+                                    + '" onclick="set_stream_click(this)"><span style="word-break: keep-all">';
+                            if (games[i].g_stream == "") game_tr_tags += '直播设置</span></a>';
+                            else game_tr_tags += '已设置</span></a>';
+                            game_tr_tags += '<a href="javascript:" class="game-delete" id="non_game_delete_' + (ii)
+                                    + '" onclick="game_delete_click(this)"><span style="word-break: keep-all">删除</span></a></td></tr>';
+                        }
+                    %>
+                    <%- game_tr_tags %></tbody>
+                </table>
+                <div style="text-align: right; padding: 2% 1%">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4"></div>
+                        <div class="col-md-4 col-sm-4" style="text-align: center">
+                            <button class="btn btn-warning" style="width: 120px;" onclick="game_table_save(2, this)">保存</button>
+                        </div>
+                        <div class="col-md-4 col-sm-4" style="text-align: right">
+                            <button class="btn btn-success" style="width: 120px;" onclick="table_all_order(2)">更新排序</button>
+                            <button class="btn btn-primary" style="width: 120px;" onclick="add_new_game(2)">新增比赛</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+        <input type="hidden" data-id="competition_id" data-content="<%= competition.id %>">
+        <input type="hidden" data-id="competition_type" data-content="<%= competition.c_type %>">
+        <input type="hidden" data-id="applied_teams_data" data-content="<%= JSON.stringify(applied_teams) %>">
+        <input type="hidden" data-id="games_data" data-content="<%= JSON.stringify(games) %>">
+        <input type="hidden" data-id="team_groups_data" data-content="<%= JSON.stringify(team_groups) %>">
+        <input type="hidden" data-id="places_data" data-content="<%= JSON.stringify(places) %>">
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+
+<!-- Score Modal -->
+<div id="game_score_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">比分编辑</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="game_score_row_id">
+                <div class="box-body">
+                    <div class="competition-row">
+                        <div class="row">
+                            <div class="col-md-3"><span id="game_score_team_name1">球队名称1</span></div>
+                            <div class="col-md-4">进球总数：<input type="number" id="game_score_total1" value="0" style="width: 70px"></div>
+                            <div class="col-md-5">点球进球数：<input type="number" id="game_score_sub1" value="0" style="width: 70px"></div>
+                        </div>
+                    </div>
+                    <div class="competition-row">
+                        <div class="row">
+                            <div class="col-md-3"><span id="game_score_team_name2">球队名称2</span></div>
+                            <div class="col-md-4">进球总数：<input type="number" id="game_score_total2" value="0" style="width: 70px"></div>
+                            <div class="col-md-5">点球进球数：<input type="number" id="game_score_sub2" value="0" style="width: 70px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="score_modal_save(true)">确定</button>
+                    <button type="button" class="btn btn-default" onclick="score_modal_save(false)">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Structure Modal -->
+<div id="game_structure_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">阵容编辑</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="game_structure_row_id">
+                <div class="box-body">
+                    <p id="team_structure_name1"></p>
+                    <table class="table table-bordered organizer-tables" id="team_structure_1">
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>球员姓名</th>
+                            <th>号码</th>
+                            <th>类型</th>
+                            <th>场上位置</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="box-body">
+                    <p id="team_structure_name2"></p>
+                    <table class="table table-bordered organizer-tables" id="team_structure_2">
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>球员姓名</th>
+                            <th>号码</th>
+                            <th>类型</th>
+                            <th>场上位置</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="structure_modal_save(true)">确定</button>
+                    <button type="button" class="btn btn-default" onclick="structure_modal_save(false)">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Situation Modal -->
+<div id="game_situation_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">赛况编辑</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="game_situation_row_id">
+                <input type="hidden" id="game_situation_row_team1">
+                <input type="hidden" id="game_situation_row_team2">
+                <div class="box-body">
+                    <div style="text-align: right">
+                        <button class="btn btn-primary" onclick="add_new_situation()">新增赛况</button>
+                    </div>
+                    <div class="game-situation-modal-data"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="situation_modal_save(true)">确定</button>
+                    <button type="button" class="btn btn-default" onclick="situation_modal_save(false)">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Stream Modal -->
+<div id="game_stream_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">直播链接</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="game_stream_row_id">
+                <div class="box-body">
+                    <div style="padding: 5%">
+                        请填写直播地址：<input class="form-control" id="game_stream_row_value" placeholder="www.baidu.com">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="stream_modal_save(true)">确定</button>
+                    <button type="button" class="btn btn-default" onclick="stream_modal_save(false)">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="game_delete_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="game_delete_row_id">
+                <h3 style="text-align: center">删除后，数据将无法恢复。 确定删除吗？</h3>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="delete_modal_save(true)">确定</button>
+                    <button type="button" class="btn btn-default" onclick="delete_modal_save(false)">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Auto generation Confirm Modal -->
+<div id="auto_confirm_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4 style="text-align: center; color: red">如果重新生成赛程，之前编辑的比赛信息会全部删除，是否确认重新生成？</h4>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="auto_generate_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<% include ../partials/foot.ejs %>
+<script>
+    let team_names = [];
+    let group_names = JSON.parse($('input[data-id="team_groups_data"]').attr('data-content'));
+    let places = [];
+    let unique_group_names = [];
+    let unique_group_teams = [];
+    let non_round_array = ['决赛', '半决赛', '1/4决赛', '1/8决赛', '1/16决赛', '1/32决赛', '1/64决赛', '1/128决赛'];
+    let non_round_order = [0, 1, 2, 3, 4, 5, 6, 7];
+    let defined_team_group_names = [];
+    let team_group_ids = [];
+    $(function () {
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+        let applied_teams = JSON.parse($('input[data-id="applied_teams_data"]').attr('data-content'));
+        for (let i = 0; i < applied_teams.length; i++) {
+            team_names.push(applied_teams[i].team.t_full_name);
+            team_group_ids.push(applied_teams[i].team.id);
+        }
+        let obj_places = JSON.parse($('input[data-id="places_data"]').attr('data-content'));
+        for (let i = 0; i < obj_places.length; i++) {
+            places.push(obj_places[i].place);
+        }
+        // let c_type = $('input[data-id="competition_type"]').attr('data-content');
+        // if (c_type == 1 || c_type == 2) {
+        //     let existing_games = JSON.parse($('input[data-id="games_data"]').attr('data-content'));
+        //     if (existing_games.length === undefined || existing_games.length === 0) {
+        //         auto_generate_confirm();
+        //     }
+        // }
+        table_all_order(1);
+        table_all_order(2);
+    })
+
+    function check_cell_validation(cell) {
+        let node = $(cell).attr('class');
+        if (node === "game-team1-td" || node === "game-team2-td") {
+            console.log(team_names);
+            autocomplete_func($(cell).find('input')[0], team_names);
+        } else if (node === "game-place-td") {
+            console.log(places);
+            autocomplete_func($(cell).find('input')[0], places);
+        } else if (node === "game-non-round-td") {
+            autocomplete_func($(cell).find('input')[0], non_round_array, true);
+        }
+    }
+
+    function check_cell_input_validation(cell_input) {
+        let res_flag = true;
+        let pattern_group = /[A-Za-z]/;
+        let node_input_class = $(cell_input).attr('class');
+        let val = $(cell_input).val();
+        if (node_input_class === "game-group-input") {
+            if (val.length > 1 || !pattern_group.test(val)) {
+                showAlert('请填写英文字母');
+                res_flag = false;
+            } else {
+                $(cell_input).val(val.toUpperCase());
+                if (group_names.indexOf(val.toUpperCase()) === -1) {
+                    showAlert('请填写英文字母');
+                    res_flag = false;
+                } else {
+                    $(cell_input).parent().attr('data-order', val.toUpperCase());
+                }
+            }
+        } else if (node_input_class === "game-round-input") {
+            if (val === "" || !checkValidNumber(Number(val))) {
+                showAlert('请填写数字');
+                res_flag = false;
+            } else {
+                $(cell_input).parent().attr('data-order', val);
+            }
+        } else if (node_input_class === "game-date-input datepicker") {
+            if (val !== "" && !checkValidDate(val)) {
+                showAlert('请填写日期');
+                res_flag = false;
+            } else {
+                setTimeout(function () {
+                    define_g_state(cell_input);
+                }, 500);
+                $(cell_input).parent().attr('data-order', val);
+            }
+        } else if (node_input_class === "game-time-input") {
+            if (val !== "" && !checkValidTime(val)) {
+                showAlert('请填写时间，示例：18:30');
+                res_flag = false;
+            } else {
+                setTimeout(function () {
+                    define_g_state(cell_input);
+                }, 500);
+                $(cell_input).parent().attr('data-order', val);
+            }
+        } else if (node_input_class === "game-place-input") {
+            // if (val === "") {
+            //     showAlert('请填写比赛场地');
+            //     res_flag = false;
+            // }
+        } else if (node_input_class === "game-team1-input" || node_input_class === "game-team2-input") {
+            if (team_names.indexOf(val) === -1) {
+                showAlert('请选择可用的团队名称');
+                res_flag = false;
+            }
+        } else if (node_input_class === 'game-non-round-input') {
+            console.log(val);
+            if (val === "" || non_round_array.indexOf(val) === -1) {
+                showAlert('请输入正确的阶段');
+                res_flag = false;
+            } else {
+                $(cell_input).parent().attr('data-order', non_round_order[non_round_array.indexOf(val)]);
+            }
+        }
+        if (!res_flag) $(cell_input).parent().css('background', 'red');
+        return res_flag;
+    }
+
+    function td_edit(el) {  // double click cell on table
+        if ($(el).attr('class') === "game-structure-td") {
+            let id = $(el).attr('id');
+            // get names
+            let name1 = $(el).parent().find('.game-team1-td span').text();
+            let name2 = $(el).parent().find('.game-team2-td span').text();
+            if (name1 === "" || name2 === "" || team_names.indexOf(name1) === -1 || team_names.indexOf(name2) === -1) {
+                showAlert('请输入正确的团队名称');
+                return;
+            }
+            if (name1 === name2) {
+                showAlert('主队和客队不能是同一个团队');
+                return;
+            }
+            $('#game_structure_row_id').val(id);
+            $('#game_structure_modal').modal();
+            $('#team_structure_name1').text(name1);
+            $('#team_structure_name2').text(name2);
+            $.ajax({
+                url: '/common/get-structure-members',
+                method: 'post',
+                data: {
+                    team_name1: name1,
+                    team_name2: name2
+                },
+                success: function (res) {
+                    if (res.status === 'success') {
+                        let member1 = res.result.team1.members;
+                        let member2 = res.result.team2.members;
+                        let st_val = $(el).find('input').val();
+                        make_team_structure_table(1, member1, st_val);
+                        make_team_structure_table(2, member2, st_val);
+                    } else {
+                        showAlert(res.message);
+                    }
+                }
+            });
+            return;
+        } else if ($(el).attr('class') === "game-situation-td") {
+            let id = $(el).attr('id');
+            // get names
+            let name1 = $(el).parent().find('.game-team1-td span').text();
+            let name2 = $(el).parent().find('.game-team2-td span').text();
+            if (name1 === "" || name2 === "" || team_names.indexOf(name1) === -1 || team_names.indexOf(name2) === -1) {
+                showAlert('请输入正确的团队名称');
+                return;
+            }
+            if (name1 === name2) {
+                showAlert('主队和客队不能是同一个团队');
+                return;
+            }
+            $('#game_situation_row_team1').val(name1);
+            $('#game_situation_row_team2').val(name2);
+            $('#game_situation_row_id').val(id);
+            $('#game_situation_modal').modal();
+            let situation_val_str = $(el).find('input').val();
+            if (situation_val_str !== '') {
+                $.ajax({
+                    url: '/common/get-structure-members',
+                    method: 'post',
+                    data: {
+                        team_name1: name1,
+                        team_name2: name2
+                    },
+                    success: function (res) {
+                        if (res.status === 'success') {
+                            let memberTotal = [];
+                            for (let i = 0; i < res.result.team1.members.length; i++) {
+                                let memberItem = res.result.team1.members[i];
+                                memberItem.parent_team = res.result.team1.t_full_name;
+                                memberTotal.push(memberItem);
+                            }
+                            for (let j = 0; j < res.result.team2.members.length; j++) {
+                                let memberItem = res.result.team2.members[j];
+                                memberItem.parent_team = res.result.team2.t_full_name;
+                                memberTotal.push(memberItem);
+                            }
+                            $('.game-situation-modal-data').html('');
+                            let situation_val = JSON.parse(situation_val_str);
+                            for (let si = 0; si < situation_val.length; si++) {
+                                add_new_situation();
+                                let parentCtrl = $($('.game-situation-modal-data .competition-row')[si]);
+                                let item = situation_val[si];
+                                let teamType = memberTotal.filter(function (a) {
+                                    return a.id === item[0];
+                                })
+                                teamType = teamType[0];
+                                parentCtrl.find('.game-situation-modal-teams').val(teamType.parent_team);
+                                parentCtrl.find('.game-situation-modal-teams').attr('data-sel-required', teamType.id);
+                                parentCtrl.find('.game-situation-modal-teams').trigger('change');
+                                parentCtrl.find('.game-situation-modal-value').val(item[1]);
+                                parentCtrl.find('.game-situation-modal-situations').val(item[2]);
+                            }
+                        } else {
+                            showAlert(res.message);
+                        }
+                    }
+                });
+            } else {
+                $('.game-situation-modal-data').html('');
+                add_new_situation();
+            }
+
+            return;
+        } else if ($(el).attr('class') === "game-score-td") {
+            let id = $(el).attr('id');
+            // get names
+            let name1 = $(el).parent().find('.game-team1-td span').text();
+            let name2 = $(el).parent().find('.game-team2-td span').text();
+            if (name1 === "" || name2 === "" || team_names.indexOf(name1) === -1 || team_names.indexOf(name2) === -1) {
+                showAlert('请输入正确的团队名称');
+                return;
+            }
+            if (name1 === name2) {
+                showAlert('主队和客队不能是同一个团队');
+                return;
+            }
+            $('#game_score_row_id').val(id);
+            let score_val_str = $(el).find('input').val();
+            if (score_val_str !== "") {
+                let score_val = JSON.parse(score_val_str);
+                $('#game_score_total1').val(score_val[0]);
+                $('#game_score_total2').val(score_val[1]);
+                $('#game_score_sub1').val(score_val[2]);
+                $('#game_score_sub2').val(score_val[3]);
+            } else {
+                $('#game_score_total1').val(0);
+                $('#game_score_total2').val(0);
+                $('#game_score_sub1').val(0);
+                $('#game_score_sub2').val(0);
+            }
+            $('#game_score_team_name1').text(name1);
+            $('#game_score_team_name2').text(name2);
+            $('#game_score_modal').modal();
+            return;
+        }
+        $(el).find('input').css("display", "block");
+        $(el).find('span').css("display", "none");
+        $(el).find('input').focus();
+        window.getSelection().removeAllRanges();
+        $(el).css('background', 'transparent');
+        check_cell_validation(el);
+    }
+
+    function td_disable(el) {
+        setTimeout(function () {
+            check_cell_input_validation(el)
+            $(el).parent().find('span').html($(el).val());
+        }, 170);
+        $(el).parent().find('span').css('display', 'block');
+        $(el).css('display', 'none')
+    }
+
+    function auto_generate_games(click_flag) {
+        let team_group_names = [];
+        let team_group_name_counts = [];
+        let error = false;
+        let checkboxes = $('.checkbox-group');
+        for (let ci = 0; ci < checkboxes.length; ci++) {
+            let ele = $(checkboxes[ci]);
+            if (ele.find('input:checked').length === 0 || ele.find('input:checked').length > 1) {
+                error = true;
+                break;
+            }
+            let group_input_id = ele.find('input:checked').attr('id');
+            let group_label_text = $('label[for="' + group_input_id + '"]').text();
+            let team_group_name = group_label_text.replace('组', '');
+            if (team_group_names.indexOf(team_group_name) === -1) team_group_name_counts.push(1);
+            else team_group_name_counts.pop();
+            team_group_names.push(team_group_name);
+        }
+        // $('.checkbox-group').each(function () {
+        //
+        // });
+
+        if (error || team_group_name_counts.length > 0) {
+            showAlert('请为所有球队选择分组');
+            return true;
+        }
+        let applied_teams = JSON.parse($('input[data-id="applied_teams_data"]').attr('data-content'));
+        if (applied_teams.length !== team_group_names.length) {
+            showAlert('Teams and Groups is not matched ...');
+            return true;
+        }
+        unique_group_names = [];
+        unique_group_teams = [];
+        defined_team_group_names = team_group_names;
+        for (let i = 0; i < team_group_names.length; i++) {
+            let unique_index = unique_group_names.indexOf(team_group_names[i]);
+            if (unique_index === -1) {
+                unique_group_names.push(team_group_names[i]);
+                unique_group_teams.push([applied_teams[i].team.t_full_name]);
+            } else {
+                unique_group_teams[unique_index].push(applied_teams[i].team.t_full_name);
+            }
+        }
+        if (click_flag) {
+            $('#auto_confirm_modal').modal();
+        } else {
+            return error;
+        }
+    }
+
+    function auto_generate_confirm() {
+        let c_type = $('input[data-id="competition_type"]').attr('data-content');
+        if (team_names.length < 2) {
+            showAlert('没有报名了球队');
+            return;
+        }
+        $('#federation_table tbody').html('');
+        if (c_type == 3 || c_type == 4) {
+            for (let index1 = 0; index1 < unique_group_names.length; index1++) {
+                // if (unique_group_teams[index1].length > 2) {
+                    if (c_type == 3) make_matching(unique_group_names[index1], unique_group_teams[index1], false);
+                    else if (c_type == 4) make_matching(unique_group_names[index1], unique_group_teams[index1], true);
+                // }
+            }
+        } else if (c_type == 1 || c_type == 2) {
+            if (c_type == 1) make_matching('', team_names, false);
+            else if (c_type == 2) make_matching('', team_names, true);
+        }
+        $('#auto_confirm_modal').modal('toggle');
+        // let trs = $('#federation_table tbody tr');
+        // for (let round_i = 0; round_i < trs.length; round_i++) {
+        //     $(trs[round_i]).find('.game-round-td span').text(round_i + 1);
+        //     $(trs[round_i]).find('.game-round-td input').val(round_i + 1);
+        // }
+    }
+    function make_matching(group_name, team_names, double_flag) {
+        if (team_names.length % 2 === 1) team_names.push("");
+        for (let auto_index1 = 0; auto_index1 < team_names.length - 1; auto_index1++) {
+            for (let auto_index2 = 0; auto_index2 < (team_names.length / 2); auto_index2++) {
+                if (team_names[auto_index2] === "" || team_names[team_names.length - 1 - auto_index2] === "") continue;
+                add_new_fed_table_row(group_name, team_names[auto_index2], team_names[team_names.length - 1 - auto_index2], (auto_index1 + 1));
+                if (double_flag)
+                    add_new_fed_table_row(group_name, team_names[team_names.length - 1 - auto_index2], team_names[auto_index2], (auto_index1 + team_names.length));
+            }
+            let temp_name = team_names.pop();
+            team_names.splice(1, 0, temp_name);
+        }
+        table_all_order(1);
+    }
+
+    function score_modal_save(flag) {
+        let id = $('#game_score_row_id').val();
+        let total_score1 = $('#game_score_total1').val();
+        let total_score2 = $('#game_score_total2').val();
+        let sub_score1 = $('#game_score_sub1').val();
+        let sub_score2 = $('#game_score_sub2').val();
+        if (flag) {
+            if (total_score1 === "" || total_score2 === "") {
+                showAlert('请输入比分');
+                return;
+            }
+            let score_text = total_score1;
+            if (sub_score1 === "" || sub_score1 === "0") sub_score1 = '0';
+            else score_text += "(" + sub_score1 + ")";
+            score_text += ":" + total_score2;
+            if (sub_score2 === "" || sub_score2 === "0") sub_score2 = '0';
+            else score_text += "(" + sub_score2 + ")";
+            $('#' + id).find('input').val(JSON.stringify([total_score1, total_score2, sub_score1, sub_score2]));
+            $('#' + id).find('span').text(score_text);
+            $('#' + id).parent().find('.game-state-td span').text('已结束');
+            $('#' + id).parent().find('.game-state-td span').css('color', 'black');
+        }
+        $('#game_score_modal').modal('toggle');
+    }
+
+    function structure_modal_save(flag) {
+        let id = $('#game_structure_row_id').val()
+        if (flag) {
+            let team1_structure = [];
+            $('#team_structure_1 tbody tr').each(function () {
+                let i_member = [];
+                i_member.push($(this).attr('id'));
+                if ($(this).find('.m-type:checked').attr('data-type') === 'm-type1') i_member.push('首发');
+                else i_member.push('替补');
+                if ($(this).find('.m-pos:checked').attr('data-type') === 'm-pos1') i_member.push('前锋');
+                else if ($(this).find('.m-pos:checked').attr('data-type') === 'm-pos2') i_member.push('中场');
+                else if ($(this).find('.m-pos:checked').attr('data-type') === 'm-pos3') i_member.push('后卫');
+                else i_member.push('守门员');
+                team1_structure.push(i_member);
+            });
+            let team2_structure = [];
+            $('#team_structure_2 tbody tr').each(function () {
+                let i_member = [];
+                i_member.push($(this).attr('id'));
+                if ($(this).find('.m-type:checked').attr('data-type') === 'm-type1') i_member.push('首发');
+                else i_member.push('替补');
+                if ($(this).find('.m-pos:checked').attr('data-type') === 'm-pos1') i_member.push('前锋');
+                else if ($(this).find('.m-pos:checked').attr('data-type') === 'm-pos2') i_member.push('中场');
+                else if ($(this).find('.m-pos:checked').attr('data-type') === 'm-pos3') i_member.push('后卫');
+                else i_member.push('守门员');
+                team2_structure.push(i_member);
+            });
+            $('#' + id).find('input').val(JSON.stringify([team1_structure, team2_structure]));
+            $('#' + id).find('span').text('已编辑');
+        }
+        $('#game_structure_modal').modal('toggle');
+    }
+
+    function situation_modal_save(flag) {
+        let error = false;
+        if (flag) {
+            let situations = [];
+            let situation_rows = $('.game-situation-modal-data .competition-row');
+            for (let i = 0; i < situation_rows.length; i++) {
+                let s_row = $(situation_rows[i]);
+                let member_val = s_row.find('.game-situation-modal-members').val();
+                let s_value = s_row.find('.game-situation-modal-value').val();
+                let s_conf = s_row.find('.game-situation-modal-situations').val();
+                if (member_val === 'none' || s_value === '' || s_conf === 'none') {
+                    showAlert('请输入情况信息');
+                    error = true;
+                    return;
+                }
+                situations.push([member_val, s_value, s_conf]);
+            }
+            let game_s_row_id = $('#game_situation_row_id').val();
+            $('#' + game_s_row_id).find('input').val(JSON.stringify(situations));
+            $('#' + game_s_row_id).find('span').text('已编辑');
+
+        }
+        if (!error) {
+            $('#game_situation_modal').modal('toggle');
+        }
+    }
+
+    function stream_modal_save(flag) {
+        if (flag) {
+            let stream_id = $('#game_stream_row_id').val();
+            console.log(stream_id);
+            let stream_url = $('#game_stream_row_value').val();
+            if (stream_url === "") {
+                showAlert('取消设置流URL');
+                return;
+            }
+            console.log(stream_url)
+            $('#' + stream_id).parent().find('input').val(stream_url);
+            $('#' + stream_id).find('span').text('已设置');
+        }
+        $('#game_stream_modal').modal('toggle');
+    }
+
+    function delete_modal_save(flag) {
+        if (flag) {
+            let delete_id = $('#game_delete_row_id').val();
+            console.log(delete_id)
+            $('#' + delete_id).parent().parent().remove();
+        }
+        $('#game_delete_modal').modal('toggle');
+    }
+
+    function set_stream_click(ele) {
+        let id = $(ele).attr('id');
+        let url = $(ele).parent().find('input.game-stream-value').val();
+        console.log(id, url);
+        $('#game_stream_row_id').val(id);
+        $('#game_stream_row_value').val(url);
+        $('#game_stream_modal').modal();
+    }
+
+    function game_delete_click(ele) {
+        let game_delete_id = $(ele).attr('id');
+        $('#game_delete_row_id').val(game_delete_id);
+        $('#game_delete_modal').modal();
+    }
+
+    function add_new_situation() {
+        let situation_team_name1 = $('#game_situation_row_team1').val();
+        let situation_team_name2 = $('#game_situation_row_team2').val();
+        let situation_length = $('.game-situation-modal-data .competition-row').length;
+        let situation_row_tags = '<div class="competition-row">\n<span>赛况' + (situation_length + 1) + ': </span>'
+            + '<select class="game-situation-modal-teams" onchange="situation_get_members(this)"><option value="none">请选择球队</option>' +
+            '<option value="' + situation_team_name1 + '">' + situation_team_name1 + '</option>'
+            + '<option value="' + situation_team_name2 + '">' + situation_team_name2 + '</option></select>\n'
+            + '<select class="game-situation-modal-members"></select>\n'
+            + '<input class="game-situation-modal-value" placeholder="请填写赛况出现分钟数（数字）">\n'
+            + '<select class="game-situation-modal-situations">' + make_situation_last_options() + '</select>\n'
+            + '<a href="javascript:" onclick="delete_situation_item(this)">删除</a>\n</div>';
+        $('.game-situation-modal-data').append(situation_row_tags);
+    }
+
+    function make_team_structure_table(index, members_param, st_val_str) {
+        let m_type_arr = [];
+        let m_pos_arr = [];
+        let members = [];
+        if (st_val_str === "") {
+            members = members_param;
+            for (let m_i = 0; m_i < members.length; m_i++) {
+                m_type_arr.push('首发');
+                if (['前锋', '中场', '后卫', '守门员'].indexOf(members[m_i].m_pos) > -1) {
+                    m_pos_arr.push(members[m_i].m_pos);
+                } else {
+                    m_pos_arr.push('前锋');
+                }
+            }
+        } else {
+            let member_ids = [];
+            let str_val = JSON.parse(st_val_str);
+            for (let b = 0; b <  str_val[index-1].length; b++) {
+                member_ids.push(str_val[index - 1][b][0])
+            }
+            for (let a = 0; a < members_param.length; a++) {
+                let a_index = member_ids.indexOf(members_param[a].id)
+                if(members_param[a].m_state== 3 || members_param[a].m_state== 0) continue;
+                if (a_index !== -1){
+                    m_type_arr.push(str_val[index - 1][a_index][1]);
+                    m_pos_arr.push(str_val[index - 1][a_index][2]);
+                    members.push(members_param[a]);
+                }else{
+                    m_type_arr.push("替补");
+                    m_pos_arr.push(members_param[a].m_pos);
+                    members.push(members_param[a]);
+                }
+            }
+        }
+        let tbody_tags = '';
+        for (let i = 0; i < members.length; i++) {
+            tbody_tags += '<tr id="' + members[i].id + '"><td>' + (i + 1) + '</td>';
+            tbody_tags += '<td>' + members[i].m_name + '</td>';
+            tbody_tags += '<td>' + members[i].m_number + '</td>';
+            tbody_tags += '<td class="m-type"><span>';
+            if (m_type_arr[i] === '首发')
+                tbody_tags += '<input type="radio" class="m-type" data-type="m-type1" name="m-type_' + index + '_' + i + '" checked> 首发</span>'
+                    + '<span><input type="radio" class="m-type" data-type="m-type2" name="m-type_' + index + '_' + i + '"> 替补</span></td>';
+            else tbody_tags += '<input type="radio" class="m-type" data-type="m-type1" name="m-type_' + index + '_' + i + '"> 首发</span>'
+                + '<span><input type="radio" class="m-type" data-type="m-type2" name="m-type_' + index + '_' + i + '" checked> 替补</span></td>';
+            tbody_tags += '<td class="m-pos">';
+            if (m_pos_arr[i] === '守门员')
+                tbody_tags += '<span><input type="radio" class="m-pos" data-type="m-pos1" name="m-pos' + index + '_' + i + '"> 前锋</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos2" name="m-pos' + index + '_' + i + '"> 中场</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos3" name="m-pos' + index + '_' + i + '"> 后卫</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos4" name="m-pos' + index + '_' + i + '" checked> 守门员</span></td>';
+            else if (m_pos_arr[i] === '后卫')
+                tbody_tags += '<span><input type="radio" class="m-pos" data-type="m-pos1" name="m-pos' + index + '_' + i + '"> 前锋</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos2" name="m-pos' + index + '_' + i + '"> 中场</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos3" name="m-pos' + index + '_' + i + '" checked> 后卫</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos4" name="m-pos' + index + '_' + i + '"> 守门员</span></td>';
+            else if (m_pos_arr[i] === '中场')
+                tbody_tags += '<span><input type="radio" class="m-pos" data-type="m-pos1" name="m-pos' + index + '_' + i + '"> 前锋</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos2" name="m-pos' + index + '_' + i + '" checked> 中场</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos3" name="m-pos' + index + '_' + i + '"> 后卫</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos4" name="m-pos' + index + '_' + i + '"> 守门员</span></td>';
+            else tbody_tags += '<span><input type="radio" class="m-pos" data-type="m-pos1" name="m-pos' + index + '_' + i + '" checked> 前锋</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos2" name="m-pos' + index + '_' + i + '"> 中场</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos3" name="m-pos' + index + '_' + i + '"> 后卫</span>'
+                    + '<span><input type="radio" class="m-pos" data-type="m-pos4" name="m-pos' + index + '_' + i + '"> 守门员</span></td>';
+        }
+        if (index === 1) {
+            $('#team_structure_1 tbody').html(tbody_tags);
+        } else {
+            $('#team_structure_2 tbody').html(tbody_tags);
+        }
+    }
+
+    function situation_get_members(ele) {
+        let situation_team_name = $(ele).val();
+        $.ajax({
+            url: '/common/get-members-from-team-name',
+            method: 'POST',
+            data: {
+                team_name: situation_team_name
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    let situation_members_tags = '<option value="none">请选择球员</option>';
+                    for (let i = 0; i < res.result.length; i++) {
+                        situation_members_tags += '<option value="' + res.result[i].id + '">' + res.result[i].m_number + '号 ' + res.result[i].m_name + '</option>';
+                    }
+                    let teamCtrl = $(ele).parent().find('.game-situation-modal-teams')
+                    let memCtrl = $(ele).parent().find('.game-situation-modal-members');
+                    memCtrl.html(situation_members_tags);
+                    if (teamCtrl.attr('data-sel-required') !== undefined) {
+                        memCtrl.val(teamCtrl.attr('data-sel-required'));
+                    }
+                } else showAlert(res.message);
+            }
+        })
+    }
+
+    function delete_situation_item(ele) {
+        $(ele).parent().remove()
+    }
+
+    function make_situation_last_options() {
+        return '<option value="none">请选择赛况</option>'
+            + '<option value="红牌">红牌</option>'
+            + '<option value="黄牌">黄牌</option>'
+            + '<option value="两黄变一红">两黄变一红</option>'
+            + '<option value="乌龙球">乌龙球</option>'
+            + '<option value="进球">进球</option>'
+            + '<option value="点球">点球</option>'
+            + '<option value="点球未进">点球未进</option>'
+            + '<option value="上场">上场</option>'
+            + '<option value="下场">下场</option>'
+            + '<option value="助攻">助攻</option>';
+    }
+
+    function add_new_game(game_type) {
+        if (game_type === 1) add_new_fed_table_row('', '', '', '');
+        else add_new_non_table_row()
+    }
+
+    function add_new_fed_table_row(new_group_name, new_team1_name, new_team2_name, round) {
+        let c_type = $('input[data-id="competition_type"]').attr('data-content');
+        let games_len = $('#federation_table tbody tr').length;
+        let game_tr_tags = '<tr data-id="new_game"><td class="game-index-td">' + (games_len + 1) + '</td>';
+        if (c_type == 3 || c_type == 4)
+            game_tr_tags += '<td class="game-group-td" ondblclick="td_edit(this)" data-order="' + new_group_name +
+                '"><span>' + new_group_name + '</span><input ' + 'class="game-group-input" style="display: none" ' +
+                'onblur="td_disable(this)" value="' + new_group_name + '"></td>';
+        game_tr_tags += '<td class="game-round-td" ondblclick="td_edit(this)" data-order="' + round + '"><span>' + round + '</span><input ' +
+            'class="game-round-input" style="display: none" onblur="td_disable(this)" value="' + round + '"></td>';
+        game_tr_tags += '<td class="game-date-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-date-input datepicker" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-time-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-time-input" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-team1-td" ondblclick="td_edit(this)"><span>' + new_team1_name + '</span><input ' +
+            'class="game-team1-input" style="display: none" onblur="td_disable(this)" value="' + new_team1_name + '"></td>';
+        game_tr_tags += '<td class="game-score-td" id="score_' + (games_len + 1)
+            + '" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>';
+        game_tr_tags += '<td class="game-team2-td" ondblclick="td_edit(this)"><span>' + new_team2_name + '</span><input ' +
+            'class="game-team2-input" style="display: none" onblur="td_disable(this)" value="' + new_team2_name + '"></td>';
+        game_tr_tags += '<td class="game-place-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-place-input" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-structure-td" id="structure_' + (games_len + 1)
+            + '" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>';
+        game_tr_tags += '<td class="game-situation-td" id="situation_' + (games_len + 1)
+            + '" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>';
+        game_tr_tags += '<td class="game-state-td"><span>未开赛</span></td>';
+        game_tr_tags += '<td class="organizer-operation">';
+        game_tr_tags += '<input type="hidden" class="game-stream-value" id="stream_url_' + (games_len + 1) + '">';
+        game_tr_tags += '<a href="javascript:" class="game-stream" id="stream_' + (games_len + 1)
+            + '" onclick="set_stream_click(this)"><span style="word-break: keep-all">直播设置</span></a>';
+        game_tr_tags += '<a href="javascript:" class="game-delete" id="game_delete_' + (games_len + 1)
+            + '" onclick="game_delete_click(this)"><span style="word-break: keep-all">删除</span></a></td></tr>';
+        $('#federation_table tbody').append(game_tr_tags);
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+    }
+
+    function add_new_non_table_row() {
+        let games_len = $('#non_federation_table tbody tr').length;
+        let game_tr_tags = '<tr data-id="new_game"><td class="game-index-td">' + (games_len + 1) + '</td>';
+        game_tr_tags += '<td class="game-non-round-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-non-round-input" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-date-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-date-input datepicker" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-time-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-time-input" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-team1-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-team1-input" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-score-td" id="non_score_' + (games_len + 1)
+            + '" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>';
+        game_tr_tags += '<td class="game-team2-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-team2-input" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-place-td" ondblclick="td_edit(this)"><span></span><input ' +
+            'class="game-place-input" style="display: none" onblur="td_disable(this)"></td>';
+        game_tr_tags += '<td class="game-structure-td" id="non_structure_' + (games_len + 1)
+            + '" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>';
+        game_tr_tags += '<td class="game-situation-td" id="non_situation_' + (games_len + 1)
+            + '" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>';
+        game_tr_tags += '<td class="game-state-td"><span>未开赛</span></td>';
+        game_tr_tags += '<td class="organizer-operation">';
+        game_tr_tags += '<input type="hidden" class="game-stream-value" id="non_stream_url_' + (games_len + 1) + '">';
+        game_tr_tags += '<a href="javascript:" class="game-stream" id="non_stream_' + (games_len + 1)
+            + '" onclick="set_stream_click(this)"><span style="word-break: keep-all">直播设置</span></a>';
+        game_tr_tags += '<a href="javascript:" class="game-delete" id="non_game_delete_' + (games_len + 1)
+            + '" onclick="game_delete_click(this)"><span style="word-break: keep-all">删除</span></a></td></tr>';
+        $('#non_federation_table tbody').append(game_tr_tags);
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+    }
+
+    function table_all_order(table_type) {
+        if (!table_all_validation(table_type)) return;
+        let c_type = $('input[data-id="competition_type"]').attr('data-content');
+        let sA = [1, 2, 3, 3];
+        let CT = ['D','S', 'S', 'S']
+        if (c_type == 3 || c_type == 4) {
+            sA = [1, 2, 3, 4];
+            CT = ['S','D', 'S', 'S']
+        }
+        let table_rows = $('#federation_table tbody')[0]
+        let table, rows, switching, i, x, y, shouldSwitch;
+        table = table_rows;
+        switching = true;
+        /*Make a loop that will continue until no switching has been done:*/
+        while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /*Loop through all table rows (except the first, which contains table headers):*/
+            for (i = 0; i < (rows.length - 1); i++) {
+                //start by saying there should be no switching:
+                shouldSwitch = false;
+                /*Get the two elements you want to compare, one from current row and one from the next:*/
+                x = rows[i].getElementsByTagName("TD");
+                y = rows[i + 1].getElementsByTagName("TD");
+                //check if the two rows should switch place:
+                if (!x[sA[0]].getAttribute('data-order')) x[sA[0]].setAttribute('data-order', '');
+                if (!y[sA[0]].getAttribute('data-order')) y[sA[0]].setAttribute('data-order', '');
+                if (compare_string(x[sA[0]].getAttribute('data-order').toLowerCase(), y[sA[0]].getAttribute('data-order').toLowerCase(), CT[0])) {
+                    shouldSwitch = true;
+                    break;
+                } else if (x[sA[0]].getAttribute('data-order').toLowerCase() === y[sA[0]].getAttribute('data-order').toLowerCase()) {
+                    if (!x[sA[1]].getAttribute('data-order')) x[sA[1]].setAttribute('data-order', '');
+                    if (!y[sA[1]].getAttribute('data-order')) y[sA[1]].setAttribute('data-order', '');
+                    if (compare_string(x[sA[1]].getAttribute('data-order').toLowerCase(), y[sA[1]].getAttribute('data-order').toLowerCase(), CT[1])) {
+                        shouldSwitch = true;
+                        break;
+                    } else if (x[sA[1]].getAttribute('data-order').toLowerCase() === y[sA[1]].getAttribute('data-order').toLowerCase()) {
+                        if (!x[sA[2]].getAttribute('data-order')) x[sA[2]].setAttribute('data-order', '');
+                        if (!y[sA[2]].getAttribute('data-order')) y[sA[2]].setAttribute('data-order', '');
+                        if (x[sA[2]].getAttribute('data-order').toLowerCase() > y[sA[2]].getAttribute('data-order').toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        } else if (x[sA[2]].getAttribute('data-order').toLowerCase() === y[sA[2]].getAttribute('data-order').toLowerCase()) {
+                            if (!x[sA[3]].getAttribute('data-order')) x[sA[3]].setAttribute('data-order', '');
+                            if (!y[sA[3]].getAttribute('data-order')) y[sA[3]].setAttribute('data-order', '');
+                            if (x[sA[3]].getAttribute('data-order').toLowerCase() > y[sA[3]].getAttribute('data-order').toLowerCase()) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+    function table_all_validation(type) {
+        let table_tr_tags = [];
+        if (type === 1) {
+            table_tr_tags = $('#federation_table tbody tr');
+        } else {
+            table_tr_tags = $('#non_federation_table tbody tr');
+        }
+        if (table_tr_tags.length === 0) return [];
+        let c_type = $('input[data-id="competition_type"]').attr('data-content');
+        let table_data = [];
+        let error_flag = false;
+        if (table_tr_tags.length === 0) return;
+        for (let i = 0; i < table_tr_tags.length; i++) {
+            let row_item = $(table_tr_tags[i]);
+            let row_data = []
+            let row_id = row_item.attr('data-id');
+            row_data.push(row_id);
+            if (type === 1) {
+                if (c_type == 3 || c_type == 4) {
+                    let row_group = row_item.find('.game-group-td span').text();
+                    if (cell_group(row_group)) {
+                        error_flag = true;
+                        row_item.find('.game-group-td').css('background', 'red');
+                        break;
+                    }
+                    row_data.push(row_group);
+                }
+                let row_round = row_item.find('.game-round-td span').text();
+                if (cell_round(row_round)) {
+                    error_flag = true;
+                    row_item.find('.game-round-td').css('background', 'red');
+                    break;
+                }
+                row_data.push(row_round);
+            } else {
+                let row_non_round = row_item.find('.game-non-round-td span').text();
+                if (cell_non_round(row_non_round)) {
+                    error_flag = true;
+                    row_item.find('.game-non-round-td').css('background', 'red');
+                    break;
+                }
+                row_data.push(row_non_round);
+            }
+            let row_date = row_item.find('.game-date-td span').text();
+            if (row_date !== '' && cell_date(row_date)) {
+                error_flag = true;
+                row_item.find('.game-date-td').css('background', 'red');
+                break;
+            }
+            row_data.push(row_date);
+            let row_time = row_item.find('.game-time-td span').text();
+            if (row_time !== '' && cell_time(row_time)) {
+                error_flag = true;
+                row_item.find('.game-time-td').css('background', 'red');
+                break;
+            }
+            row_data.push(row_time);
+            let row_team1 = row_item.find('.game-team1-td span').text();
+            if (cell_team(row_team1)) {
+                error_flag = true;
+                row_item.find('.game-team1-td').css('background', 'red');
+                break;
+            }
+            row_data.push(row_team1);
+            row_data.push(row_item.find('.game-score-td input').val());
+            let row_team2 = row_item.find('.game-team2-td span').text();
+            if (cell_team(row_team2)) {
+                error_flag = true;
+                row_item.find('.game-team2-td').css('background', 'red');
+                break;
+            }
+            row_data.push(row_team2);
+            // check 2 teams
+            if (row_team1 === row_team2) {
+                error_flag = true;
+                row_item.find('.game-team1-td').css('background', 'red');
+                row_item.find('.game-team2-td').css('background', 'red');
+                break;
+            } else {
+                row_item.find('.game-team1-td').css('background', 'transparent');
+                row_item.find('.game-team2-td').css('background', 'transparent');
+            }
+            let row_place = row_item.find('.game-place-td span').text();
+            // if (cell_place(row_place)) {
+            //     error_flag = true;
+            //     row_item.find('.game-place-td').css('background', 'red');
+            //     break;
+            // }
+            row_data.push(row_place);
+            row_data.push(row_item.find('.game-structure-td input').val());
+            row_data.push(row_item.find('.game-situation-td input').val());
+            row_data.push(row_item.find('.game-state-td span').text());
+            row_data.push(row_item.find('.game-stream-value').val());
+
+            table_data.push(row_data);
+        }
+        console.log(table_data)
+        if (error_flag || table_data.length === 0) {
+            showAlert('比赛日期、开球时间、主队、客队为必填项');
+            return false;
+        } else {
+            return table_data;
+        }
+    }
+
+    function define_g_state(ele) {
+        let current_local_time = new Date().getTime();
+        let g_test_date = $(ele).parent().parent().find('.game-date-td span').text();
+        if (g_test_date === '') return;
+        let g_test_time = $(ele).parent().parent().find('.game-time-td span').text();
+        if (g_test_time === '') return;
+        let g_test_score = $(ele).parent().parent().find('.game-score-td span').text();
+        if (g_test_score !== '') return;
+        let set_test_time = new Date(g_test_date.split('-')[0], g_test_date.split('-')[1],
+            g_test_date.split('-')[2], g_test_time.split(':')[0], g_test_time.split(':')[1]);
+        set_test_time = set_test_time.setMonth(set_test_time.getMonth() - 1);
+        if (current_local_time > set_test_time) {
+            $(ele).parent().parent().find('.game-state-td span').text('待更新结果');
+            $(ele).parent().parent().find('.game-state-td span').css('color', 'red');
+        } else {
+            $(ele).parent().parent().find('.game-state-td span').text('未开赛');
+            $(ele).parent().parent().find('.game-state-td span').css('color', 'black');
+        }
+    }
+
+    function game_table_save(table_type, ele) {
+        let game_data = table_all_validation(table_type);
+        if (!game_data) return;
+        let c_id = $('input[data-id="competition_id"]').attr('data-content');
+        let c_type = $('input[data-id="competition_type"]').attr('data-content');
+        let g_type = 1;
+        if (table_type === 1 && (c_type == '3' || c_type == '4')) g_type = 2;
+        else if (table_type === 2) g_type = 3;
+        if (g_type === 2) {
+            let is_error = auto_generate_games(false);
+            if (is_error) return;
+        }
+        console.log(game_data);
+        let data = {
+            g_type: g_type,
+            g_team_ids: team_group_ids,
+            g_team_group_names: defined_team_group_names,
+            games: JSON.stringify(game_data)
+        }
+        console.log(data);
+        // return;
+        $.ajax({
+            url: '/organizer/add-games/' + c_id,
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    $(ele).prop('disabled', true);
+                    setTimeout(function () {
+                        $(ele).prop('disabled', false);
+                    }, 3000);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+
+
+    // cell validations
+    function cell_group(text) {
+        let pattern_group = /[A-Za-z]/;
+        return (text.length > 1 || !pattern_group.test(text) || group_names.indexOf(text.toUpperCase()) === -1);
+    }
+
+    function cell_round(text) {
+        return (text === "" || !checkValidNumber(Number(text)));
+    }
+
+    function cell_non_round(text) {
+        return (text === "" || non_round_array.indexOf(text) === -1);
+    }
+
+    function cell_date(text) {
+        return (text === "" || !checkValidDate(text));
+    }
+
+    function cell_time(text) {
+        return (text === "" || !checkValidTime(text));
+    }
+
+    function cell_team(text) {
+        return (team_names.indexOf(text) === -1)
+    }
+
+    function cell_place(text) {
+        return (text === "");
+    }
+    function compare_string(text1, text2, compare_type) {
+        if (compare_type == 'D') {
+            let text1_val = (checkValidNumber(text1))?10000000000:parseInt(text1);
+            let text2_val = (checkValidNumber(text2))?10000000000:parseInt(text2);
+            return text1_val > text2_val;
+        } else {
+            return text1 > text2;
+        }
+
+    }
+</script>
+</body>
+</html>

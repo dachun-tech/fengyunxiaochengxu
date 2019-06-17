@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-organizer.css">
+<style>
+    .applies-counts label {
+        padding: 0 1%;
+    }
+</style>
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+    <% include ../partials/main-header.ejs %>
+    <div class="content-wrapper">
+        <div class="container">
+            <div style="padding: 5% 0 0 1%">
+                <h3 style="text-align: center"><%= competition.c_name %></h3>
+            </div>
+
+            <div class="box-body">
+                <div class="applies-counts">
+                    <label>报名俱乐部总数：<span><%= total_len %></span></label>
+                    <label>待审核：<span><%= pending_len %></span></label>
+                    <label>审核通过：<span><%= pass_len %></span></label>
+                    <label>审核不通过：<span><%= non_pass_len %></span></label>
+                    <% if (competition.c_state == 2 || competition.c_state == 6) { %>
+                        <button class="btn btn-primary" style="width: 200px; float: right" onclick="change_c_state(7, '<%= competition.id %>')">停止报名</button>
+                    <%} else if ([3, 4, 5, 7].indexOf(competition.c_state) !== -1) { %>
+                        <button class="btn btn-default" style="width: 200px; float: right" onclick="change_c_state(6, '<%= competition.id %>')">已停止报名，点击重新开启</button>
+                    <% } %>
+                </div>
+                <table class="table table-bordered organizer-tables" id="applying_table">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>俱乐部名称</th>
+                        <th>团体类型</th>
+                        <th>LOGO</th>
+                        <th>城市</th>
+                        <th>队长</th>
+                        <th>联系电话</th>
+                        <th>审核状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <!-- applies -->
+                    <tbody>
+                    <% for (let i = 0; i < applies.length; i++) { %>
+                        <tr id="<%= applies[i].id %>">
+                            <td><%= i + 1 %></td>
+                            <td><%= applies[i].team[0].t_full_name %></td>
+                            <td><%= applies[i].team[0].t_type %></td>
+                            <td class="td-logo">
+                                <img src="<%= applies[i].team[0].t_logo %>" /></td>
+                            <td><%= applies[i].team[0].t_city %></td>
+                            <td><%= applies[i].a_name %></td>
+                            <td><%= applies[i].a_phone %></td>
+                            <td><%= (applies[i].a_state === 1)?'待审核':(applies[i].a_state === 2)?'审核通过':'审核不通过' %></td>
+                            <td class="organizer-operation">
+                                <% if (applies[i].a_state === 1) { %>
+                                    <a href="/organizer/edit-applying/<%= applies[i].id %>">审核</a>
+                                <% } else if (applies[i].a_state === 2) { %>
+                                        <a href="/organizer/edit-applying/<%= applies[i].id %>">查看</a>
+                                        <a href="javascript:" onclick="delete_applying('<%= applies[i].id %>')">取消报名</a>
+                                    <% } else { %>
+                                        <a href="/organizer/edit-applying/<%= applies[i].id %>">查看</a>
+                                <% } %>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <% include ../partials/footer.ejs %>
+</div>
+
+<!-- Apply Cancel Modal -->
+<div id="apply_cancel_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="apply_cancel_row_id">
+                <h3 style="text-align: center">确定取消吗？</h3>
+                <p>若赛事还未开始，取消报名后，报名费将原路退回，若赛事已经开始，取消报名后，报名费用将不会返还。</p>
+            </div>
+            <div class="modal-footer">
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" onclick="apply_cancel_confirm()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<% include ../partials/foot.ejs %>
+<script>
+
+    function change_c_state(value, id) {
+        $.ajax({
+            url: '/common/change-competition-state',
+            method: 'POST',
+            data: {
+                id: id,
+                value: value,
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload()
+                    }, 2000);
+                } else showAlert(res.message);
+            }
+        })
+    }
+    function delete_applying(a_id) {
+        console.log("remove applying: ", a_id);
+        $('#apply_cancel_row_id').val(a_id);
+        $('#apply_cancel_modal').modal();
+    }
+    function apply_cancel_confirm() {
+        let a_id = $('#apply_cancel_row_id').val();
+        $.ajax({
+            url: '/organizer/cancel-applying',
+            method: 'post',
+            data: {
+                a_id: a_id
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    $('#apply_cancel_modal').modal('toggle');
+                    $('#applying_table tbody #' + a_id).remove();
+                } else showAlert(res.message);
+            }
+        });
+    }
+</script>
+</body>
+</html>

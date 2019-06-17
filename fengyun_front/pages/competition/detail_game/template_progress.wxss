@@ -1,0 +1,78 @@
+/** template progress **/
+
+.progress-section {
+    position: relative;
+    width: 100%;
+    background: white;
+    padding: 0;
+    margin: 0;
+}
+
+.top-button {
+    background: #df4848;
+    width: 100%;
+    height: 44rpx;
+    line-height: 44rpx;
+    font-size: 24rpx;
+    color: white;
+    text-align: center;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.progress-line {
+    position: absolute;
+    width: 50%;
+    height: calc(100% - 200rpx);
+    top: 100rpx;
+    border-right: 1px solid #d8d8d8;
+}
+
+.section-row {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 16rpx 0;
+}
+
+.section-row.item {
+    margin: 16rpx 0;
+}
+
+.section-row>view {
+    flex: 10%;
+    text-align: center;
+    align-self: center;
+    font-size: 24rpx;
+    color: #888888;
+}
+
+.section-row>view:first-child {
+    flex: 45%;
+    text-align: right;
+}
+
+.section-row>view:last-child {
+    flex: 45%;
+    text-align: left;
+}
+
+.section-row image {
+    width: 42rpx;
+    height: 38rpx;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 10rpx;
+}
+
+.info-item.time {
+    width: 50rpx;
+    height: 50rpx;
+    line-height: 50rpx;
+    color: white;
+    background: #333333;
+    border-radius: 50%;
+    display: inline-block;
+}

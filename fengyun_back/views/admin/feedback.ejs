@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-admin.css">
+
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+    <% include ../partials/header.ejs %>
+    <% include ../partials/side.ejs %>
+
+    <div class="content-wrapper">
+        <section class="content-header" style="padding-bottom: 2%">
+
+        </section>
+
+        <section class="content body">
+            <div class="container">
+                <div class="box-body">
+                    <div style="padding: 1%;">
+                        <a><button class="btn btn-info" style="min-width: 150px;" onclick="change_multi_state()">已读</button></a>
+                        <a><button class="btn btn-default" onclick="history.back()" style="min-width: 150px; float: right;">返回</button></a>
+                    </div>
+                    <table class="table table-bordered admin-tables" id="admin_feedback_table">
+                        <thead>
+                        <tr>
+                            <th class="place-select-box" style="width: 5%">
+                                <div class="round">
+                                    <input class="place-checkbox" type="checkbox" id="checkbox_all" onchange="select_all(this)"/>
+                                    <label for="checkbox_all"></label>
+                                </div>
+                            </th>
+                            <th style="width: 5%">序号</th>
+                            <th style="width: 20%">联系邮箱</th>
+                            <th style="width: 50%">内容</th>
+                            <th style="width: 15%">反馈时间</th>
+                            <th style="width: 5%">操作</th>
+                        </tr>
+                        </thead>
+                        <!-- feedback -->
+                        <tbody>
+                        <% for (let _i = 0; _i < feedbacks.length; _i++) { %>
+                            <tr>
+                                <td class="place-select-box">
+                                    <div class="round">
+                                        <input class="place-checkbox" data-id="<%= feedbacks[_i].id %>" data-ctrl-type="feedback_selector" type="checkbox" id="checkbox<%= _i %>"/>
+                                        <label for="checkbox<%= _i %>"></label>
+                                    </div>
+                                </td>
+                                <td><%= _i + 1 %></td>
+                                <td><%= feedbacks[_i].email %></td>
+                                <td><%= feedbacks[_i].content %></td>
+                                <td class="feedback-time"><%= feedbacks[_i].created_at %></td>
+                                <td>
+                                    <% if (feedbacks[_i].state === 1) { %>
+                                        <a href="javascript:" data-id="<%= feedbacks[_i].id %>" data-ctrl-type="feedbackBtns" onclick="change_feedback_state(this)">未读</a>
+                                    <% } else { %>
+                                        <span>已读</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                    <% if (pages > 0) { %>
+                        <ul class="pagination justify-content-center">
+                            <% if (current == 1) { %>
+                                <li class="page-item disabled"><a class="page-link">首页</a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="javascript:">首页</a></li>
+                            <% } %>
+                            <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+                            <% if (i !== 1) { %>
+                                <li class="page-item disabled"><a class="page-link">...</a></li>
+                            <% } %>
+                            <% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                                <% if (i == current) { %>
+                                    <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                                <% } else { %>
+                                    <li class="page-item"><a class="page-link" href="javascript:"><%= i %></a></li>
+                                <% } %>
+                                <% if (i == Number(current) + 2 && i < pages) { %>
+                                    <li class="page-item disabled"><a class="page-link">...</a></li>
+                                <% } %>
+                            <% } %>
+                            <% if (current == pages) { %>
+                                <li class="page-item disabled"><a class="page-link">尾页</a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="javascript:">尾页</a></li>
+                            <% } %>
+                        </ul>
+                    <% } %>
+                </div>
+            </div>
+        </section>
+    </div>
+
+</div>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    $(function () {
+        change_feedback_time();
+    });
+    function select_all(ele) {
+        let flag = $(ele).prop('checked');
+        $('input[data-ctrl-type="feedback_selector"]').each(function () {
+            if ($(this).prop('checked') !== flag) $(this).prop('checked', flag);
+        })
+    }
+    function change_feedback_time() {
+        $('.feedback-time').each(function () {
+            let num = $(this).text();
+            $(this).text(china_time(num));
+        });
+    }
+    function submit_feedback_state(ids) {
+        $.ajax({
+            url: '/admin/change-feedback-state',
+            method: 'post',
+            data: {
+                ids: ids
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    $('a[data-ctrl-type="feedbackBtns"]').each(function () {
+                        if (ids.indexOf($(this).attr('data-id')) >= 0) {
+                            $(this).parent().html('<span>已读</span>');
+                        }
+                    })
+                } else showAlert(res.message);
+            }
+        });
+    }
+    function change_feedback_state(ele) {
+        let ids = [];
+        let feedback_id = $(ele).attr('data-id');
+        ids.push(feedback_id);
+        submit_feedback_state(ids);
+    }
+    function change_multi_state() {
+        let ids = [];
+        $('input[data-ctrl-type="feedback_selector"]').each(function () {
+            if ($(this).prop('checked')) ids.push($(this).attr('data-id'));
+        })
+        if (ids.length === 0) {
+            showAlert("请选择");
+            return;
+        }
+        submit_feedback_state(ids);
+    }
+    function reload_table(cur_page) {
+        $.ajax({
+            url: '/common/pagination',
+            method: 'post',
+            data: {
+                table_name: 'feedback',
+                cur_page: cur_page
+            },
+            success: function (res) {
+                if (res.status === "success") {
+                    display_feedbacks(res.page_content, cur_page, page_rows, res.total_pages);
+                    custom_pagination(cur_page, res.total_pages);
+                    $('#checkbox_all').prop('checked', false);
+                } else {
+                    showAlert("Pagination is failed, please refresh page");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+    function display_feedbacks(feedbacks, current, page_rows, total_pages) {
+        $('#admin_feedback_table tbody tr').remove();
+        if (current === '首页') current = 1
+        else if (current === '尾页') current = total_pages
+        else current = parseInt(current);
+        let tbody_tags = "";
+        for (let index = 0; index < feedbacks.length; index++) {
+            tbody_tags += '<tr><td class="place-select-box"><div class="round"><input class="place-checkbox" data-id="'
+                + feedbacks[index].id + '"  data-ctrl-type="feedback_selector" type="checkbox" id="checkbox'
+                + index + '"/><label for="checkbox' + index + '"></label></div></td>';
+            tbody_tags += '<td>' + (index+page_rows*(current-1) + 1) + '</td>';
+            tbody_tags += '<td>' + feedbacks[index].email + '</td>';
+            tbody_tags += '<td>' + feedbacks[index].content + '</td>';
+            tbody_tags += '<td class="feedback-time">' + feedbacks[index].created_at + '</td>';
+            if (feedbacks[index].state === 1) tbody_tags += '<td><a href="javascript:" data-id="'
+                + feedbacks[index].id + '"  data-ctrl-type="feedbackBtns" onclick="change_feedback_state(this)">未读</a></td>';
+            else tbody_tags += '<td><span>已读</span></td>';
+        }
+        $("#admin_feedback_table tbody").append(tbody_tags);
+        change_feedback_time();
+    }
+</script>
+</body>
+</html>

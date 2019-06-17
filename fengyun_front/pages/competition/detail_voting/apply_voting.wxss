@@ -1,0 +1,130 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+@import "../../templates/fixedButtons/fixedButtons.wxss";
+@import "../../templates/shareImage/shareImage.wxss";
+
+/************** header view part *****************/
+
+page {
+    background: white;
+}
+
+.table-view {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    background: #f4f4f4;
+    padding: 0;
+}
+
+.voting-section {
+    position: relative;
+    width: 100%;
+    padding: 0;
+}
+
+.section-bg {
+    width: 100%;
+    height: 380rpx;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.section-bg image {
+    width: 100%;
+    height: 100%;
+}
+
+.section-description {
+    background: white;
+    height: 222rpx;
+    padding: 96rpx 0 0;
+    width: 100%;
+    text-align: center;
+    color: #333;
+    font-size: 26rpx;
+    line-height: 48rpx;
+}
+
+.section-info {
+    position: absolute;
+    z-index: 10;
+    left: 305rpx;
+    top: 310rpx;
+    width: 140rpx;
+    height: 140rpx;
+    border-radius: 50%;
+    background: #f4f4f4;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-info>image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.voting-info {
+    width: 100%;
+    height: 120rpx;
+    display: flex;
+    background: transparent;
+    justify-content: center;
+    align-items: center;
+}
+
+.voting-info>view {
+    position: relative;
+    flex: 25%;
+}
+
+.voting-info>view>view {
+    width: 100%;
+    font-size: 26rpx;
+    text-align: center;
+    height: 44rpx;
+}
+
+.voting-buttons {
+    width: 100%;
+    text-align: center;
+    background: white;
+    padding: 320rpx 0 30rpx;
+}
+
+.voting-buttons button {
+    display: inline-block;
+    width: 240rpx;
+    height: 74rpx;
+    line-height: 74rpx;
+    font-size: 30rpx;
+    text-align: center;
+    background: #6cab3b;
+    color: white;
+    margin: 0 30rpx;
+}
+
+.voting-buttons button.disabled {
+    background: #ccc;
+}
+
+.voting-notify {
+    position: fixed;
+    width: 500rpx;
+    height: 70rpx;
+    line-height: 70rpx;
+    left: 128rpx;
+    bottom: 214rpx;
+    background: black;
+    color: white;
+    font-size: 26rpx;
+    opacity: 0.7;
+    text-align: center;
+    border-radius: 12rpx;
+    z-index: 2;
+}

@@ -1,0 +1,50 @@
+<!-- template-introduction -->
+<template name="template-progress">
+    <view class="progress-section" wx:if="{{allItems.game.g_stream!=''}}">
+        <navigator class="top-button" bindtap="onclick_button" data-type="viewSite" data-value="{{allItems.game.g_stream}}">
+            比赛正在直播，请点击查看
+        </navigator>
+    </view>
+    <view class="progress-section">
+        <view class="progress-line"></view>
+        <view class="section-row" style="padding-bottom: 0;">
+            <view></view>
+            <view style="flex: 40%;">比赛开始</view>
+            <view></view>
+        </view>
+        <view class="section-row item" wx:for="{{allItems.game.g_situation}}" wx:key="index">
+            <view>
+                <block wx:if="{{item[5]==allItems.game.g_team1}}">
+                    <view wx:for="{{item[4]}}" wx:key="idx" wx:for-item="situation" wx:for-index="idx">
+                        {{situation}}
+                        <image mode="aspectFit" src="{{item[6][idx]}}"></image>
+                    </view>
+                </block>
+            </view>
+            <view>
+                <view class="info-item time">{{item[1]}}</view>
+            </view>
+            <view>
+                <block wx:if="{{item[5]==allItems.game.g_team2}}">
+                    <view wx:for="{{item[4]}}" wx:key="idx" wx:for-item="situation" wx:for-index="idx">
+                        <image mode="aspectFit" src="{{item[6][idx]}}"></image>
+                        {{situation}}
+                    </view>
+                </block>
+                <!-- <view wx:if="{{item[5]==allItems.game.g_team2}}">
+                    <image mode="aspectFit" src="{{item[6]}}"></image>
+                    {{item[4]}}
+                </view> -->
+                <!-- <view wx:if="{{index==8}}">
+                    <image mode="aspectFit" src="{{item[6]}}"></image>
+                    {{item[4]}}
+                </view> -->
+            </view>
+        </view>
+        <view class="section-row" style="padding-top: 0;">
+            <view></view>
+            <view style="flex: 40%;">比赛结束</view>
+            <view></view>
+        </view>
+    </view>
+</template>

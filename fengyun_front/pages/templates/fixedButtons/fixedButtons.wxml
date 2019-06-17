@@ -1,0 +1,11 @@
+<template name="template-fixedButtons">   
+    <button bindtap="onclick_button" data-type="go2Home" class="fixed_button {{(is3IconExist==0)?'share':''}}" wx:if="{{is3IconExist>=0}}">
+        <image mode="aspectFit" src="../../../images/homepage@2x.png"></image>
+    </button>
+    <button open-type="share" class="fixed_button {{(is3IconExist==0)?'download':'share'}}" wx:if="{{is3IconExist>=0}}">
+        <image mode="aspectFit" src="../../../images/share@2x.png"></image>
+    </button>
+    <button bindtap="onclick_button" data-type="saveShareImage" class="fixed_button download" wx:if="{{is3IconExist>0}}">
+        <image mode="aspectFit" src="../../../images/save01@2x.png"></image>
+    </button>
+</template>

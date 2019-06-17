@@ -1,0 +1,25 @@
+<tbody>
+<% for (let i = 0; i < 2; i++) { %>
+    <tr>
+        <td class="game-index-td"><%= i+1 %></td>
+        <% if (competition.c_type == 3 || competition.c_type == 4) { %>
+            <td class="game-group-td" ondblclick="td_edit(this)"><span></span><input class="game-group-input" style="display: none" onblur="td_disable(this)"></td>
+        <% } %>
+        <td class="game-round-td" ondblclick="td_edit(this)"><span></span><input class="game-round-input" style="display: none" onblur="td_disable(this)"></td>
+        <td class="game-date-td" ondblclick="td_edit(this)"><span></span><input class="game-date-input datepicker" style="display: none" onblur="td_disable(this)"></td>
+        <td class="game-time-td" ondblclick="td_edit(this)"><span></span><input class="game-time-input" style="display: none" onblur="td_disable(this)"></td>
+        <td class="game-team1-td" ondblclick="td_edit(this)"><span></span><input class="game-team1-input" style="display: none" onblur="td_disable(this)"></td>
+        <td class="game-score-td" id="score_<%= i %>" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>
+        <td class="game-team2-td" ondblclick="td_edit(this)"><span></span><input class="game-team2-input" style="display: none" onblur="td_disable(this)"></td>
+        <td class="game-place-td" ondblclick="td_edit(this)"><span></span><input class="game-place-input" style="display: none" onblur="td_disable(this)"></td>
+        <td class="game-structure-td" id="structure_<%= i %>" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>
+        <td class="game-situation-td" id="situation_<%= i %>" ondblclick="td_edit(this)"><span></span><input type="hidden"></td>
+        <td class="game-state-td"><span></span></td>
+        <td class="organizer-operation">
+            <input type="hidden" class="game-stream-value" id="stream_url_<%= i %>">
+            <a href="javascript:" class="game-stream" id="stream_<%= i %>" onclick="set_stream_click(this)"><span style="word-break: keep-all">直播设置</span></a>
+            <a href="javascript:" class="game-delete" id="game_delete_<%= i %>" onclick="game_delete_click(this)"><span style="word-break: keep-all">删除</span></a>
+        </td>
+    </tr>
+<%} %>
+</tbody>

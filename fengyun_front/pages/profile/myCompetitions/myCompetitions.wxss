@@ -1,0 +1,177 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+
+/************* fixed authorize button **************/
+
+.fixed_button {
+    position: fixed;
+    bottom: 40rpx;
+    left: 622rpx;
+    width: 88rpx;
+    height: 88rpx;
+    line-height: 38rpx;
+    padding-top: 4rpx;
+    background: #EF641C;
+    color: white;
+    border-radius: 12rpx;
+    -webkit-border-radius: 12rpx;
+    -moz-border-radius: 12rpx;
+    -ms-border-radius: 12rpx;
+    -o-border-radius: 12rpx;
+    z-index: 10;
+    text-align: center;
+    font-size: 28rpx;
+}
+
+
+/*********** top menu part *************/
+
+.index_top_view {
+    position: relative;
+    background: white;
+    width: 100%;
+    height: 88rpx;
+    padding: 20rpx 0;
+    z-index: 7;
+    display: flex;
+    margin-bottom: 20rpx;
+}
+
+.menu-item {
+    flex: 30%;
+    font-size: 28rpx;
+    font-weight: bold;
+    text-align: center;
+    border-right: 1px solid #d8d8d8;
+    color: #333333;
+}
+
+.menu-item:last-child {
+    border: none;
+}
+
+.menu-item.selected {
+    color: #6cab3b;
+}
+
+
+/*********** competition item part ************/
+
+.table-view {
+    position: relative;
+    width: 100%;
+    background: #f4f4f4;
+}
+
+.item-container {
+    position: relative;
+    background: white;
+    width: 100%;
+    height: 240rpx;
+    margin-bottom: 20rpx;
+}
+
+.item-status-icon {
+    position: absolute;
+    left: 0;
+    top: 20rpx;
+    width: 90rpx;
+    height: 38rpx;
+    line-height: 38rpx;
+    background: #489CE5;
+    color: white;
+    font-size: 24rpx;
+    padding-left: 20rpx;
+    border-top-right-radius: 12rpx;
+    border-bottom-right-radius: 12rpx;
+}
+
+image.item-image {
+    position: absolute;
+    left: 30rpx;
+    top: 30rpx;
+    width: 180rpx;
+    height: 180rpx;
+}
+
+.item-content {
+    position: relative;
+    padding: 30rpx 0 0;
+    padding-left: 230rpx;
+    width: 750rpx;
+}
+
+.item-title {
+    width: 490rpx;
+    font-size: 30rpx;
+    line-height: 46rpx;
+    font-weight: bold;
+}
+
+.item-info {
+    padding: 6rpx 0;
+    font-size: 24rpx;
+    display: flex;
+    justify-content: center;
+}
+
+.item-info-cell {
+    align-self: flex-start;
+    flex: auto;
+    padding-right: 20rpx;
+}
+
+.item-info-cell.right {
+    align-self: flex-end;
+    text-align: right;
+}
+
+image.info-icon {
+    width: 32rpx;
+    height: 32rpx;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10rpx;
+}
+
+image.info-icon.location {
+    width: 26rpx;
+}
+
+.info-type {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.item-info-cell.text {
+    width: 100rpx;
+    height: 38rpx;
+    line-height: 38rpx;
+    background: #e6b53c;
+    border-top-left-radius: 12rpx;
+    border-bottom-left-radius: 12rpx;
+    color: white;
+    text-align: center;
+    padding: 0;
+    border: none;
+}
+
+.item-info-cell.text.status1 {
+    background: #e6b53c;
+}
+
+.item-info-cell.text.status2 {
+    background: white;
+    border: 1px solid #6cab3b;
+    border-right: none;
+    color: #6cab3b;
+}
+
+.item-info-cell.text.status3 {
+    background: #6cab3b;
+}
+
+.item-info-cell.text.status4 {
+    background: #ccc;
+}

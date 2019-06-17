@@ -1,0 +1,91 @@
+{
+    "pages": [
+
+        "pages/competition/index/index",
+        "pages/competition/news/news",
+        "pages/competition/detail_competition/detail_competition",
+        "pages/competition/detail_advertise/detail_advertise",
+        "pages/competition/detail_voting/detail_voting",
+        "pages/competition/detail_voting/apply_voting",
+        "pages/competition/perform_apply/perform_apply",
+        "pages/competition/perform_apply/perform_result",
+
+        "pages/team/index/index",
+        "pages/team/cities/cities",
+        "pages/team/mine_team/mine_team",
+        "pages/team/detail_team/detail_team",
+        "pages/competition/detail_game/detail_game",
+        "pages/team/edit_member/edit_member",
+        "pages/team/detail_member/detail_member",
+
+        "pages/other/other",
+        "pages/other/view_site",
+
+        "pages/profile/index/index",
+        "pages/profile/myCompetitions/myCompetitions",
+        "pages/profile/myTeams/myTeams",
+        "pages/profile/favorites/favorites",
+        "pages/profile/wallet/wallet",
+        "pages/profile/wallet/transactions/transactions",
+        "pages/profile/wallet/withdraw/withdraw",
+        "pages/profile/wallet/withdraw_history/withdraw_history",
+        "pages/profile/identify/identify",
+        "pages/profile/identify/identify_input",
+        "pages/profile/identify/identify_result",
+        "pages/profile/contact/contact",
+
+        "pages/templates/cropper/upload-image",
+        "pages/templates/getUserInfoModal/getUserInfoModal"
+    ],
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "white",
+        "navigationBarTitleText": "蜂云赛事",
+        "navigationBarTextStyle": "black"
+    },
+    "tabBar": {
+        "backgroundColor": "#FBFBFB",
+        "borderStyle": "white",
+        "color": "#888888",
+        "selectedColor": "#472e00",
+        "list": [{
+                "pagePath": "pages/competition/index/index",
+                "text": "赛事",
+                "iconPath": "images/Competition_n@2x.png",
+                "selectedIconPath": "images/Competition_s@2x.png"
+            },
+            {
+                "pagePath": "pages/team/index/index",
+                "text": "球队",
+                "iconPath": "images/Group_n@2x.png",
+                "selectedIconPath": "images/Group_s@2x.png"
+            },
+            {
+                "pagePath": "pages/other/other",
+                "text": "去订场",
+                "iconPath": "images/Book_n@2x.png",
+                "selectedIconPath": "images/Book_s@2x.png"
+            },
+            {
+                "pagePath": "pages/profile/index/index",
+                "text": "我的",
+                "iconPath": "images/my_n@2x.png",
+                "selectedIconPath": "images/my_s@2x.png"
+            }
+        ]
+    },
+    "networkTimeout": {
+        "request": 20000,
+        "downloadFile": 20000
+    },
+    "permission": {
+        "scope.userLocation": {
+            "desc": "要正常使用此小程序，您需要允许用户位置获取权限"
+        }
+    },
+    "debug": false,
+    "navigateToMiniProgramAppIdList": [
+        "wxea381fb0ca7c2a24"
+    ],
+    "sitemapLocation": "sitemap.json"
+}

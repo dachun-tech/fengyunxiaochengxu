@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" type="text/css" href="/assets/main/css/custom-admin.css">
+
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+    <% include ../partials/header.ejs %>
+    <% include ../partials/side.ejs %>
+
+    <div class="content-wrapper">
+        <section class="content-header" style="padding-bottom: 2%">
+            <div class="admin-header1">
+                <a href="/admin-competition"><button class="btn btn-info">赛事列表</button></a>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="admin-header2"><a href="/admin-organizer"><button class="btn btn-default btn-lg">主办方</button></a></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="admin-header2"><a href="/admin-team"><button class="btn btn-default btn-lg">球队</button></a></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="admin-header2"><button class="btn btn-info btn-lg">所有用户</button></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content body">
+            <div class="admin-filter">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div style="text-align: right">
+                                <select id="user_filter1">
+                                    <option value="nickname">昵称</option>
+                                    <option value="name">姓名</option>
+                                    <option value="phone">手机号码</option>
+                                </select>
+                                <input type="text" id="user_filter_value" placeholder="请输入">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="text-align: center">
+                                <select id="user_filter2">
+                                    <option value="0">禁用状态</option>
+                                    <option value="1">未禁用</option>
+                                    <option value="2">已禁用</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div style="text-align: left">
+                                <button class="btn btn-info btn-sm" style="width: 100px" onclick="reload_table(1)">查询</button>
+                                <button class="btn btn-info btn-sm" style="width: 100px" onclick="exportTable('所有用户')">导出</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end of container -->
+            </div>
+            <div class="container">
+                <div class="box-body">
+                    <table class="table table-bordered admin-tables" id="admin_user_table">
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>头像</th>
+                            <th>昵称</th>
+                            <th>禁用状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <!-- users -->
+                        <tbody>
+                        <% for (let _i = 0; _i < users.length; _i++) { %>
+                            <tr>
+                                <td><%= _i + 1 %></td>
+                                <td class="table-avatar">
+                                    <% if (users[_i].avatar === '') { %>
+                                        <img src="/assets/main/images/logo.png">
+                                    <% } else { %>
+                                        <img src="<%= users[_i].avatar %>">
+                                    <% } %>
+                                </td>
+                                <td><%= users[_i].nickname %></td>
+                                <td><%= (users[_i].disabledState)?'已禁用':'未禁用'; %></td>
+                                <td>
+                                    <span class="operator-user">
+                                        <% if (users[_i].disabledState) { %>
+                                            <a href="javascript:" onclick="disable_user(false, '<%= users[_i].id %>')">启用</a>
+                                        <% } else { %>
+                                            <a href="javascript:" onclick="disable_user(true, '<%= users[_i].id %>')">禁用</a>
+                                        <% } %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                    <% if (pages > 0) { %>
+                        <ul class="pagination justify-content-center">
+                            <% if (current == 1) { %>
+                                <li class="page-item disabled"><a class="page-link">首页</a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="javascript:">首页</a></li>
+                            <% } %>
+                            <% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+                            <% if (i !== 1) { %>
+                                <li class="page-item disabled"><a class="page-link">...</a></li>
+                            <% } %>
+                            <% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+                                <% if (i == current) { %>
+                                    <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                                <% } else { %>
+                                    <li class="page-item"><a class="page-link" href="javascript:"><%= i %></a></li>
+                                <% } %>
+                                <% if (i == Number(current) + 2 && i < pages) { %>
+                                    <li class="page-item disabled"><a class="page-link">...</a></li>
+                                <% } %>
+                            <% } %>
+                            <% if (current == pages) { %>
+                                <li class="page-item disabled"><a class="page-link">尾页</a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="javascript:">尾页</a></li>
+                            <% } %>
+                        </ul>
+                    <% } %>
+                </div>
+            </div>
+
+        </section>
+    </div>
+</div>
+<!-- modals -->
+<!-- disable operation -->
+<div class="modal fade" id="disable-user-modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="disable-user-modal-id">
+                <input type="hidden" id="disable-user-modal-flag">
+                <h3 style="text-align: center"></h3>
+                <div class="identify-modal-row">
+                    <div class="identify-modal-btn">
+                        <button type="button" class="btn btn-info" id="disable-user-success" onclick="disable_user_success()">确定</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    function disable_user(flag, id) {
+        console.log(flag, id)
+        let flag_str = 'true';
+        if (flag) {
+            $('#disable-user-modal .modal-header h4').html('禁用');
+            $('#disable-user-modal .modal-body h3').html('确定要禁用?');
+        } else {
+            $('#disable-user-modal .modal-header h4').html('启用');
+            $('#disable-user-modal .modal-body h3').html('确定要启用?');
+            flag_str = 'false';
+        }
+        $('#disable-user-modal-id').val(id);
+        $('#disable-user-modal-flag').val(flag_str);
+        $('#disable-user-modal').modal();
+    }
+    function disable_user_success() {
+        let account_id = $('#disable-user-modal-id').val();
+        let flag = $('#disable-user-modal-flag').val();
+        console.log(account_id, flag);
+        $('#disable-user-modal').modal('toggle');
+        $.ajax({
+            url: '/admin-user-disable',
+            method: 'POST',
+            data: {
+                account_id: account_id,
+                flag: flag
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload()
+                    }, 2000)
+                } else {
+                    showAlert(res.message)
+                }
+            }
+        })
+    }
+    function reload_table(cur_page) {
+        let user_filter1 = $('#user_filter1').val();
+        let user_filter1_value = $('#user_filter_value').val();
+        let user_filter2 = $('#user_filter2').val();
+        let data = {
+            table_name: 'user',
+            user_filter1: user_filter1,
+            user_filter1_value: user_filter1_value,
+            user_filter2: user_filter2,
+            cur_page: cur_page
+        };
+        console.log(data);
+        $.ajax({
+            url: '/common/search-and-pagination',
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    display_users(res.search_result, cur_page, res.page_rows, res.total_pages);
+                    custom_pagination(cur_page, res.total_pages);
+                } else {
+                    showAlert(res.message);
+                }
+            }
+        })
+    }
+    function display_users(users, current, page_rows, total_pages) {
+        $('#admin_user_table tbody tr').remove();
+        if (current === '首页') current = 1
+        else if (current === '尾页') current = total_pages
+        else current = parseInt(current);
+        let tbody_tags = "";
+        for (let index = 0; index < users.length; index++) {
+            tbody_tags += '<tr><td>' + (index+page_rows*(current-1) + 1) + '</td>';
+            tbody_tags += '<td class="table-avatar"><img src="' + users[index].avatar + '"></td>';
+            tbody_tags += '<td>' + users[index].nickname + '</td>';
+            if (users[index].disabledState) tbody_tags += '<td>已禁用</td>';
+            else tbody_tags += '<td>未禁用</td>';
+            if (users[index].disabledState) {
+                tbody_tags += '<td><span class="operator-user"><a href="javascript:" onclick="disable_user('
+                    + false + ', \'' + users[index].id + '\')">启用</a></span></td></tr>';
+            } else {
+                tbody_tags += '<td><span class="operator-user"><a href="javascript:" onclick="disable_user('
+                    + true + ', \'' + users[index].id + '\')">禁用</a></span></td></tr>';
+            }
+        }
+        $("#admin_user_table tbody").append(tbody_tags);
+    }
+</script>
+</body>
+</html>

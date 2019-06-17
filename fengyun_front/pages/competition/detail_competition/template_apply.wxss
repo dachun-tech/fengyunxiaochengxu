@@ -1,0 +1,79 @@
+/** template introduction **/
+
+.apply-section {
+    width: 100%;
+    margin-bottom: 20rpx;
+    background: white;
+    padding: 15rpx 0;
+}
+
+.apply-section .section-title {
+    width: 690rpx;
+    height: 42rpx;
+    padding: 0 12rpx;
+    margin: 20rpx 0 56rpx 30rpx;
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333333;
+    border-left: 8rpx solid #6cab3b;
+}
+
+.section-title view {
+    display: inline-block;
+    font-weight: 400;
+    font-size: 26rpx;
+    width: 500rpx;
+    margin-left: 20rpx;
+}
+
+.apply-button {
+    width: 100%;
+    padding: 0 12rpx;
+    margin: 70rpx 0 30rpx;
+    text-align: center;
+}
+
+.apply-button button {
+    width: 600rpx;
+    height: 80rpx;
+    line-height: 80rpx;
+    font-size: 32rpx;
+    font-weight: bold;
+    background: #6cab3b;
+    border-radius: 12rpx;
+    color: white;
+}
+
+.apply-info {
+    padding: 0 30rpx;
+    height: 88rpx;
+    line-height: 88rpx;
+    font-size: 24rpx;
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.apply-info:last-child {
+    border: none;
+}
+
+.apply-info-cell {
+    align-self: flex-start;
+    flex: auto;
+    padding-right: 20rpx;
+}
+
+.apply-info-cell image.info-icon {
+    width: 50rpx;
+    height: 50rpx;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 20rpx;
+}
+
+.info-type {
+    display: inline-block;
+    vertical-align: middle;
+}

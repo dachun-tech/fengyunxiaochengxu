@@ -1,0 +1,51 @@
+/** competition / index / index.wxss **/
+
+@import "../../templates/getUserInfoModal/getUserInfoModal.wxss";
+@import "../../templates/fixedButtons/fixedButtons.wxss";
+@import "../../../wxParse/wxParse.wxss";
+
+/************** bottom view part *****************/
+
+.table-view {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    background: #f4f4f4;
+    padding: 0;
+}
+
+.intro-section {
+    width: 100%;
+    background: white;
+    padding: 15rpx 0;
+}
+
+.section-title {
+    width: 690rpx;
+    height: 42rpx;
+    padding: 0 12rpx;
+    margin: 15rpx 0 30rpx 30rpx;
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333333;
+}
+
+.intro-author {
+    padding: 0 30rpx;
+    line-height: 44rpx;
+    font-size: 24rpx;
+    width: 100%;
+    padding: 0 30rpx;
+    margin: 0;
+    color: #888888;
+}
+
+.intro-description {
+    padding: 0 30rpx;
+    /* line-height: 44rpx; */
+    font-size: 26rpx;
+    width: 100%;
+    padding: 0 30rpx;
+    margin: 50rpx 0;
+    text-align: justify;
+}
